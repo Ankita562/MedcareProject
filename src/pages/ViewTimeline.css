@@ -1,0 +1,113 @@
+/* ================================
+   View Timeline Page (Dark + Light)
+================================== */
+
+.timeline-page-container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Light Mode */
+.light .timeline-page-container {
+  background: linear-gradient(180deg, #f9faff 0%, #eef1ff 100%);
+  color: #2c2c2c;
+}
+
+/* Dark Mode */
+.dark .timeline-page-container {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  color: #eaeaea;
+}
+
+/* Page Header */
+.timeline-page-container h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--heading-color, #4a4a9c);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted, #555);
+  margin-bottom: 2rem;
+}
+
+/* Timeline */
+.timeline-container {
+  position: relative;
+  width: 90%;
+  max-width: 700px;
+  margin-top: 20px;
+}
+
+.timeline-container::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  width: 3px;
+  height: 100%;
+  background: #a777e3;
+  opacity: 0.6;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.8rem;
+  position: relative;
+  padding-left: 3rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 8px;
+  top: 0;
+  font-size: 1.6rem;
+}
+
+.timeline-content {
+  background: var(--card-bg, #fff);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow, 0 8px 20px rgba(0, 0, 0, 0.08));
+  width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.timeline-content:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(110, 142, 251, 0.3);
+}
+
+.timeline-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  color: var(--heading-color, #4a4a9c);
+}
+
+.event-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted, #666);
+  margin-bottom: 0.5rem;
+}
+
+.event-date {
+  font-size: 0.85rem;
+  color: #888;
+  text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timeline-container {
+    width: 100%;
+  }
+  .timeline-content {
+    padding: 0.9rem 1rem;
+  }
+}

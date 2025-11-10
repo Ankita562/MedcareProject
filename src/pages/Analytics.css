@@ -1,0 +1,120 @@
+/* ===============================
+   Analytics Page
+   Light + Dark Mode
+   =============================== */
+
+.analytics-page-container {
+  min-height: 100vh;
+  padding: 3rem 5%;
+  font-family: "Inter", sans-serif;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* ===== Light Mode ===== */
+.light .analytics-page-container {
+  background: linear-gradient(180deg, #f9faff 0%, #eef1ff 100%);
+  color: #2c2c2c;
+}
+
+/* ===== Dark Mode ===== */
+.dark .analytics-page-container {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  color: #eaeaea;
+}
+
+/* ===== Headings ===== */
+.analytics-page-container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* ===== Summary Cards ===== */
+.summary-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.summary-card {
+  flex: 1 1 240px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+}
+
+.summary-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+  color: var(--heading-color);
+}
+
+.summary-card p {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.summary-card.adherence {
+  border-top: 4px solid #6e8efb;
+}
+.summary-card.total-meds {
+  border-top: 4px solid #a777e3;
+}
+.summary-card.missed {
+  border-top: 4px solid #f78fb3;
+}
+
+/* ===== Charts ===== */
+.charts-container {
+  display: grid;
+  gap: 2rem;
+}
+
+.chart-box {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--card-shadow);
+}
+
+.chart-box h2 {
+  font-size: 1.3rem;
+  color: var(--heading-color);
+  margin-bottom: 1rem;
+}
+
+/* ===== Theme Variables ===== */
+.light {
+  --card-bg: #ffffff;
+  --card-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  --heading-color: #3b3b3b;
+  --text-muted: #555;
+}
+
+.dark {
+  --card-bg: #20263a;
+  --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  --heading-color: #d0d4ff;
+  --text-muted: #aaa;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .summary-cards {
+    flex-direction: column;
+  }
+}

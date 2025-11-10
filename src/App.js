@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Components
+// 🧭 Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-// Pages
+// 🩺 Pages
 import Auth from "./pages/Auth";
 import PatientDetailsForm from "./pages/PatientDetailsForm";
 import AppointmentChoice from "./pages/AppointmentChoice";
@@ -19,13 +19,13 @@ import ScanReport from "./pages/ScanReport";
 import MedicalReports from "./pages/MedicalReports";
 import ViewTimeline from "./pages/ViewTimeline";
 import Analytics from "./pages/Analytics";
-// ❌ You said you don’t want “Find Doctors” in dashboard, so we exclude it
+import FindDoctors from "./pages/FindDoctors"; // ✅ make sure this file exists
 
-// Data + API (✅ corrected paths)
+// 🧠 Data + API
 import { fakePatientDetails } from "./data/fakeData";
 import { api } from "./api";
 
-// Global styles
+// 🎨 Styles
 import "./App.css";
 
 function App() {
@@ -39,7 +39,7 @@ function App() {
 
   // ------------------ EFFECTS ------------------
 
-  // ✅ Load login state on mount
+  // ✅ Load login state
   useEffect(() => {
     setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
   }, []);
@@ -49,7 +49,7 @@ function App() {
     localStorage.setItem("isLoggedIn", isLoggedIn);
   }, [isLoggedIn]);
 
-  // ✅ Manage dark/light mode on body
+  // ✅ Manage dark/light mode
   useEffect(() => {
     document.body.classList.toggle("dark", darkMode);
     document.body.classList.toggle("light", !darkMode);
@@ -88,7 +88,7 @@ function App() {
             }
           />
 
-          {/* 🔐 Authentication */}
+          {/* 🔐 Auth */}
           <Route
             path="/login"
             element={<Auth onLogin={() => setIsLoggedIn(true)} />}
@@ -110,7 +110,7 @@ function App() {
             }
           />
 
-          {/* 💬 Next Step → Appointment Choice */}
+          {/* 💬 Appointment Choice */}
           <Route
             path="/next-step"
             element={
@@ -134,7 +134,7 @@ function App() {
             }
           />
 
-          {/* 💊 Medicine Management */}
+          {/* 💊 Add/Edit Medicine */}
           <Route
             path="/medicines/new"
             element={
@@ -176,7 +176,7 @@ function App() {
             }
           />
 
-          {/* 🧾 Medical Modules */}
+          {/* 🧾 Medical History / Reports */}
           <Route
             path="/medical-history"
             element={
@@ -206,6 +206,12 @@ function App() {
                 <Navigate to="/login" replace />
               )
             }
+          />
+
+          {/* 👨‍⚕️ Find Doctors */}
+          <Route
+            path="/doctors"
+            element={isLoggedIn ? <FindDoctors /> : <Navigate to="/login" replace />}
           />
 
           {/* 🚫 Fallback */}

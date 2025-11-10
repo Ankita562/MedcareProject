@@ -1,0 +1,129 @@
+/* ================================
+   Find Doctors Page (Dark + Light)
+================================== */
+
+.find-doctors-page {
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Light Mode */
+.light .find-doctors-page {
+  background: linear-gradient(180deg, #f9faff 0%, #eef1ff 100%);
+  color: #2c2c2c;
+}
+
+/* Dark Mode */
+.dark .find-doctors-page {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  color: #eaeaea;
+}
+
+.find-doctors-page h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #777;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* ===== Search Bar ===== */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.search-bar input {
+  padding: 12px 18px;
+  width: 300px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 1rem;
+}
+
+.search-bar input:focus {
+  border-color: #6e8efb;
+}
+
+.search-btn {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(110, 142, 251, 0.3);
+}
+
+/* ===== Doctor Cards ===== */
+.doctor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.doctor-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow, 0 8px 20px rgba(0, 0, 0, 0.08));
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.doctor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(110, 142, 251, 0.3);
+}
+
+.doctor-card h3 {
+  font-size: 1.2rem;
+  color: var(--heading-color, #4a4a9c);
+  margin-bottom: 0.5rem;
+}
+
+.doctor-card p {
+  font-size: 0.95rem;
+  color: var(--text-muted, #555);
+  margin: 3px 0;
+}
+
+.contact-btn {
+  margin-top: 1rem;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(110, 142, 251, 0.3);
+}
+
+.no-results {
+  font-size: 1rem;
+  color: #777;
+  margin-top: 2rem;
+}
