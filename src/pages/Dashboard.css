@@ -1,171 +1,231 @@
-/* ================================================
-   ❤️ MedCare Dashboard – Refined Minimal Layout
-   Clean, calm red × pastel pink theme
-   ================================================ */
+/* ==============================
+   ❤️ MedCare Dashboard Template
+   Responsive + Interactive
+   ============================== */
 
 .dashboard-page {
-  background: linear-gradient(180deg, #fff8fa, #ffeef2);
-  min-height: 100vh;
-  font-family: "Poppins", sans-serif;
-  color: #2b1b1d;
-  padding: 2rem 3rem;
-  transition: background 0.3s ease, color 0.3s ease;
+  padding: 2rem;
+  background: var(--bg-color);
+  transition: background 0.4s, color 0.4s;
 }
 
-/* Section Wrapper */
 .section {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.1);
-  padding: 2rem;
   margin-bottom: 2rem;
 }
 
-/* Section Titles */
-.section h2 {
-  color: #ff6b6b;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  font-size: 1.4rem;
+/* PATIENT CARD */
+.patient-card {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Patient Info Section */
-.patient-info p {
-  margin: 0.3rem 0;
-  font-size: 1rem;
-  color: #444;
+.patient-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.2);
 }
 
-/* Alerts Section */
-.alerts {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.alert {
-  background: #fff0f3;
-  border-left: 4px solid #ff6b6b;
-  padding: 0.9rem 1rem;
-  border-radius: 10px;
-  color: #2b1b1d;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.alert.urgent {
-  border-left-color: #ff9800;
-  background: #fff8e1;
-}
-
-/* Medicines Section */
-.medicine-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.2rem;
-  margin-top: 1.5rem;
-}
-
-.medicine-card {
-  background: #fff;
-  border: 1px solid #ffdce5;
-  border-radius: 14px;
-  padding: 1.2rem;
-  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.medicine-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(255, 107, 107, 0.15);
-}
-
-.medicine-card h3 {
-  color: #a02a43;
-  font-size: 1.1rem;
+.patient-header h2 {
+  color: var(--accent-color);
   margin-bottom: 0.5rem;
 }
 
-.medicine-card .dosage {
-  background: #ffebef;
-  color: #a02a43;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 0.85rem;
+.subtext {
+  color: var(--muted-text);
+  font-size: 0.95rem;
+}
+
+/* ALERTS */
+.alerts-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.alert-card {
+  background: #fff0f3;
+  padding: 1rem;
+  border-left: 4px solid var(--accent-color);
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+
+.alert-card:hover {
+  transform: translateX(5px);
+}
+ /* ===============================
+   🚨 Health Alerts – Light Mode
+   =============================== */
+.alerts-section h2 {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.alerts-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.alert-card {
+  background: #fff0f3; /* light pink base */
+  padding: 1rem 1.2rem;
+  border-left: 4px solid var(--accent-color);
+  border-radius: 10px;
+  color: #2b1b1d; /* readable dark text */
+  transition: all 0.3s ease;
+}
+
+.alert-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 14px rgba(255, 107, 107, 0.15);
+}
+
+/* ===============================
+   🌙 Health Alerts – Dark Mode Fix
+   =============================== */
+body.dark .alert-card {
+  background: #3a1f26; /* deeper muted rose background */
+  border-left-color: #ff8a80; /* soft glowing coral */
+  color: #ffe9ef; /* readable text on dark bg */
+  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.15);
+}
+
+body.dark .alert-card:hover {
+  background: #4b242e; /* slightly lighter on hover */
+  box-shadow: 0 8px 20px rgba(255, 182, 193, 0.25);
+  transform: translateX(5px);
+}
+
+
+/* MEDICINES SECTION */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ffb6c1);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.add-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* Template Grid */
+.medicine-template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.medicine-template-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.medicine-template-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.2);
+}
+
+.medicine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dose {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.medicine-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.edit-btn {
+  color: var(--accent-color);
+  text-decoration: none;
   font-weight: 500;
 }
 
-.medicine-card p {
-  margin: 0.3rem 0;
-  font-size: 0.9rem;
-  color: #444;
+.reminder-btn {
+  background: transparent;
+  border: 1px solid var(--accent-color);
+  border-radius: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.medicine-card .edit-link {
-  color: #ff6b6b;
+.reminder-btn:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+/* QUICK ACTIONS */
+
+/* QUICK ACTIONS */
+.quick-actions {
+  margin-top: 2rem;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.action-card {
+  background: linear-gradient(135deg, #ff6b6b, #ffb6c1);
+  color: #fff;
+  padding: 1.2rem;
+  border-radius: 14px;
+  text-align: center;
   font-weight: 500;
   text-decoration: none;
-  margin-top: 0.8rem;
-  display: inline-block;
+  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.2s ease;
 }
 
-.medicine-card .edit-link:hover {
-  text-decoration: underline;
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.35);
+  filter: brightness(1.1);
 }
 
-/* Add Medicine Link */
-.add-medicine {
-  color: #ff6b6b;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 0.5rem;
+/* Dark Mode Quick Actions */
+body.dark .action-card {
+  background: linear-gradient(135deg, #ff8a80, #ffb6c1);
+  color: #fff5f7;
+  box-shadow: 0 8px 20px rgba(255, 182, 193, 0.2);
 }
 
-/* Buttons Section */
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 2rem;
-  justify-content: center;
+body.dark .action-card:hover {
+  filter: brightness(1.15);
 }
 
-.action-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ffb6c1);
-  border: none;
-  color: white;
-  padding: 12px 18px;
-  font-weight: 500;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
-
-.action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(255, 107, 107, 0.25);
-}
-
-/* Dark Mode */
-body.dark-mode .dashboard-page {
-  background: linear-gradient(180deg, #1b0f13, #2b1b22);
-  color: #fce4ec;
-}
-
-body.dark-mode .section {
-  background: #2b1b22;
-  color: #fce4ec;
-  box-shadow: 0 2px 8px rgba(255, 182, 193, 0.1);
-}
-
-body.dark-mode .alert {
-  background: #3a1f26;
-  color: #fcdde1;
-}
-
-body.dark-mode .medicine-card {
-  background: #3a1f26;
-  border-color: #5b2e38;
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: 1.5rem;
+  }
+  .medicine-template-card {
+    padding: 1.2rem;
+  }
 }

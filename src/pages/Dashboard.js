@@ -12,7 +12,7 @@ const Dashboard = () => {
     () => localStorage.getItem("darkMode") === "true"
   );
 
-  // Fetch medicines from fake API
+  // Fetch medicines
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,13 +25,13 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // Apply dark mode globally
+  // Apply dark mode
   useEffect(() => {
     document.body.classList.toggle("dark-mode", darkMode);
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  // Derived alerts based on patient and medicines
+  // Alerts
   const alerts = [];
   if (patient.age > 60)
     alerts.push("👵 Elderly Mode: Frequent reminders & emergency alerts.");
@@ -40,68 +40,80 @@ const Dashboard = () => {
     alerts.push("⚠️ 1 medicine expiring soon.");
 
   return (
-    <div className="dashboard-page">
-      {/* 🧍‍♂️ Patient Info */}
+    <div className="dashboard-page fade-in">
+      {/* ================= PATIENT INFO ================= */}
       <section className="section patient-info">
-        <h2>Good afternoon, {patient.name}!</h2>
-        <p>Email: {patient.email}</p>
-        <p>Phone: {patient.phone}</p>
-        <p>Age: {patient.age}</p>
+        <div className="patient-card">
+          <div className="patient-header">
+            <h2>Hello, {patient.name} 👋</h2>
+            <p className="subtext">Stay on track with your health today</p>
+          </div>
+          <div className="patient-details">
+            <p><strong>Email:</strong> {patient.email}</p>
+            <p><strong>Phone:</strong> {patient.phone}</p>
+            <p><strong>Age:</strong> {patient.age}</p>
+          </div>
+        </div>
       </section>
 
-      {/* 🚨 Alerts Section */}
+      {/* ================= ALERTS ================= */}
       <section className="section alerts-section">
-        <h2>Health Alerts</h2>
-        <div className="alerts">
-          {alerts.map((a, i) => (
-            <div key={i} className="alert">
-              {a}
+        <h2>🚨 Health Alerts</h2>
+        <div className="alerts-grid">
+          {alerts.map((alert, i) => (
+            <div key={i} className="alert-card">
+              {alert}
             </div>
           ))}
         </div>
       </section>
 
-      {/* 💊 Medicines Section */}
+      {/* ================= MEDICINE TEMPLATE ================= */}
       <section className="section medicines-section">
-        <h2>My Medicines</h2>
-        <Link to="/medicines/new" className="add-medicine">
-          + Add Medicine
-        </Link>
+        <div className="section-header">
+          <h2>💊 My Medicines</h2>
+          <Link to="/medicines/new" className="add-btn">
+            + Add New
+          </Link>
+        </div>
 
-        <div className="medicine-grid">
+        <div className="medicine-template-grid">
           {meds.map((med) => (
-            <div key={med.id} className="medicine-card">
-              <h3>{med.name}</h3>
-              <div className="dosage">{med.dosage}</div>
-              <p>{med.notes}</p>
-              <p>{med.frequency}</p>
-              <Link to={`/medicines/${med.id}`} className="edit-link">
-                Edit
-              </Link>
+            <div key={med.id} className="medicine-template-card">
+              <div className="medicine-header">
+                <h3>{med.name}</h3>
+                <span className="dose">{med.dosage}</span>
+              </div>
+              <div className="medicine-body">
+                <p><strong>Frequency:</strong> {med.frequency}</p>
+                <p><strong>Notes:</strong> {med.notes || "None"}</p>
+                <p><strong>Duration:</strong> {med.startDate} → {med.endDate}</p>
+              </div>
+              <div className="medicine-footer">
+                <Link to={`/medicines/${med.id}`} className="edit-btn">
+                  ✏️ Edit
+                </Link>
+                <button
+                  className="reminder-btn"
+                  onClick={() => alert(`Reminder set for ${med.name}`)}
+                >
+                  ⏰ Set Reminder
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ⚙️ Quick Actions */}
-      <section className="section">
-        <h2>Quick Actions</h2>
-        <div className="actions">
-          <Link to="/appointments" className="action-btn">
-            📅 Book Appointment
-          </Link>
-          <Link to="/scan-report" className="action-btn">
-            📄 Scan Report
-          </Link>
-          <Link to="/timeline" className="action-btn">
-            🕒 View Timeline
-          </Link>
-          <Link to="/analytics" className="action-btn">
-            📊 Analytics
-          </Link>
-          <Link to="/contacts" className="action-btn">
-            🚨 Emergency Contacts
-          </Link>
+      {/* ================= QUICK ACTIONS ================= */}
+      <section className="section quick-actions">
+        <h2>⚙️ Quick Actions</h2>
+        <div className="actions-grid">
+          <Link to="/appointments" className="action-card">📅 Book Appointment</Link>
+          <Link to="/scan-report" className="action-card">📄 Scan Report</Link>
+          <Link to="/timeline" className="action-card">🕒 View Timeline</Link>
+          <Link to="/analytics" className="action-card">📊 Analytics</Link>
+          <Link to="/contacts" className="action-card">🚨 Emergency Contacts</Link>
         </div>
       </section>
     </div>
@@ -109,5 +121,6 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
 
 

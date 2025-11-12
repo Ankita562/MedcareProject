@@ -1,4 +1,4 @@
-// src/App.js
+// ✅ src/App.js
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
@@ -33,15 +33,13 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const [patientInfo] = useState(fakePatientDetails);
-
-  // 🌗 Global Dark Mode State
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("darkMode") === "true"
   );
 
   // ------------------ EFFECTS ------------------
 
-  // ✅ Load login state on mount
+  // ✅ Load login state once
   useEffect(() => {
     setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
   }, []);
@@ -51,10 +49,10 @@ function App() {
     localStorage.setItem("isLoggedIn", isLoggedIn);
   }, [isLoggedIn]);
 
-  // ✅ Manage dark/light mode globally
+  // ✅ Apply dark/light mode globally
   useEffect(() => {
-    document.body.classList.toggle("dark", darkMode);
-    document.body.classList.toggle("light", !darkMode);
+    document.body.classList.toggle("dark-mode", darkMode);
+    document.body.classList.toggle("light-mode", !darkMode);
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
@@ -64,9 +62,9 @@ function App() {
     setIsLoggedIn(false);
   };
 
-  // ------------------ RENDER ------------------
+  // ------------------ MAIN RETURN ------------------
   return (
-    <div className={`app-container ${darkMode ? "dark" : "light"}`}>
+    <div className={`app-container ${darkMode ? "dark-mode" : "light-mode"}`}>
       {/* 🧭 Navbar */}
       <Navbar
         onLogout={handleLogout}
@@ -90,7 +88,7 @@ function App() {
             }
           />
 
-          {/* 🔐 Authentication */}
+          {/* 🔐 Auth */}
           <Route
             path="/login"
             element={<Auth onLogin={() => setIsLoggedIn(true)} />}
@@ -129,14 +127,14 @@ function App() {
             path="/dashboard"
             element={
               isLoggedIn ? (
-                <Dashboard patient={patientInfo} />
+                <Dashboard patient={patientInfo} darkMode={darkMode} />
               ) : (
                 <Navigate to="/login" replace />
               )
             }
           />
 
-          {/* 💊 Add/Edit Medicine */}
+          {/* 💊 Medicines */}
           <Route
             path="/medicines/new"
             element={
@@ -154,15 +152,11 @@ function App() {
           <Route
             path="/appointments"
             element={
-              isLoggedIn ? (
-                <DoctorAppointment />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              isLoggedIn ? <DoctorAppointment /> : <Navigate to="/login" replace />
             }
           />
 
-          {/* 📜 View Timeline */}
+          {/* 📜 Timeline */}
           <Route
             path="/timeline"
             element={
@@ -202,11 +196,7 @@ function App() {
           <Route
             path="/contacts"
             element={
-              isLoggedIn ? (
-                <EmergencyContacts />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              isLoggedIn ? <EmergencyContacts /> : <Navigate to="/login" replace />
             }
           />
 
@@ -230,4 +220,5 @@ function App() {
 }
 
 export default App;
+
 

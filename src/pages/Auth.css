@@ -1,171 +1,184 @@
-/* ============================================
-   ❤️ Auth Page – MedCare Theme
-   Red × Pastel Pink Palette
-   Light + Dark Mode Supported
-   ============================================ */
+/* src/pages/Auth.css
+   MedCare Auth Page — cleaned + consistent with "dark-mode" on <body>
+*/
 
-.auth-container {
+.auth-page {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #fff5f7 0%, #ffe9ef 100%);
-  transition: background 0.4s ease, color 0.4s ease;
+  transition: background 0.35s ease, color 0.35s ease;
+  margin: 0;
+  padding: 0;
 }
 
-/* ===== Dark Mode ===== */
-.dark .auth-container {
-  background: linear-gradient(135deg, #1b0f13 0%, #2b1b22 100%);
-  color: #fce4ec;
+/* Light by default */
+.auth-page {
+  background: linear-gradient(120deg, #fff5f7 0%, #ffe9ef 100%);
+  color: #2b1b1d;
 }
 
-/* ===== Auth Box ===== */
-.auth-box {
-  background: var(--card-bg, #ffffff);
-  padding: 40px 35px;
+/* Card wrapper */
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.15);
-  width: 360px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.15);
   text-align: center;
-  animation: fadeIn 0.6s ease;
-  transition: background 0.4s ease, box-shadow 0.4s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.dark .auth-box {
-  background: #2b1b22;
-  box-shadow: 0 8px 25px rgba(255, 182, 193, 0.15);
+.auth-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(255, 107, 107, 0.22);
 }
 
-/* ===== Heading ===== */
-.auth-box h2 {
-  margin-bottom: 24px;
-  color: var(--accent-color, #ff6b6b);
-  font-weight: 700;
+/* Branding */
+.brand-title {
+  font-size: 1.8rem;
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+.brand-title span {
+  color: #ffb6c1;
 }
 
-/* ===== Form Layout ===== */
-.auth-form {
+/* headings & text */
+.auth-card h2 {
+  font-size: 1.4rem;
+  margin: 0 0 8px 0;
+}
+.subtitle {
+  font-size: 0.95rem;
+  color: #6b4f52;
+  margin-bottom: 1.25rem;
+}
+
+/* Form layout */
+form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0.7rem;
+  margin-top: 6px;
+}
+
+label {
   text-align: left;
-}
-
-.auth-form label {
   font-weight: 500;
-  color: var(--text-color, #2b1b1d);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-.dark .auth-form label {
-  color: #fcdde1;
-}
-
-/* ===== Inputs ===== */
-.auth-form input {
-  padding: 12px;
-  border: 1px solid var(--border-color, #ffd9e2);
+input {
+  padding: 10px;
   border-radius: 10px;
-  font-size: 15px;
-  background: var(--input-bg, #fff5f7);
-  color: var(--text-color, #2b1b1d);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  border: 1px solid #ffd9e2;
+  font-size: 1rem;
+  background: #fff;
+  color: inherit;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.auth-form input:focus {
-  border-color: var(--accent-color, #ff6b6b);
-  box-shadow: 0 0 6px rgba(255, 107, 107, 0.3);
+input:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.12);
   outline: none;
 }
 
-.dark .auth-form input {
-  background: #1b0f13;
-  border-color: #3a1f26;
-  color: #fce4ec;
-}
-
-/* ===== Primary Button ===== */
+/* main button */
 .main-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ffb6c1);
-  color: white;
-  padding: 12px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ffb6c1 100%);
+  color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 16px;
+  padding: 12px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .main-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.22);
 }
 
-/* ===== Switch Buttons (Login ↔ Register) ===== */
-.btn-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 24px;
+/* error text */
+.error-text {
+  color: #ff3d3d;
+  font-size: 0.9rem;
+  margin: 6px 0 0 0;
+  text-align: left;
 }
 
-.switch-btn {
-  background: #fff0f3;
-  border: 1px solid #ffc4cc;
-  color: #b23a48;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 15px;
-  font-weight: 500;
+/* footer text */
+.form-footer {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #6b4f52;
+}
+.form-footer span {
+  color: #ff6b6b;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+}
+.form-footer span:hover { text-decoration: underline; }
+
+/* mode toggle */
+.mode-toggle {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid #ffd9e2;
+  border-radius: 20px;
+  padding: 8px 14px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-toggle:hover {
+  background: #ff6b6b;
+  color: #fff;
 }
 
-.switch-btn:hover {
-  background: #ffe1e6;
-  color: #8c2c3b;
-  transform: translateY(-1px);
+/* ---------------- Dark mode (when body has .dark-mode) ---------------- */
+body.dark-mode .auth-page {
+  background: linear-gradient(120deg, #1b0f13 0%, #2b1b22 100%);
+  color: #fce4ec;
 }
 
-.dark .switch-btn {
-  background: #3a1f26;
-  color: #ffb6c1;
-  border-color: #5b2e38;
+body.dark-mode .auth-card {
+  background: #2b1b22;
+  box-shadow: 0 8px 25px rgba(255, 182, 193, 0.12);
+  color: #fce4ec;
 }
 
-.dark .switch-btn:hover {
-  background: #4b242e;
-  color: #fff0f3;
+body.dark-mode input {
+  background: #3a2229;
+  color: #fce4ec;
+  border-color: #3a1f26;
 }
 
-/* ===== Fade-in Animation ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+body.dark-mode .subtitle,
+body.dark-mode .form-footer {
+  color: #d8b8bd;
 }
 
-/* ===== Responsive ===== */
+body.dark-mode .mode-toggle {
+  border-color: #3a1f26;
+}
+
+/* Responsive small screens */
 @media (max-width: 480px) {
-  .auth-box {
-    width: 90%;
-    padding: 30px 25px;
+  .auth-card {
+    padding: 1.6rem;
   }
-
-  .auth-box h2 {
-    font-size: 1.6rem;
-  }
-
-  .main-btn {
-    font-size: 15px;
-  }
+  .brand-title { font-size: 1.5rem; }
 }
