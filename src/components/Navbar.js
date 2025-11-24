@@ -1,3 +1,8 @@
+/* -------------------------------
+   THEME VARIABLES
+--------------------------------*/
+// src/components/Navbar.jsx
+// src/components/Navbar.jsx
 // src/components/Navbar.jsx
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -17,6 +22,7 @@ import {
   LogOut,
   Moon,
   Sun,
+  Baby,          // 👶 Age Group icon
 } from "lucide-react";
 
 const Navbar = ({
@@ -28,6 +34,7 @@ const Navbar = ({
 }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
+  const [ageDropdown, setAgeDropdown] = useState(false); // 👶 age menu toggle
 
   // Toggle Sidebar
   const toggleSidebar = () => {
@@ -66,6 +73,7 @@ const Navbar = ({
 
       {/* NAVIGATION */}
       <div className="sidebar-links">
+
         <NavItem to="/dashboard" icon={<Home />} text="Dashboard" open={open} />
         <NavItem to="/timeline" icon={<Calendar />} text="Timeline" open={open} />
         <NavItem to="/analytics" icon={<BarChart3 />} text="Analytics" open={open} />
@@ -74,6 +82,30 @@ const Navbar = ({
         <NavItem to="/contacts" icon={<Users />} text="Contacts" open={open} />
         <NavItem to="/doctors" icon={<Plus />} text="Doctors" open={open} />
         <NavItem to="/chatbot" icon={<MessageCircle />} text="Chatbot" open={open} />
+
+        {/* 👶 AGE GROUP MAIN ITEM */}
+        <div className="tooltip-wrapper">
+          <button
+            className="age-btn"
+            onClick={() => setAgeDropdown(!ageDropdown)}
+          >
+            <Baby className="icon" />
+            {open && <span>Age Groups</span>}
+          </button>
+
+          {!open && <div className="tooltip">Age Groups</div>}
+        </div>
+
+        {/* 👶 DROPDOWN OPTIONS */}
+        {ageDropdown && (
+          <div className="age-dropdown">
+            <NavItem to="/age/2-5" text="2 - 5 Years" open={open} />
+            <NavItem to="/age/6-19" text="6 - 19 Years" open={open} />
+            <NavItem to="/age/20-50" text="20 - 50 Years" open={open} />
+            <NavItem to="/age/50plus" text="50+ Years" open={open} />
+          </div>
+        )}
+
       </div>
 
       {/* BOTTOM SECTION */}
@@ -87,15 +119,9 @@ const Navbar = ({
 
         {/* USER BOX */}
         <div className="user-box">
-
           {isLoggedIn ? (
             <>
-              <NavItem
-                to="/profile"
-                icon={<User />}
-                text="Profile"
-                open={open}
-              />
+              <NavItem to="/profile" icon={<User />} text="Profile" open={open} />
 
               <button className="logout-btn" onClick={handleLogout}>
                 <LogOut className="icon" />
@@ -103,14 +129,8 @@ const Navbar = ({
               </button>
             </>
           ) : (
-            <NavItem
-              to="/login"
-              icon={<User />}
-              text="Login"
-              open={open}
-            />
+            <NavItem to="/login" icon={<User />} text="Login" open={open} />
           )}
-
         </div>
       </div>
     </div>
@@ -124,7 +144,7 @@ const NavItem = ({ to, icon, text, open }) => (
       to={to}
       className={({ isActive }) => (isActive ? "active" : "")}
     >
-      <span className="icon">{icon}</span>
+      {icon && <span className="icon">{icon}</span>}
       <span>{text}</span>
     </NavLink>
 
@@ -133,4 +153,3 @@ const NavItem = ({ to, icon, text, open }) => (
 );
 
 export default Navbar;
-
