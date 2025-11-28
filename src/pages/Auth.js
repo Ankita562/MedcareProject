@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
 import "./Auth.css";
+import logo from '../assets/images/logo.png';
 
 const Auth = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -59,7 +60,7 @@ const Auth = ({ onLogin }) => {
         transition={{ duration: 0.7 }}
       >
         <img
-          src={require("../assets/images/logo.png")}
+          src={logo}
           alt="MedCare"
           className="auth-illustration"
         />
