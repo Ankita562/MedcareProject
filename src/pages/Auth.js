@@ -59,12 +59,12 @@ const Auth = ({ onLogin }) => {
         transition={{ duration: 0.7 }}
       >
         <img
-          src="/logo512.png"
-          alt="MediCare"
+          src={require("../assets/images/logo.png")}
+          alt="MedCare"
           className="auth-illustration"
         />
 
-        <h1 className="brand-title">MediCare</h1>
+        <h1 className="brand-title">MedCare</h1>
         <p className="auth-tagline">
           🌿 Your daily health assistant — simplified.
         </p>
@@ -82,7 +82,7 @@ const Auth = ({ onLogin }) => {
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
-          {isLogin ? "Welcome Back 👋" : "Join MediCare 🎉"}
+          {isLogin ? "Welcome Back 👋" : "Join MedCare 🎉"}
         </motion.h2>
 
         {/* SHOW ERRORS */}

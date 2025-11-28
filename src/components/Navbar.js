@@ -81,20 +81,6 @@ const Navbar = ({
         <NavItem to="/reports" icon={<FileChartColumn />} text="Reports" open={open} />
         <NavItem to="/contacts" icon={<Users />} text="Contacts" open={open} />
         <NavItem to="/doctors" icon={<Plus />} text="Doctors" open={open} />
-        <NavItem to="/chatbot" icon={<MessageCircle />} text="Chatbot" open={open} />
-
-        {/* 👶 AGE GROUP MAIN ITEM */}
-        <div className="tooltip-wrapper">
-          <button
-            className="age-btn"
-            onClick={() => setAgeDropdown(!ageDropdown)}
-          >
-            <Baby className="icon" />
-            {open && <span>Age Groups</span>}
-          </button>
-
-          {!open && <div className="tooltip">Age Groups</div>}
-        </div>
 
         {/* 👶 DROPDOWN OPTIONS */}
         {ageDropdown && (
