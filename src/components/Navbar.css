@@ -39,12 +39,14 @@ body.dark-mode {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box; /* Ensures padding fits inside the 100vh */
+  padding-bottom: 20px;   
 }
 
 .sidebar.closed {
   width: 70px;
 }
-
+ 
 /* -------------------------------
    TOGGLE BUTTON
 --------------------------------*/
@@ -56,6 +58,11 @@ body.dark-mode {
   color: var(--sidebar-text);
   border: 1px solid var(--border-color);
   cursor: pointer;
+
+  display: flex;             /* Add Flexbox */
+  align-items: center;       /* Center vertically */
+  justify-content: center;   /* Center horizontally */
+  padding: 0;                /* Remove extra padding */
 }
 
 .sidebar-toggle:hover {
@@ -73,30 +80,43 @@ body.dark-mode {
 }
 
 /* -------------------------------
-   NAV LINKS
+   NAV LINKS & USER LINKS
 --------------------------------*/
 .sidebar-links {
   margin-top: 20px;
   flex: 1;
+  
+  overflow-y: auto; /* Allows scrolling if list is too long */
+  min-height: 0;    /* Required for flex scrolling to work */
+  
+  /* Optional: Hide scrollbar for cleaner look */
+  scrollbar-width: none; /* Firefox */
 }
 
-.sidebar-links a {
+.sidebar-links::-webkit-scrollbar { 
+  display: none; /* Chrome/Safari */
+}
+
+.sidebar-links a,
+.user-box a {        
   display: flex;
   align-items: center;
   padding: 12px 14px;
   text-decoration: none;
-  color: var(--sidebar-text) !important;   /* ← FIXED */
+  color: var(--sidebar-text) !important;
   gap: 14px;
   font-size: 15px;
   border-radius: 8px;
   transition: 0.25s;
 }
 
-.sidebar-links a:hover {
+.sidebar-links a:hover,
+.user-box a:hover {
   background: var(--sidebar-hover);
 }
 
-.sidebar-links a.active {
+.sidebar-links a.active,
+.user-box a.active {
   background: var(--sidebar-active);
   font-weight: bold;
 }
@@ -148,8 +168,8 @@ body.dark-mode {
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 12px 10px;
-  gap: 10px;
+  padding: 12px 14px;
+  gap: 14px;
   font-size: 15px;
   border-radius: 8px;
   border: none;
@@ -172,23 +192,41 @@ body.dark-mode {
   flex-direction: column;
 }
 
+/* FINAL LOGOUT FIX */
 .logout-btn {
+  /* 1. Layout & Alignment */
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 10px;
-  border: none;
-  background: transparent;
-  color: #f87171; /* soft red */
+  
+  /* Matches "Profile" exactly */
+  padding: 12px 14px !important; 
+  gap: 14px !important;
+  
+  /* 2. Remove default button styles */
+  background: transparent !important;
+  border: none !important;
   border-radius: 8px;
   cursor: pointer;
+  
+  /*  Text Styling */
+  font-size: 15px;
+  color: #ef4444; /* Red text */
+  transition: 0.2s;
+  text-align: left;
 }
 
+/* Hover Effect */
 .logout-btn:hover {
-  background: rgba(248, 113, 113, 0.15);
+  background: rgba(239, 68, 68, 0.1) !important;
 }
 
+.logout-btn svg {
+  width: 20px;
+  height: 20px;
+  min-width: 20px; 
+  color: #ef4444;
+}
 /* -------------------------------
    RESPONSIVE
 --------------------------------*/
@@ -199,4 +237,31 @@ body.dark-mode {
   .sidebar.closed {
     width: 60px;
   }
+}
+
+/* =========================================
+   SIDEBAR CLOSED STATE 
+   ========================================= */
+
+/*  Hide all text spans when closed */
+.sidebar.closed .nav-text {
+  display: none;
+}
+
+.sidebar.closed .sidebar-brand {
+  display: none;
+}
+
+.sidebar.closed .sidebar-links a,
+.sidebar.closed .user-box a,
+.sidebar.closed .mode-btn,
+.sidebar.closed .logout-btn {
+  justify-content: center; 
+  gap: 0;                
+  padding-left: 0;        
+  padding-right: 0;
+}
+
+.sidebar.closed .logout-btn {
+  width: 100%;
 }

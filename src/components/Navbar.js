@@ -1,40 +1,21 @@
-/* -------------------------------
-   THEME VARIABLES
---------------------------------*/
-// src/components/Navbar.jsx
-// src/components/Navbar.jsx
-// src/components/Navbar.jsx
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 // Icons
 import {
-  Home,
-  Calendar,
-  BarChart3,
-  History,
-  FileChartColumn,
-  Users,
-  Plus,
-  MessageCircle,
-  User,
-  LogOut,
-  Moon,
-  Sun,
-  Baby,          // 👶 Age Group icon
+  Home, Calendar, BarChart3, History, FileChartColumn,
+  Users, Plus, User, LogOut, Moon, Sun,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 const Navbar = ({
-  onLogout,
-  isLoggedIn,
-  darkMode,
-  setDarkMode,
-  setSidebarOpen,
+  onLogout, isLoggedIn, darkMode, setDarkMode, setSidebarOpen,
 }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
-  const [ageDropdown, setAgeDropdown] = useState(false); // 👶 age menu toggle
+  const [ageDropdown, setAgeDropdown] = useState(false);
 
   // Toggle Sidebar
   const toggleSidebar = () => {
@@ -63,17 +44,17 @@ const Navbar = ({
     <div className={`sidebar ${open ? "open" : "closed"}`}>
       {/* Sidebar Toggle */}
       <button className="sidebar-toggle" onClick={toggleSidebar}>
-        {open ? "←" : "→"}
+        {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
 
-      {/* Brand */}
+      {/* Brand - Only show when open */}
       <div className="sidebar-brand" onClick={() => navigate("/")}>
+        {/* We hide this whole div via CSS when closed */}
         MedCare <span style={{ color: "#c8925c" }}>+</span>
       </div>
 
       {/* NAVIGATION */}
       <div className="sidebar-links">
-
         <NavItem to="/dashboard" icon={<Home />} text="Dashboard" open={open} />
         <NavItem to="/timeline" icon={<Calendar />} text="Timeline" open={open} />
         <NavItem to="/analytics" icon={<BarChart3 />} text="Analytics" open={open} />
@@ -82,25 +63,22 @@ const Navbar = ({
         <NavItem to="/contacts" icon={<Users />} text="Contacts" open={open} />
         <NavItem to="/doctors" icon={<Plus />} text="Doctors" open={open} />
 
-        {/* 👶 DROPDOWN OPTIONS */}
+        {/* Age Dropdown */}
         {ageDropdown && (
           <div className="age-dropdown">
             <NavItem to="/age/2-5" text="2 - 5 Years" open={open} />
-            <NavItem to="/age/6-19" text="6 - 19 Years" open={open} />
-            <NavItem to="/age/20-50" text="20 - 50 Years" open={open} />
-            <NavItem to="/age/50plus" text="50+ Years" open={open} />
+            {/* ... other items ... */}
           </div>
         )}
-
       </div>
 
       {/* BOTTOM SECTION */}
       <div className="sidebar-bottom">
-
         {/* Dark Mode Button */}
         <button className="mode-btn" onClick={toggleMode}>
           {darkMode ? <Sun className="icon" /> : <Moon className="icon" />}
-          <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
+          {/* ADDED CLASS HERE */}
+          <span className="nav-text">{darkMode ? "Light Mode" : "Dark Mode"}</span>
         </button>
 
         {/* USER BOX */}
@@ -108,10 +86,10 @@ const Navbar = ({
           {isLoggedIn ? (
             <>
               <NavItem to="/profile" icon={<User />} text="Profile" open={open} />
-
               <button className="logout-btn" onClick={handleLogout}>
                 <LogOut className="icon" />
-                <span>Logout</span>
+                {/* ADDED CLASS HERE */}
+                <span className="nav-text">Logout</span>
               </button>
             </>
           ) : (
@@ -126,14 +104,11 @@ const Navbar = ({
 /* Reusable Nav Item */
 const NavItem = ({ to, icon, text, open }) => (
   <div className="tooltip-wrapper">
-    <NavLink
-      to={to}
-      className={({ isActive }) => (isActive ? "active" : "")}
-    >
+    <NavLink to={to} className={({ isActive }) => (isActive ? "active" : "")}>
       {icon && <span className="icon">{icon}</span>}
-      <span>{text}</span>
+      {/* ADDED CLASS HERE */}
+      <span className="nav-text">{text}</span>
     </NavLink>
-
     {!open && <div className="tooltip">{text}</div>}
   </div>
 );

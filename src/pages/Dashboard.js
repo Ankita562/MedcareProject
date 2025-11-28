@@ -16,7 +16,7 @@ const Dashboard = ({ patient, darkMode }) => {
       
       {/* HEADER */}
       <div className="dashboard-header">
-        <h1>Welcome, {patient.firstName}</h1>
+        <h1>Welcome, {patient.name}</h1>
         <p>Your health overview at a glance</p>
       </div>
 
