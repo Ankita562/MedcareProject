@@ -76,19 +76,23 @@ function App() {
         />
       )}
 
-      {/* MAIN CONTENT */}
+     {/* MAIN CONTENT */}
       <main
-        className="fade-in"
+        // dynamic classes for CSS to handle
+        className={`main-content fade-in ${isLoggedIn ? (sidebarOpen ? "expanded" : "collapsed") : ""}`}
+        
         style={{
-          minHeight: "80vh",
+          minHeight: "100vh",
           overflowX: "hidden",
-
-          // ⭐ Apply margin only when logged in
-          marginLeft: isLoggedIn ? (sidebarOpen ? "240px" : "70px") : "0px",
-
-          transition: "margin-left 0.3s ease",
+          
+          paddingTop: isLoggedIn ? "80px" : "0px",
+          
+          paddingLeft: "20px",
+          paddingRight: "20px",
+          paddingBottom: "20px",
         }}
       >
+        
         <Routes>
           <Route
             path="/"

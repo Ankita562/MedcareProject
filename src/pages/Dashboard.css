@@ -101,3 +101,30 @@
   from { opacity: 0; transform: translateY(15px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* =========================================
+   MOBILE DASHBOARD FIXES
+   ========================================= */
+
+@media (max-width: 768px) {
+  
+  /* 1. Force Grid to be 1 Column */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important; /* Forces single column */
+    gap: 15px; /* Smaller gap */
+  }
+
+  /* 2. Adjust Card Padding */
+  .dashboard-card {
+    padding: 15px; /* Less padding inside cards */
+  }
+
+  /* 3. Make the Header Text Smaller */
+  .dashboard-header h1 {
+    font-size: 1.5rem; /* Smaller title */
+  }
+  
+  .dashboard-header p {
+    font-size: 0.9rem;
+  }
+}

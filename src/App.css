@@ -235,3 +235,69 @@ a:hover {
   main { padding: 10px; }
   .theme-toggle button { font-size: 0.8rem; }
 }
+
+/* =========================================
+   RESPONSIVE LAYOUT SYSTEM
+   ========================================= */
+
+/* Base Transition */
+.main-content {
+  transition: margin-left 0.3s ease;
+  width: 100%;
+}
+
+/* DESKTOP BEHAVIOR (Standard Push) */
+/* When sidebar is OPEN, push content 240px */
+.main-content.expanded {
+  margin-left: 240px;
+  width: calc(100% - 240px); /* Prevent horizontal scroll */
+}
+
+/* When sidebar is CLOSED, push content 70px */
+.main-content.collapsed {
+  margin-left: 70px;
+  width: calc(100% - 70px);
+}
+
+/* MOBILE BEHAVIOR (Max Width 768px) */
+@media (max-width: 768px) {
+  
+  /* On mobile, DO NOT push content when sidebar opens.
+     The content stays put, and the sidebar floats over it. */
+  .main-content.expanded,
+  .main-content.collapsed {
+    margin-left: 70px !important; /* Keep the small gap for the closed bar */
+    width: calc(100% - 70px) !important;
+    padding-left: 10px !important; /* Less padding on small screens */
+    padding-right: 10px !important;
+    body {
+    font-size: 14px;
+    }
+  }
+}
+
+/* =========================================
+   MOBILE SIDEBAR OVERLAY
+   ========================================= */
+
+@media (max-width: 768px) {
+  
+  .sidebar {
+    position: fixed;
+    height: 100vh;
+    /* Ensure it sits ON TOP of the content */
+    z-index: 9999; 
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2); /* Stronger shadow for depth */
+  }
+
+  /* When OPEN on mobile, it covers the content */
+  .sidebar.open {
+    width: 250px;
+  }
+
+  /* When CLOSED on mobile, it stays small */
+  .sidebar.closed {
+    width: 70px;
+  }
+}
+
