@@ -262,17 +262,19 @@ a:hover {
 /* MOBILE BEHAVIOR (Max Width 768px) */
 @media (max-width: 768px) {
   
-  /* On mobile, DO NOT push content when sidebar opens.
-     The content stays put, and the sidebar floats over it. */
+  /* FIX: Don't force a specific pixel width. Let it fill naturally. */
   .main-content.expanded,
   .main-content.collapsed {
-    margin-left: 70px !important; /* Keep the small gap for the closed bar */
-    width: calc(100% - 70px) !important;
-    padding-left: 10px !important; /* Less padding on small screens */
+    margin-left: 70px !important; 
+    width: auto !important; /* Fills remaining space automatically */
+    padding-left: 10px !important;
     padding-right: 10px !important;
-    body {
-    font-size: 14px;
-    }
+    overflow-x: hidden; /* Stops horizontal scrolling */
+  }
+
+  /* Ensure text doesn't overflow cards */
+  h1, h2, h3, p {
+    word-wrap: break-word;
   }
 }
 
@@ -286,7 +288,7 @@ a:hover {
     position: fixed;
     height: 100vh;
     /* Ensure it sits ON TOP of the content */
-    z-index: 9999; 
+    z-index: 10000; 
     box-shadow: 4px 0 15px rgba(0,0,0,0.2); /* Stronger shadow for depth */
   }
 

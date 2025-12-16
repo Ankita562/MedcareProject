@@ -1,4 +1,5 @@
 // src/pages/Auth.jsx
+import axios from "axios";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
@@ -25,31 +26,64 @@ const Auth = ({ onLogin }) => {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
 
-    if (!isLogin) {
-      if (!form.firstName || !form.lastName) {
-        setError("Please fill in your first and last name.");
-        return;
+    try {
+      if (isLogin) {
+        // ==============================
+        // 🟢 LOGIN LOGIC
+        // ==============================
+        const res = await axios.post("http://localhost:5000/api/auth/login", {
+          email: form.email,
+          password: form.password,
+        });
+
+        // 1. Save user info to browser storage
+        localStorage.setItem("user", JSON.stringify(res.data));
+        localStorage.setItem("isLoggedIn", "true");
+
+        // 2. Update App state & Redirect
+        if (onLogin) onLogin();
+        navigate("/dashboard");
+
+      } else {
+        // ==============================
+        // 🔵 REGISTER LOGIC
+        // ==============================
+        // Basic Validation
+        if (!form.firstName || !form.lastName) {
+          setError("Please fill in your first and last name.");
+          return;
+        }
+        if (form.password.length < 4) {
+          setError("Password must be at least 4 characters long.");
+          return;
+        }
+
+        // Send data to Backend
+        await axios.post("http://localhost:5000/api/auth/register", {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          password: form.password,
+        });
+
+        // Success!
+        alert("Registration Successful! Please Login.");
+        setIsLogin(true); // Switch to login screen
       }
+
+    } catch (err) {
+      console.error(err);
+      
+      // 1. Try to get the specific message from the server
+      const serverMessage = err.response?.data?.message || err.response?.data;
+      
+      // 2. If server sent a message, use it. Otherwise use default.
+      setError(serverMessage || "Something went wrong!");
     }
-
-    if (!form.email.includes("@")) {
-      setError("Enter a valid email address.");
-      return;
-    }
-
-    if (form.password.length < 4) {
-      setError("Password must be at least 4 characters long.");
-      return;
-    }
-
-    localStorage.setItem("user", JSON.stringify(form));
-    localStorage.setItem("isLoggedIn", true);
-
-    if (onLogin) onLogin();
-    navigate("/dashboard");
   };
 
   return (

@@ -146,6 +146,11 @@ function App() {
           />
 
           <Route
+            path="/add-medicine"
+            element={isLoggedIn ? <AddEditMedicine /> : <Navigate to="/login" />}
+          />
+          
+          <Route
             path="/medicines/new"
             element={isLoggedIn ? <AddEditMedicine /> : <Navigate to="/login" />}
           />

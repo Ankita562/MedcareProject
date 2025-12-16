@@ -18,13 +18,14 @@ import MedicalReports from "./pages/MedicalReports";
 import EmergencyContacts from "./pages/EmergencyContacts";
 import ScanReport from "./pages/ScanReport";
 import Analytics from "./pages/Analytics";
-import ChatbotPage from "./pages/ChatbotPage";
-
+import Profile from "./pages/Profile";
 // Data
 import { fakePatientDetails } from "./data/fakeData";
 
 // Styles
 import "./App.css";
+
+<Route path="/profile" element={<Profile />} />
 
 function App() {
   // ---------------- STATE ----------------

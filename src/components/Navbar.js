@@ -40,19 +40,22 @@ const Navbar = ({
     navigate("/login");
   };
 
-  return (
-    <div className={`sidebar ${open ? "open" : "closed"}`}>
-      {/* Sidebar Toggle */}
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
-        {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-      </button>
+  return (<div className={`sidebar ${open ? "open" : "closed"}`}>
+      
+      {/* 1. NEW HEADER CONTAINER */}
+      <div className="sidebar-header">
+        
+        {/* Brand Name - Only shows when Open */}
+        {/* We use React conditional rendering here for safety */}
+        <div className={`sidebar-brand ${!open && "hidden"}`} onClick={() => navigate("/")}>
+          MedCare <span style={{ color: "#c8925c" }}>+</span>
+        </div>
 
-      {/* Brand - Only show when open */}
-      <div className="sidebar-brand" onClick={() => navigate("/")}>
-        {/* We hide this whole div via CSS when closed */}
-        MedCare <span style={{ color: "#c8925c" }}>+</span>
+        {/* Toggle Button - Always shows */}
+        <button className="sidebar-toggle" onClick={toggleSidebar}>
+          {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+        </button>
       </div>
-
       {/* NAVIGATION */}
       <div className="sidebar-links">
         <NavItem to="/dashboard" icon={<Home />} text="Dashboard" open={open} />

@@ -25,6 +25,14 @@ body.dark-mode {
 /* -------------------------------
    SIDEBAR
 --------------------------------*/
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Pushes Text to left, Button to right */
+  padding: 15px 10px;
+  min-height: 60px; /* Keeps height stable */
+}
+
 .sidebar {
   position: fixed;
   left: 0;
@@ -50,35 +58,45 @@ body.dark-mode {
 /* -------------------------------
    TOGGLE BUTTON
 --------------------------------*/
+/* New Toggle Button Style */
 .sidebar-toggle {
   width: 35px;
-  height: 28px;
-  border-radius: 6px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
-  color: var(--sidebar-text);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
+  border: none;
 
-  display: flex;             /* Add Flexbox */
-  align-items: center;       /* Center vertically */
-  justify-content: center;   /* Center horizontally */
-  padding: 0;                /* Remove extra padding */
+  color: var(--sidebar-text);
+
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .sidebar-toggle:hover {
   background: var(--sidebar-hover);
 }
 
+.sidebar-toggle svg {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: block;
+}
+
 /* -------------------------------
    BRAND
 --------------------------------*/
+/* Brand Text Style */
 .sidebar-brand {
   font-size: 20px;
   font-weight: bold;
-  padding: 20px 10px;
   color: var(--brand-color);
+  cursor: pointer;
+  white-space: nowrap;
 }
-
 /* -------------------------------
    NAV LINKS & USER LINKS
 --------------------------------*/
@@ -228,21 +246,36 @@ body.dark-mode {
   color: #ef4444;
 }
 /* -------------------------------
-   RESPONSIVE
+   RESPONSIVE (Mobile Overlay)
 --------------------------------*/
 @media (max-width: 768px) {
   .sidebar {
-    width: 200px;
+    position: fixed;
+    height: 100vh;
+    z-index: 10000; /* Force it on top of everything */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+    width: 240px; /* Standard width when open on mobile */
   }
+
+  /* When closed on mobile */
   .sidebar.closed {
-    width: 60px;
+    width: 70px;
   }
 }
 
 /* =========================================
    SIDEBAR CLOSED STATE 
    ========================================= */
+/* Center the header content (the arrow) when closed */
+.sidebar.closed .sidebar-header {
+  justify-content: center;
+  padding: 15px 0;
+}
 
+/* Ensure brand text is hidden when closed */
+.sidebar.closed .sidebar-brand {
+  display: none;
+}
 /*  Hide all text spans when closed */
 .sidebar.closed .nav-text {
   display: none;

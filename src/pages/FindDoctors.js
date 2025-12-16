@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./FindDoctors.css";
 
 const doctorData = [
@@ -47,7 +48,7 @@ const doctorData = [
 const FindDoctors = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredDoctors, setFilteredDoctors] = useState(doctorData);
-
+  const navigate = useNavigate();
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchTerm(query);
@@ -62,6 +63,15 @@ const FindDoctors = () => {
 
   const handleFindOnline = () => {
     window.open("https://www.google.com/search?q=doctors+near+me", "_blank");
+  };
+  
+  const handleBookClick = (doctor) => {
+    navigate("/appointments", { 
+      state: { 
+        prefillDoctor: doctor.name, 
+        prefillSpecialty: doctor.specialty 
+      } 
+    });
   };
 
   return (
@@ -100,7 +110,8 @@ const FindDoctors = () => {
               </p>
               <button
                 className="contact-btn"
-                onClick={() => window.open(doc.contact, "_blank")}
+                onClick={() => handleBookClick(doc)}
+                style={{background: "#8B5E3C", color: "white"}} 
               >
                 🔗 View on Google
               </button>
