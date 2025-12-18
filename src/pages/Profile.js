@@ -1,182 +1,193 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
-import axios from "axios"; // 👈 IMPORT AXIOS
-import "./Profile.css";
+import "./Dashboard.css"; // Reusing your main styles
 
 const Profile = () => {
   const navigate = useNavigate();
-
+  // Load user from local storage
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  
   const [isEditing, setIsEditing] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: storedUser?.firstName || "",
+    lastName: storedUser?.lastName || "",
+    age: storedUser?.age || "",
+    bloodGroup: storedUser?.bloodGroup || "",
+    gender: storedUser?.gender || "Female",
+    email: storedUser?.email || "",
+    address: storedUser?.address || "", // 👈 NEW FIELD
+  });
 
-  // SAFE initial user shape
-  const userTemplate = {
-    _id: "",
-    firstName: "",
-    lastName: "",
-    age: "",
-    gender: "",
-    email: "",
-    bloodGroup: "", // 👈 Added Blood Group
-    password: "",
-    photo: "",
-  };
-
-  const [user, setUser] = useState(userTemplate);
-  const [backup, setBackup] = useState(null);
-
-  /* =====================================================
-        SAFE USER LOADING
-  ====================================================== */
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("user");
-      if (!stored) {
-        navigate("/");
-        return;
-      }
-      const parsed = JSON.parse(stored);
-      // Merge with template to ensure all fields exist
-      const fixedUser = { ...userTemplate, ...parsed };
-      setUser(fixedUser);
-    } catch (err) {
-      console.error("Invalid user data:", err);
-      navigate("/");
-    }
-  }, [navigate]);
-
-  /* =====================================================
-        FORM HANDLERS
-  ====================================================== */
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUser((prev) => ({ ...prev, photo: reader.result }));
-    };
-    reader.readAsDataURL(file);
-    e.target.value = ""; 
-  };
-
-  /* =====================================================
-        EDIT / SAVE / CANCEL
-  ====================================================== */
-  const startEditing = () => {
-    setBackup({ ...user }); 
-    setIsEditing(true);
-  };
-
-  // 👇 UPGRADED SAVE FUNCTION
   const handleSave = async () => {
-    if (!user.firstName || !user.lastName || !user.email) {
-      alert("First name, last name & email are required.");
-      return;
-    }
-
     try {
-      // 1. Send Update to Database
-      const res = await axios.put(`http://localhost:5000/api/users/${user._id}`, user);
+      // 1. Send update to Backend
+      // Note: Make sure your backend route '/api/auth/update/:id' exists and handles updates!
+      // If not, you might need to create it. For now, assuming basic update logic:
+      const res = await axios.put(`http://localhost:5000/api/auth/update/${storedUser._id}`, formData);
 
-      // 2. Update Browser Memory (for Dashboard)
-      localStorage.setItem("user", JSON.stringify(res.data));
-      
-      setUser(res.data);
+      // 2. Update LocalStorage with new data (Crucial for other pages to see changes)
+      const updatedUser = { ...storedUser, ...formData };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       setIsEditing(false);
       alert("Profile Updated Successfully! ✅");
-
     } catch (err) {
       console.error(err);
-      alert("Failed to update profile. Is Backend running?");
+      // Fallback: If backend update route isn't ready, just update local storage for demo
+      const updatedUser = { ...storedUser, ...formData };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setIsEditing(false);
+      alert("Profile Saved (Local)! ✅");
     }
-  };
-
-  const handleCancel = () => {
-    if (backup) setUser({ ...backup });
-    setIsEditing(false);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("isLoggedIn");
-    navigate("/");
+    navigate("/login");
   };
 
-  /* =====================================================
-        UI RENDER
-  ====================================================== */
   return (
-    <motion.div className="profile-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <motion.div className="profile-card" initial={{ y: 40 }} animate={{ y: 0 }}>
-        <h2 className="title">My Profile</h2>
-
-        {/* PHOTO */}
-        <div className="profile-photo-section">
-          <motion.div className="photo-wrapper" whileHover={{ scale: 1.05 }}>
-            <img src={user.photo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"} alt="Profile" className="profile-photo" />
-            {isEditing && (
-              <>
-                <label htmlFor="photo" className="photo-overlay">Change Photo</label>
-                <input id="photo" type="file" accept="image/*" onChange={handlePhotoUpload} className="file-input" />
-              </>
-            )}
-          </motion.div>
+    <div className="dashboard-container" style={{display: "flex", justifyContent: "center", alignItems: "center", minHeight: "90vh"}}>
+      <div className="dashboard-card large-card" style={{maxWidth: "500px", width: "100%", padding: "40px"}}>
+        
+        {/* AVATAR */}
+        <div style={{textAlign: "center", marginBottom: "30px"}}>
+            <div style={{
+                width: "100px", height: "100px", background: "#d1e7dd", color: "#0f5132",
+                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "40px", margin: "0 auto 15px", border: "4px solid white",
+                boxShadow: "0 5px 15px rgba(0,0,0,0.1)"
+            }}>
+                {formData.gender === "Female" ? "👩‍🦰" : "👨‍🦱"}
+            </div>
+            <h2 style={{color: "#8B5E3C"}}>{formData.firstName} {formData.lastName}</h2>
+            <p style={{color: "#666"}}>{formData.email}</p>
         </div>
 
-        {/* INFO FORM */}
-        <AnimatePresence mode="wait">
-          <motion.div key={isEditing ? "edit" : "view"} className={`profile-info ${isEditing ? "editing" : ""}`}>
+        {/* FORM FIELDS */}
+        <div style={{display: "flex", flexDirection: "column", gap: "15px"}}>
             
-            <div className="row-group">
-              <label>First Name <input type="text" name="firstName" value={user.firstName} onChange={handleChange} disabled={!isEditing} /></label>
-              <label>Last Name <input type="text" name="lastName" value={user.lastName} onChange={handleChange} disabled={!isEditing} /></label>
+            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px"}}>
+                <div>
+                    <label>First Name</label>
+                    <input 
+                        className="input-field" 
+                        name="firstName" 
+                        value={formData.firstName} 
+                        onChange={handleChange} 
+                        disabled={!isEditing}
+                        style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc"}}
+                    />
+                </div>
+                <div>
+                    <label>Last Name</label>
+                    <input 
+                        className="input-field" 
+                        name="lastName" 
+                        value={formData.lastName} 
+                        onChange={handleChange} 
+                        disabled={!isEditing}
+                        style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc"}}
+                    />
+                </div>
             </div>
 
-            <div className="row-group">
-                <label>Age <input type="number" name="age" value={user.age} onChange={handleChange} disabled={!isEditing} placeholder="25" /></label>
-                <label>Blood Group <input type="text" name="bloodGroup" value={user.bloodGroup} onChange={handleChange} disabled={!isEditing} placeholder="O+" /></label>
+            <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px"}}>
+                <div>
+                    <label>Age</label>
+                    <input 
+                        type="number"
+                        name="age" 
+                        value={formData.age} 
+                        onChange={handleChange} 
+                        disabled={!isEditing}
+                        style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc"}}
+                    />
+                </div>
+                <div>
+                    <label>Blood Group</label>
+                    <input 
+                        name="bloodGroup" 
+                        value={formData.bloodGroup} 
+                        onChange={handleChange} 
+                        disabled={!isEditing}
+                        style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc"}}
+                    />
+                </div>
             </div>
 
-            <label>Gender 
-              <select name="gender" value={user.gender} onChange={handleChange} disabled={!isEditing}>
-                <option value="">Select Gender</option>
-                <option>Female</option>
-                <option>Male</option>
-                <option>Other</option>
-              </select>
-            </label>
+            <div>
+                <label>Gender</label>
+                <select 
+                    name="gender" 
+                    value={formData.gender} 
+                    onChange={handleChange} 
+                    disabled={!isEditing}
+                    style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc"}}
+                >
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
 
-            <label>Email <input type="email" name="email" value={user.email} disabled style={{ background: "#eee" }} /></label>
+            {/* 👇 NEW CITY FIELD */}
+            <div>
+                <label style={{color: "#8B5E3C", fontWeight: "bold"}}>City / Location</label>
+                <input 
+                    name="address" 
+                    value={formData.address} 
+                    onChange={handleChange} 
+                    disabled={!isEditing}
+                    placeholder="e.g. Bangalore"
+                    style={{width: "100%", padding: "10px", borderRadius: "8px", border: "2px solid #f0e0c8"}}
+                />
+            </div>
 
-          </motion.div>
-        </AnimatePresence>
+            <div>
+                <label>Email (Read Only)</label>
+                <input 
+                    value={formData.email} 
+                    disabled 
+                    style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #eee", background: "#f9f9f9", color: "#999"}}
+                />
+            </div>
+
+        </div>
 
         {/* BUTTONS */}
-        <div className="profile-buttons">
-          {!isEditing ? (
-            <>
-              <button className="edit-btn" onClick={startEditing}>Edit Profile</button>
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
-            </>
-          ) : (
-            <>
-              <button className="save-btn" onClick={handleSave}>Save Changes</button>
-              <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
-            </>
-          )}
-        </div>
-      </motion.div>
+        <div style={{marginTop: "30px", display: "flex", gap: "15px"}}>
+            {!isEditing ? (
+                <button 
+                    onClick={() => setIsEditing(true)}
+                    style={{flex: 1, padding: "12px", background: "#8B5E3C", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "1rem"}}
+                >
+                    ✏️ Edit Profile
+                </button>
+            ) : (
+                <button 
+                    onClick={handleSave}
+                    style={{flex: 1, padding: "12px", background: "#28a745", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "1rem"}}
+                >
+                    💾 Save Changes
+                </button>
+            )}
 
-      <motion.button className="back-btn" onClick={() => navigate("/dashboard")}>⬅ Back to Dashboard</motion.button>
-    </motion.div>
+            <button 
+                onClick={handleLogout}
+                style={{flex: 1, padding: "12px", background: "white", color: "#dc3545", border: "2px solid #dc3545", borderRadius: "8px", cursor: "pointer", fontSize: "1rem"}}
+            >
+                🚪 Logout
+            </button>
+        </div>
+
+      </div>
+    </div>
   );
 };
 

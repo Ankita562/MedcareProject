@@ -27,6 +27,7 @@ const UserSchema = new mongoose.Schema({
   age: { type: String, default: "" },
   gender: { type: String, default: "" },
   bloodGroup: { type: String, default: "" },
+  address: { type: String },
   photo: { type: String, default: "" }
   },
   { timestamps: true });

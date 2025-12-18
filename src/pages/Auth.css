@@ -289,3 +289,36 @@
     flex-direction: column;
   }
 }
+
+.link-text {
+  font-weight: bold;
+  cursor: pointer;
+  color: #8B5E3C;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.link-text:hover {
+  color: #5a3a20;
+}
+
+/* === FORGOT PASSWORD PAGE LAYOUT === */
+.forgot-password-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;             /* 👈 This is key for centering */
+  justify-content: center;   /* Center Horizontally */
+  align-items: center;       /* Center Vertically */
+  background: #fdf6ec;       /* Match your app background */
+  padding: 20px;
+}
+
+.forgot-password-card {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(139, 94, 60, 0.15); /* Soft brown shadow */
+  width: 100%;
+  max-width: 450px;          /* Keep it nice and compact */
+  border: 1px solid rgba(139, 94, 60, 0.1);
+}

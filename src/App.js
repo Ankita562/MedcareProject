@@ -21,6 +21,8 @@ import ViewTimeline from "./pages/ViewTimeline";
 import Analytics from "./pages/Analytics";
 import FindDoctors from "./pages/FindDoctors";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Data
 import { fakePatientDetails } from "./data/fakeData";
@@ -94,6 +96,7 @@ function App() {
       >
         
         <Routes>
+          <Route path="/reset-password/*" element={<ResetPassword />} />
           <Route
             path="/"
             element={
@@ -105,6 +108,8 @@ function App() {
             path="/login"
             element={<Auth onLogin={() => setIsLoggedIn(true)} />}
           />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          
 
           <Route
             path="/register"

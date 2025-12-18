@@ -1,193 +1,178 @@
-/* ======================================
-   🤎 Find Doctors Page – MedCare Theme
-   Brown × Beige Palette
-   Light + Dark Mode Supported
-   ====================================== */
-
+/* FindDoctors.css */
 .find-doctors-page {
-  min-height: 100vh;
-  padding: 2rem;
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
   text-align: center;
-  font-family: "Poppins", sans-serif;
-  transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* ===== Light Mode ===== */
-.light .find-doctors-page {
-  background: linear-gradient(180deg, #FFF7ED 0%, #F5E9D6 100%);
-  color: #3B2C22;
-}
-
-/* ===== Dark Mode ===== */
-.dark .find-doctors-page {
-  background: linear-gradient(180deg, #231A15 0%, #3B2C22 100%);
-  color: #F0E2D3;
-}
-
-/* ===== Headings ===== */
 .find-doctors-page h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  color: var(--accent-color); /* brown */
-  font-weight: 700;
+  color: #8B5E3C;
+  margin-bottom: 10px;
 }
 
 .subtitle {
-  color: var(--muted-text); /* mocha */
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 30px;
 }
 
-/* ===== Search Bar ===== */
+/* --- Search Section --- */
 .search-bar {
   display: flex;
+  gap: 10px;
   justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 30px;
   flex-wrap: wrap;
 }
 
 .search-bar input {
-  padding: 12px 18px;
-  width: 300px;
-  border-radius: 10px;
-  border: 1px solid var(--card-border);
-  outline: none;
+  padding: 12px 20px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
   font-size: 1rem;
-  background: #F5E9D6;
-  color: var(--text-color);
-  transition: all 0.3s ease;
+  outline: none;
 }
 
 .search-bar input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 6px rgba(139, 94, 60, 0.3);
-  background-color: #ffffff;
+  border-color: #8B5E3C;
 }
 
-/* ===== Search Button ===== */
 .search-btn {
-  padding: 12px 18px;
-  background: linear-gradient(135deg, #8B5E3C, #C58F63); /* brown → caramel */
-  color: white;
-  border: none;
-  border-radius: 10px;
+  padding: 12px 20px;
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 25px;
   cursor: pointer;
-  font-weight: 500;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition: 0.3s;
 }
 
 .search-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(139, 94, 60, 0.35);
+  background: #e0e0e0;
 }
 
-/* ===== Doctor Cards ===== */
+/* --- Doctor List Grid --- */
 .doctor-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
 }
 
+/* --- Individual Doctor Card --- */
 .doctor-card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 18px rgba(139, 94, 60, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: fadeIn 0.4s ease-in-out;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  text-align: left;
+  transition: transform 0.2s;
 }
 
 .doctor-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(139, 94, 60, 0.25);
+  transform: translateY(-5px);
+  border-color: #8B5E3C;
 }
 
 .doctor-card h3 {
-  font-size: 1.2rem;
-  color: var(--accent-color);
-  margin-bottom: 0.4rem;
-  font-weight: 600;
+  margin-top: 0;
+  color: #333;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
 }
 
 .doctor-card p {
-  font-size: 0.95rem;
-  color: var(--muted-text);
-  margin: 3px 0;
+  margin: 8px 0;
+  color: #555;
 }
 
-/* ===== Contact Button ===== */
-.contact-btn {
-  margin-top: 1rem;
-  padding: 10px 16px;
-  background: linear-gradient(135deg, #8B5E3C, #C58F63);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+/* --- NEW ACTION BUTTONS AREA --- */
+.doctor-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-.contact-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(139, 94, 60, 0.3);
+/* Common button styles */
+.google-btn, .manual-btn {
+    flex: 1; /* Makes them equal width */
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border: none;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
-/* ===== No Results Text ===== */
+/* Google Button (Secondary style) */
+.google-btn {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+}
+.google-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Manual Button (Primary style) */
+.manual-btn {
+    background: #8B5E3C;
+    color: white;
+}
+.manual-btn:hover {
+    background: #734d32;
+}
+
 .no-results {
-  font-size: 1rem;
-  color: var(--muted-text);
-  margin-top: 2rem;
+  grid-column: 1 / -1;
+  color: #888;
   font-style: italic;
 }
 
-/* ===== Dark Mode Variables ===== */
-.dark .doctor-card {
-  background: #3B2C22;
-  box-shadow: 0 8px 20px rgba(197, 143, 99, 0.15);
+/* === WARNING BANNER STYLE === */
+.profile-warning {
+  background-color: #fff3cd;       /* Light Yellow Background */
+  border: 1px solid #ffeeba;       /* Yellow Border */
+  color: #856404;                  /* Dark Yellow/Brown Text */
+  padding: 15px 20px;
+  border-radius: 8px;              /* Rounded Corners */
+  margin: 0 auto 30px auto;        /* Center it and add space below */
+  max-width: 800px;                /* Don't let it get too wide */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;                       /* Space between text and link */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Subtle shadow */
+  font-size: 1rem;
 }
 
-.dark .doctor-card p {
-  color: #F0E2D3;
+/* Style for the "Complete Profile" link */
+.complete-link {
+  color: #d9534f;                  /* Red/Orange color for urgency */
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.dark .subtitle {
-  color: var(--muted-text);
+.complete-link:hover {
+  color: #c9302c;                  /* Darker red on hover */
 }
 
-.dark .search-bar input {
-  background: #231A15;
-  border-color: #4A3A32;
-  color: #F0E2D3;
+/* Animation to make it pop in nicely */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Animation ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .find-doctors-page h1 {
-    font-size: 1.7rem;
-  }
-
-  .search-bar input {
-    width: 90%;
-  }
-
-  .doctor-card {
-    padding: 1.2rem;
-  }
+.profile-warning {
+  animation: slideDown 0.4s ease-out;
 }
