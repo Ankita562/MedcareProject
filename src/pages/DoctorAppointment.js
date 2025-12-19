@@ -1,205 +1,189 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
-import "./DoctorAppointment.css"; 
+import "./DoctorAppointment.css"; // Keep your existing CSS file
 
 const DoctorAppointment = () => {
-  const locationHook = useLocation();
   const user = JSON.parse(localStorage.getItem("user"));
-
+  
+  // --- STATE: Apollo Popup ---
   const [showPopup, setShowPopup] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
-  const [isManualMode, setIsManualMode] = useState(false);
+
+  // --- STATE: Manual Appointment Data ---
   const [appointments, setAppointments] = useState([]);
+  const [doctorName, setDoctorName] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [specialty, setSpecialty] = useState("General");
+  const [location, setLocation] = useState("");
 
-  const [form, setForm] = useState({
-    doctorName: "",
-    specialty: "General",
-    date: "",
-    time: "",
-    location: "City Clinic",
-  });
-
-  // 1. CHECK FOR PRE-FILLED DATA
-  useEffect(() => {
-    if (locationHook.state) {
-      const { prefillDoctor, prefillSpecialty } = locationHook.state;
-      if (prefillDoctor) {
-        setIsManualMode(true);
-        setForm((prev) => ({
-          ...prev,
-          doctorName: prefillDoctor || "",
-          specialty: prefillSpecialty || "General",
-        }));
-      }
-    }
-  }, [locationHook.state]);
-
-  // 2. FETCH APPOINTMENTS
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      if (user?._id) {
-        try {
-          const res = await axios.get(`http://localhost:5000/api/appointments/${user._id}`);
-          setAppointments(res.data);
-        } catch (err) {
-          console.error("Error fetching appointments:", err);
-        }
-      }
-    };
-    fetchAppointments();
-  }, [user?._id]);
-
-  // 3. HANDLE SUBMIT
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!user) return alert("Please login first");
-
+  // --- 1. Fetch Appointments ---
+  const fetchAppointments = async () => {
+    if (!user?._id) return;
     try {
-      const res = await axios.post("http://localhost:5000/api/appointments/add", {
-        userId: user._id,
-        ...form,
-      });
-
-      setAppointments([...appointments, res.data]); 
-      setForm({ doctorName: "", specialty: "General", date: "", time: "", location: "City Clinic" }); 
-      setIsManualMode(false); 
-      alert("Appointment Booked Successfully! ✅");
-      
+      const res = await axios.get(`http://localhost:5000/api/appointments/${user._id}`);
+      setAppointments(res.data);
     } catch (err) {
-      console.error(err);
-      alert("Error booking appointment. Is Backend running?");
+      console.error("Error fetching appointments:", err);
     }
   };
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  useEffect(() => {
+    fetchAppointments();
+  }, [user?._id]);
 
+  // --- 2. Handle Apollo Redirect ---
   const handleApolloRedirect = () => {
     setShowPopup(true);
     setTimeout(() => {
       setShowCheck(true);
       setTimeout(() => {
-        window.open("https://www.apollo247.com/doctors", "_blank", "noopener,noreferrer");
+        window.open("https://www.apollo247.com/book-appointment", "_blank", "noopener,noreferrer");
         setShowPopup(false);
         setShowCheck(false);
       }, 1000);
     }, 1500);
   };
 
+  // --- 3. Handle Manual Submit ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/api/appointments/add", {
+        userId: user._id,
+        doctorName,
+        date,
+        time,
+        specialty,
+        location
+      });
+      // Reset Form & Refresh
+      setDoctorName(""); setDate(""); setTime(""); setLocation("");
+      fetchAppointments();
+    } catch (err) {
+      alert("Error booking appointment");
+    }
+  };
+
+  // --- 4. Handle Delete ---
+  const handleDelete = async (id) => {
+    if (window.confirm("Delete this appointment record?")) {
+      try {
+        await axios.delete(`http://localhost:5000/api/appointments/${id}`);
+        fetchAppointments();
+      } catch (err) {
+        console.error("Failed to delete", err);
+      }
+    }
+  };
+
+  // --- 5. Filtering Logic ---
+  const todayStr = new Date().toISOString().split('T')[0];
+  const upcomingVisits = appointments.filter(appt => appt.date >= todayStr);
+  upcomingVisits.sort((a, b) => a.date.localeCompare(b.date));
+
   return (
     <div className="appointment-page-container">
       
-      {/* GRID CONTAINER FOR LAYOUT */}
-      <div className="appointment-grid">
+      {/* HEADER SECTION */}
+      <div className="appointment-card" style={{marginBottom: "20px"}}>
+        <h1>📅 Doctor Appointment</h1>
+        <p className="subtitle">Schedule your medical consultations via Apollo or track them manually.</p>
         
-        {/* === LEFT CARD: ACTIONS === */}
-        <div className="appointment-card">
-          <h1>📅 Doctor Appointment</h1>
+        {/* APOLLO BUTTON */}
+        <div className="options" style={{marginTop: "20px"}}>
+          <button className="primary-btn" onClick={handleApolloRedirect} style={{width: "100%", padding: "15px", fontSize: "1.1rem"}}>
+            🩺 Book Online via Apollo 24/7
+          </button>
+        </div>
+      </div>
+
+      {/* MANUAL BOOKING SECTION (Split View) */}
+      <div style={{display: "flex", flexWrap: "wrap", gap: "20px"}}>
+        
+        {/* LEFT: BOOKING FORM */}
+        <div className="appointment-card" style={{flex: 1, minWidth: "300px", textAlign: "left"}}>
+          <h3 style={{color: "#8B5E3C", borderBottom: "2px solid #eee", paddingBottom: "10px"}}>➕ Add Manual Record</h3>
           
-          {!isManualMode ? (
-            <>
-              <p className="subtitle">
-                Schedule your medical consultations easily and conveniently.
-              </p>
-
-              <div className="options">
-                <button className="primary-btn" onClick={handleApolloRedirect}>
-                  🩺 Book via Apollo
-                </button>
-
-                <button className="secondary-btn" onClick={() => setIsManualMode(true)}>
-                  💊 Add Appointment Manually
-                </button>
-              </div>
-
-              <div className="coming-soon">
-                <p>✨ Connect with top specialists near you.</p>
-              </div>
-            </>
-          ) : (
-            <div className="form-container" style={{ textAlign: "left", padding: "10px" }}>
-              <h3 style={{ marginBottom: "15px", color: "#8B5E3C" }}>New Appointment</h3>
-              <form onSubmit={handleSubmit} style={{ display: "grid", gap: "10px" }}>
-                
-                <label>Doctor Name</label>
-                <input name="doctorName" value={form.doctorName} onChange={handleChange} placeholder="Dr. Smith" required className="input-field" />
-
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <div style={{ flex: 1 }}>
-                    <label>Date</label>
-                    <input name="date" type="date" value={form.date} onChange={handleChange} required className="input-field" />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label>Time</label>
-                    <input name="time" type="time" value={form.time} onChange={handleChange} required className="input-field" />
-                  </div>
-                </div>
-
-                <label>Specialty</label>
-                <select name="specialty" value={form.specialty} onChange={handleChange} className="input-field">
-                  <option>General</option>
-                  <option>Cardiologist</option>
-                  <option>Dentist</option>
-                  <option>Dermatologist</option>
-                  <option>Neurologist</option>
-                  <option>Orthopedic</option>
-                </select>
-
-                <label>Location</label>
-                <input name="location" value={form.location} onChange={handleChange} placeholder="Hospital Name" className="input-field" />
-
-                <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
-                  <button type="submit" className="primary-btn" style={{ flex: 1 }}>Save</button>
-                  <button type="button" className="secondary-btn" onClick={() => setIsManualMode(false)} style={{ flex: 1, background: "#eee", color: "#333", border: "none" }}>Cancel</button>
-                </div>
-              </form>
+          <form onSubmit={handleSubmit} style={{display: "flex", flexDirection: "column", gap: "15px", marginTop: "15px"}}>
+            <input type="text" placeholder="Doctor Name" value={doctorName} onChange={e => setDoctorName(e.target.value)} required style={inputStyle} />
+            
+            <div style={{display: "flex", gap: "10px"}}>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} required style={inputStyle} />
+              <input type="time" value={time} onChange={e => setTime(e.target.value)} required style={inputStyle} />
             </div>
-          )}
+
+            <select value={specialty} onChange={e => setSpecialty(e.target.value)} style={inputStyle}>
+              <option>General Physician</option>
+              <option>Cardiologist</option>
+              <option>Dermatologist</option>
+              <option>Neurologist</option>
+              <option>Dentist</option>
+            </select>
+
+            <input type="text" placeholder="Clinic / Hospital Name" value={location} onChange={e => setLocation(e.target.value)} style={inputStyle} />
+            
+            <button type="submit" className="secondary-btn" style={{marginTop: "10px"}}>💾 Save to History</button>
+          </form>
         </div>
 
-        {/* === RIGHT CARD: UPCOMING VISITS (Only shows if appointments exist) === */}
-        {appointments.length > 0 && (
-          <div className="upcoming-container">
-            <h3 style={{ color: "#8B5E3C", textAlign: "center", marginBottom: "20px" }}>🗓️ Upcoming Visits</h3>
-            <div className="scrollable-list">
-              {appointments.map((appt) => (
-                <div key={appt._id} className="visit-card">
-                  <div>
-                    <h4 style={{ margin: 0, color: "#333" }}>{appt.doctorName}</h4>
-                    <p style={{ margin: "4px 0", fontSize: "0.85rem", color: "#666" }}>{appt.specialty} • {appt.location}</p>
+        {/* RIGHT: UPCOMING LIST */}
+        <div className="appointment-card" style={{flex: 1, minWidth: "300px", textAlign: "left"}}>
+          <h3 style={{color: "#5D4037", borderBottom: "2px solid #eee", paddingBottom: "10px"}}>🗓️ Upcoming Visits</h3>
+          
+          {upcomingVisits.length > 0 ? (
+            <div style={{marginTop: "15px", maxHeight: "400px", overflowY: "auto"}}>
+              {upcomingVisits.map(appt => (
+                <div key={appt._id} style={cardStyle}>
+                  <div style={{display: "flex", justifyContent: "space-between"}}>
+                     <div>
+                        <strong style={{fontSize: "1.1rem", color: "#333"}}>{appt.doctorName}</strong>
+                        <div style={{fontSize: "0.85rem", color: "#666"}}>{appt.specialty} • {appt.location}</div>
+                     </div>
+                     <div style={{textAlign: "right", color: "#8B5E3C", fontWeight: "bold"}}>
+                        <div>{appt.date}</div>
+                        <div style={{fontSize: "0.9rem"}}>{appt.time}</div>
+                     </div>
                   </div>
-                  <div style={{ textAlign: "right", minWidth: "80px" }}>
-                    <p style={{ margin: 0, fontWeight: "bold", color: "#8B5E3C" }}>{appt.date}</p>
-                    <p style={{ margin: 0, fontSize: "0.85rem", color: "#555" }}>{appt.time}</p>
-                  </div>
+                  <button onClick={() => handleDelete(appt._id)} style={deleteBtnStyle}>
+                    ✖ Cancel / Delete
+                  </button>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p style={{color: "#888", marginTop: "20px", textAlign: "center"}}>No upcoming appointments.</p>
+          )}
+        </div>
 
       </div>
 
-      {/* POPUP */}
+      {/* ✅ Confirmation Popup (Your Existing Logic) */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-box">
             {!showCheck ? (
               <>
                 <div className="spinner"></div>
-                <p>Redirecting to Apollo...</p>
+                <p>Redirecting to Apollo Booking Portal...</p>
               </>
             ) : (
               <>
                 <div className="checkmark">✅</div>
-                <p>Opening Apollo 24/7...</p>
+                <p>All set! Opening Apollo...</p>
               </>
             )}
           </div>
         </div>
       )}
+
     </div>
   );
 };
+
+// --- Styles for Form & Cards ---
+const inputStyle = { width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc", boxSizing: "border-box" };
+const cardStyle = { background: "#FFF8E7", padding: "15px", borderRadius: "10px", marginBottom: "10px", borderLeft: "5px solid #8B5E3C", position: "relative" };
+const deleteBtnStyle = { marginTop: "10px", background: "none", border: "none", color: "#E53E3E", cursor: "pointer", fontSize: "0.85rem", textDecoration: "underline", width: "100%", textAlign: "right" };
 
 export default DoctorAppointment;

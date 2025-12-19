@@ -109,7 +109,7 @@ function App() {
             element={<Auth onLogin={() => setIsLoggedIn(true)} />}
           />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           <Route
             path="/register"
