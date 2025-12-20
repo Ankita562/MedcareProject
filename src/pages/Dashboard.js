@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios"; 
 import "./Dashboard.css";
 import AddReminderModal from "../components/AddReminderModal"; 
+import { toast } from "react-toastify";
 import {
   Calendar,
   Pill,
@@ -10,13 +11,14 @@ import {
   Bell,
   User,
   Activity,
+  Trash2,
 } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   
-  // State
+  // Data State
   const [medicines, setMedicines] = useState([]);
   const [reports, setReports] = useState([]);
   const [nextAppt, setNextAppt] = useState(null);
@@ -27,36 +29,50 @@ const Dashboard = () => {
   // Reminder States
   const [reminders, setReminders] = useState([]);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+  
+  // ⭐ NEW: Permission Modal State
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
-  // 1. Notification Permission
+  // 1. Check Permission on Load (Modified)
   useEffect(() => {
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission();
+    // Only show the custom box if the user hasn't decided yet ('default')
+    // If they already 'granted' or 'denied', we don't bother them.
+    if (Notification.permission === "default") {
+      setShowPermissionModal(true);
     }
   }, []);
 
-  // 2. Central Data Fetching Function
+  // 2. Handle "Enable" Click from Modal
+  const requestNotificationAccess = () => {
+    Notification.requestPermission().then((permission) => {
+      setShowPermissionModal(false); // Close the custom box
+      if (permission === "granted") {
+        toast.success("Reminders enabled! 🔔");
+      } else {
+        toast.info("Reminders disabled.");
+      }
+    });
+  };
+
+  // 3. Central Data Fetching Function
   const fetchData = useCallback(async () => {
     if (!user?._id) return;
 
     try {
-      // Medicines
-      const medRes = await axios.get(`http://localhost:5000/api/medicines/${user._id}`);
+      // Parallel Fetching for speed
+      const [medRes, apptRes, reportRes, remRes, analyticsRes] = await Promise.all([
+        axios.get(`http://localhost:5000/api/medicines/${user._id}`),
+        axios.get(`http://localhost:5000/api/appointments/${user._id}`),
+        axios.get(`http://localhost:5000/api/reports/${user._id}`),
+        axios.get(`http://localhost:5000/api/reminders/${user._id}`),
+        axios.get(`http://localhost:5000/api/analytics/${user._id}`)
+      ]);
+
       setMedicines(medRes.data);
-
-      // Appointments
-      const apptRes = await axios.get(`http://localhost:5000/api/appointments/${user._id}`);
-      
-      // Reports 
-      const reportRes = await axios.get(`http://localhost:5000/api/reports/${user._id}`);
       setReports(reportRes.data);
-
-      // Reminders
-      const remRes = await axios.get(`http://localhost:5000/api/reminders/${user._id}`);
       setReminders(remRes.data);
 
-      // Health Analytics
-      const analyticsRes = await axios.get(`http://localhost:5000/api/analytics/${user._id}`);
+      // Analytics Logic
       const logs = analyticsRes.data;
       const getLatest = (category) => {
          const items = logs.filter(log => log.category === category);
@@ -69,22 +85,11 @@ const Dashboard = () => {
          temp: getLatest("Temperature")
       });
 
-      // ⭐ NEXT APPOINTMENT LOGIC (Improved)
-      const todayStr = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
-      
-      const futureAppts = apptRes.data.filter(a => {
-         // Ensure we compare compatible date strings
-         return a.date >= todayStr; 
-      });
-      
-      // Sort by earliest date first
+      // Next Appointment Logic
+      const todayStr = new Date().toISOString().split('T')[0];
+      const futureAppts = apptRes.data.filter(a => a.date >= todayStr);
       futureAppts.sort((a, b) => a.date.localeCompare(b.date));
-      
-      if (futureAppts.length > 0) {
-        setNextAppt(futureAppts[0]);
-      } else {
-        setNextAppt(null);
-      }
+      setNextAppt(futureAppts.length > 0 ? futureAppts[0] : null);
 
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -95,9 +100,11 @@ const Dashboard = () => {
     fetchData();
   }, [fetchData]);
 
-  // 3. Notification Checker
+  // 4. Notification Checker (Runs every 5s)
   useEffect(() => {
     const interval = setInterval(() => {
+      if (Notification.permission !== "granted") return;
+
       const now = new Date();
       reminders.forEach(rem => {
         const remDate = new Date(rem.datetime);
@@ -121,7 +128,7 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [reminders]);
 
-  // Delete Reminder Function
+  // Actions
   const deleteReminder = async (id) => {
      if(window.confirm("Delete this reminder?")) {
         try {
@@ -131,20 +138,81 @@ const Dashboard = () => {
      }
   };
 
-  // ⭐ NEW: Cancel Appointment Function
   const cancelAppointment = async (id) => {
     if (window.confirm("Cancel this appointment?")) {
       try {
         await axios.delete(`http://localhost:5000/api/appointments/${id}`);
-        fetchData(); // Refresh to show next one or empty
-      } catch (err) {
-        console.error("Failed to cancel appointment", err);
-      }
+        fetchData(); 
+      } catch (err) { console.error(err); }
     }
   };
   
+  const deleteMedicine = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
+      try {
+        await axios.delete(`http://localhost:5000/api/medicines/${id}`);
+        toast.success(`${name} deleted successfully! 🗑️`);
+        fetchData(); 
+      } catch (err) {
+        toast.error("Failed to delete medicine.");
+      }
+    }
+  };
+
   return (
     <div className="dashboard-container">
+      
+      {/* ⭐ PERMISSION MODAL (The Centered Box) */}
+      {showPermissionModal && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)", // Dimmed background
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: "white",
+            padding: "30px",
+            borderRadius: "15px",
+            textAlign: "center",
+            maxWidth: "400px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+            border: "1px solid #eee"
+          }}>
+            <Bell size={48} color="#8B5E3C" style={{ marginBottom: "15px" }} />
+            <h2 style={{ color: "#333", marginBottom: "10px", marginTop: 0 }}>Enable Reminders?</h2>
+            <p style={{ color: "#666", marginBottom: "25px", lineHeight: "1.5" }}>
+              MedCare needs your permission to send alerts for your medication times and appointments.
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button 
+                onClick={requestNotificationAccess}
+                style={{
+                  background: "#8B5E3C", color: "white", padding: "10px 25px",
+                  border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold",
+                  fontSize: "1rem"
+                }}
+              >
+                Allow
+              </button>
+              <button 
+                onClick={() => setShowPermissionModal(false)}
+                style={{
+                  background: "#f0f0f0", color: "#555", padding: "10px 25px",
+                  border: "none", borderRadius: "8px", cursor: "pointer",
+                  fontSize: "1rem"
+                }}
+              >
+                Later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="dashboard-header">
         <h1>Welcome, {user ? `${user.firstName} ${user.lastName}` : "Guest"}</h1>
         <p>Your health overview at a glance</p>
@@ -152,7 +220,7 @@ const Dashboard = () => {
 
       <div className="dashboard-grid">
 
-        {/* ⭐ CARD 1: APPOINTMENTS (UPDATED WITH DELETE) */}
+        {/* CARD 1: APPOINTMENTS */}
         <div 
            className="dashboard-card" 
            onClick={() => navigate("/appointments")} 
@@ -162,11 +230,9 @@ const Dashboard = () => {
           <h3>Next Appointment</h3>
           {nextAppt ? (
             <div className="fade-in" style={{position: "relative"}}>
-               
-               {/* DELETE BUTTON */}
                <button 
                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent navigating
+                    e.stopPropagation();
                     cancelAppointment(nextAppt._id);
                  }}
                  style={{
@@ -174,10 +240,7 @@ const Dashboard = () => {
                    background: "#FFF5F5", color: "red", border: "none",
                    borderRadius: "50%", width: "25px", height: "25px", cursor: "pointer"
                  }}
-                 title="Cancel Appointment"
-               >
-                 ✖
-               </button>
+               >✖</button>
 
                <p style={{fontWeight: "bold", fontSize: "1.2rem", margin: "10px 0 5px", color: "#333"}}>
                  {nextAppt.doctorName}
@@ -198,16 +261,37 @@ const Dashboard = () => {
         </div>
 
         {/* CARD 2: MEDICINES */}
-        <div className="dashboard-card">
-          <div className="card-icon"><Pill /></div>
-          <h3>Medicines</h3>
-          <p style={{fontWeight: "bold", fontSize: "1.2rem", color: "#8B5E3C", margin: "10px 0"}}>{medicines.length} Active</p>
-          <div style={{fontSize: "0.85rem", color: "#666", marginBottom: "15px", minHeight: "40px"}}>
-             {medicines.length > 0 ? medicines.slice(0, 2).map(med => (
-                 <div key={med._id} style={{marginBottom:"4px"}}>• {med.name}</div>
-             )) : <span>No medicines added.</span>}
+        <div className="dashboard-card" style={{display: 'flex', flexDirection: 'column'}}>
+          <div className="card-header">
+             <div className="card-icon"><Pill /></div>
+             <h3>Medicines</h3>
           </div>
-          <button className="dash-btn" onClick={() => navigate("/add-medicine")}>+ Add Medicine</button>
+          <p style={{fontWeight: "bold", fontSize: "1.2rem", color: "#8B5E3C", margin: "10px 0"}}>{medicines.length} Active</p>
+          
+          <div style={{flexGrow: 1, overflowY: "auto", maxHeight: "150px", paddingRight: "5px", marginBottom: "15px"}}>
+             {medicines.length > 0 ? medicines.map(med => (
+                 <div key={med._id} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    marginBottom: "8px", padding: "8px", borderBottom: "1px dashed #eee",
+                    background: "#fafafa", borderRadius: "6px"
+                 }}>
+                     <div>
+                        <div style={{fontWeight: "600", fontSize: "0.95rem"}}>{med.name}</div>
+                        <div style={{fontSize: "0.8rem", color: "#666"}}>{med.dosage || "No dosage"}</div>
+                     </div>
+                     <button 
+                        onClick={(e) => { e.stopPropagation(); deleteMedicine(med._id, med.name); }}
+                        style={{
+                           border: "none", background: "#FFF5F5", color: "#E53E3E", 
+                           cursor: "pointer", padding: "6px", borderRadius: "50%"
+                        }}
+                     >
+                        <Trash2 size={16} />
+                     </button>
+                 </div>
+             )) : <span style={{color: "#888", fontStyle: "italic"}}>No medicines added.</span>}
+          </div>
+          <button className="dash-btn" onClick={() => navigate("/medicines/new")} style={{marginTop: "auto"}}>+ Add Medicine</button>
         </div>
 
         {/* CARD 3: REPORTS */}
@@ -232,17 +316,15 @@ const Dashboard = () => {
                         padding:"10px 0", borderBottom:"1px dashed #eee"
                     }}>
                        <div>
-                         <span style={{display:"block", fontWeight:"600", color: "#5D4037", fontSize: "0.9rem"}}>{r.title}</span>
-                         <span style={{fontSize:"0.75rem", color:"#888"}}>
-                           {new Date(r.datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                         </span>
+                          <span style={{display:"block", fontWeight:"600", color: "#5D4037", fontSize: "0.9rem"}}>{r.title}</span>
+                          <span style={{fontSize:"0.75rem", color:"#888"}}>
+                            {new Date(r.datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </span>
                        </div>
                        <button 
-                         onClick={(e) => { e.stopPropagation(); deleteReminder(r._id); }} 
-                         style={{border:"none", background:"#FFF5F5", color:"#E53E3E", cursor:"pointer", padding: "5px", borderRadius: "5px"}}
-                       >
-                         🗑️
-                       </button>
+                          onClick={(e) => { e.stopPropagation(); deleteReminder(r._id); }} 
+                          style={{border:"none", background:"#FFF5F5", color:"#E53E3E", cursor:"pointer", padding: "5px", borderRadius: "5px"}}
+                       >🗑️</button>
                     </div>
                   ))}
                 </div>
@@ -252,7 +334,6 @@ const Dashboard = () => {
                 </div>
              )}
           </div>
-
           <button className="dash-btn" onClick={() => setIsReminderModalOpen(true)} style={{marginTop: "auto"}}>+ Set Reminder</button>
         </div>
 
@@ -278,13 +359,10 @@ const Dashboard = () => {
              <div className="summary-item"><span>⚖️</span><div><label>Weight</label><p>{healthSummary.weight}</p></div></div>
              <div className="summary-item"><span>🌡️</span><div><label>Temp</label><p>{healthSummary.temp}</p></div></div>
           </div>
-          
           <button 
              style={{background:"none", border:"none", color:"#8B5E3C", fontSize:"0.85rem", marginTop:"15px", cursor:"pointer"}}
              onClick={() => navigate("/analytics")}
-          >
-             View detailed analytics →
-          </button>
+          >View detailed analytics →</button>
         </div>
 
       </div>

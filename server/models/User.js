@@ -24,6 +24,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     min: 6
   },
+
+  //FIELDS FOR EMAIL VERIFICATION
+  isVerified: { type: Boolean, default: false },
+  verificationToken: { type: String },
+
   age: { type: String, default: "" },
   gender: { type: String, default: "" },
   bloodGroup: { type: String, default: "" },

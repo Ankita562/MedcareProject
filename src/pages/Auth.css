@@ -1,324 +1,181 @@
-/* ==========================================================
-   THEME VARIABLES — MATCH EXACT COLORS FROM YOUR DASHBOARD
-========================================================== */
-:root {
-  --bg: #F7EEDC;                 /* Light cream background */
-  --bg-card: #F9EED9;            /* Soft cream card */
-  --bg-left: linear-gradient(135deg, #F0DFCA, #E6D5BF);
+/* =======================================
+   🤎 Auth Page Styles (src/pages/Auth.css)
+   ======================================= */
 
-  --text: #6B4F33;               /* Warm brown heading */
-  --text-light: #7A6148;         /* Softer brown subtext */
-
-  --accent: #A0764F;             /* Brown highlight button */
-  --accent-dark: #8B623D;        /* Darker brown hover */
-
-  --input-bg: #FFFFFF;           /* Clean white inputs */
-  --input-border: #D6B892;       /* Soft brown border */
-
-  --error-bg: #F9E1D5;           /* Soft peach error */
-  --error-text: #A33D2E;         /* Warm red-brown */
-}
-
-/* ==========================================================
-   DARK MODE — MATCHES YOUR DARK SIDEBAR STYLE
-========================================================== */
-[data-theme="dark"] {
-  --bg: #1C1C1C;
-  --bg-card: #252525;
-  --bg-left: linear-gradient(135deg, #2D2A26, #1D1A17);
-
-  --text: #EFEFEF;
-  --text-light: #C7C7C7;
-
-  --accent: #A0764F;
-  --accent-dark: #8B623D;
-
-  --input-bg: #333;
-  --input-border: #555;
-
-  --error-bg: #3A1F1F;
-  --error-text: #FFABAB;
-}
-
-/* ==========================================================
-   PAGE LAYOUT
-========================================================== */
+/* 1. Main Page Layout */
 .auth-page {
   display: flex;
   height: 100vh;
   width: 100%;
-  background: var(--bg);
+  background: var(--bg-color);
   overflow: hidden;
-  font-family: "Poppins", sans-serif;
-  position: relative;
 }
 
-/* DARK MODE TOGGLE BUTTON */
-.theme-toggle {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  background: var(--bg-card);
-  border: 2px solid var(--accent);
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--accent);
-  transition: 0.3s;
-  z-index: 1000;
-}
-
-.theme-toggle:hover {
-  background: var(--accent);
-  color: white;
-}
-
-/* ==========================================================
-   LEFT BRAND PANEL
-========================================================== */
+/* 2. Left Side (Brand) */
 .auth-left {
   flex: 1;
-  background: var(--bg-left);
-  color: white;
-  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #F0DFCA, #E6D5BF); /* Light mode gradient */
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  padding: 2rem;
+}
+
+/* Dark Mode Gradient for Left Side */
+body.dark-mode .auth-left {
+  background: linear-gradient(135deg, #2c2c3e, #1a1a24);
 }
 
 .auth-illustration {
-  width: 200px;
-  height: 200px;
-  margin-bottom: 1.5rem;
-  animation: float 3s ease-in-out infinite;
+  width: 250px;
+  margin-bottom: 20px;
 }
 
 .brand-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  color: #fff; /* Always white on brand panel */
 }
 
-.auth-tagline {
-  font-size: 1.1rem;
-  opacity: 0.95;
-}
-
-/* Floating animation */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-  100% { transform: translateY(0px); }
-}
-
-/* ==========================================================
-   RIGHT FORM PANEL
-========================================================== */
+/* 3. Right Side (Login Form) */
 .auth-right {
   flex: 1;
-  background: var(--bg-card);
+  background: var(--card-bg); /* Matches Dark Mode Variable */
+  color: var(--text-color);   /* Matches Dark Mode Variable */
+  
   padding: 4rem 3rem;
-  border-top-left-radius: 50px;
-  border-bottom-left-radius: 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: -5px 0 20px rgba(0,0,0,0.05);
+  
+  border-top-left-radius: 50px;
+  border-bottom-left-radius: 50px;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .form-title {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: var(--text);
+  color: var(--text-color);
   font-weight: 700;
 }
 
-/* ==========================================================
-   FORM FIELDS
-========================================================== */
-.auth-form label {
-  font-weight: 600;
-  color: var(--text-light);
-  margin-top: 1rem;
-  display: block;
-}
-
+/* 4. Inputs */
 .auth-form input {
   width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.3rem;
-  font-size: 1rem;
-  background: var(--input-bg);
-  border: 2px solid var(--input-border);
-  border-radius: 10px;
-  color: var(--text);
+  padding: 12px;
+  margin-top: 8px;
+  font-size: 16px;
+  
+  /* Variables for Colors */
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  
+  border-radius: 8px;
   outline: none;
-  transition: 0.25s;
+  transition: 0.3s;
 }
 
 .auth-form input:focus {
-  border-color: var(--accent);
-  box-shadow: 0px 0px 8px rgba(160, 118, 79, 0.3);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 8px rgba(139, 94, 60, 0.25);
 }
 
-/* 2 columns for signup */
-.two-input {
-  display: flex;
-  gap: 1rem;
+.auth-form label {
+  font-weight: 600;
+  color: var(--muted-text);
+  margin-top: 15px;
+  display: block;
 }
 
-/* ==========================================================
-   PASSWORD INPUT WITH EYE ICON
-========================================================== */
+/* ============================
+   5. FIXED PASSWORD EYE ICON
+   ============================ */
 .password-field {
   position: relative;
-}
-
-.password-field input {
-  padding-right: 45px;
+  display: flex;
+  flex-direction: column; /* Ensures label sits on top */
 }
 
 .toggle-eye {
   position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 15px;
+  
+  /* Align from the BOTTOM to sit perfectly inside the input */
+  bottom: 12px; 
+  
   cursor: pointer;
-  color: var(--accent-dark);
-  transition: 0.2s;
+  color: var(--muted-text);
+  font-size: 1.2rem;
+  z-index: 10;
 }
 
-.toggle-eye:hover {
-  transform: scale(1.1);
-}
-
-/* ==========================================================
-   ERROR BOX
-========================================================== */
-.error-box {
-  background: var(--error-bg);
-  padding: 0.8rem 1rem;
-  border-left: 4px solid var(--accent);
-  color: var(--error-text);
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-}
-
-/* ==========================================================
-   SUBMIT BUTTON
-========================================================== */
+/* ============================
+   6. FIXED BUTTONS
+   ============================ */
 .auth-btn {
   width: 100%;
-  margin-top: 1.5rem;
-  padding: 0.9rem;
-  background: var(--accent);
+  margin-top: 20px; 
+  padding: 12px 0;  
+  background: var(--accent-color);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: 0.3s ease;
-  box-shadow: 0px 6px 15px rgba(160, 118, 79, 0.25);
+  transition: all 0.3s ease;
+  
+  /* Ensure it doesn't shrink or move weirdly */
+  display: block;
+  text-align: center;
 }
 
 .auth-btn:hover {
-  background: var(--accent-dark);
-  box-shadow: 0px 6px 18px rgba(139, 98, 61, 0.35);
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 94, 60, 0.3);
 }
 
-/* ==========================================================
-   TOGGLE LOGIN/SIGNUP
-========================================================== */
+/* 7. Toggle Link (Sign Up / Login text) */
 .toggle-auth {
-  margin-top: 1.2rem;
+  margin-top: 20px;
   text-align: center;
-  font-size: 0.9rem;
-  color: var(--text-light);
+  color: var(--muted-text);
 }
 
 .toggle-auth span {
-  color: var(--accent);
+  color: var(--accent-color);
   cursor: pointer;
+  font-weight: bold;
   margin-left: 5px;
-  font-weight: 600;
 }
 
-/* ==========================================================
-   RESPONSIVE DESIGN
-========================================================== */
-@media (max-width: 992px) {
-  .auth-page {
-    flex-direction: column;
-  }
-
-  .auth-left {
-    height: 40vh;
-    border-radius: 0 0 40px 40px;
-  }
-
-  .auth-right {
-    height: 60vh;
-    border-radius: 0;
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .auth-left {
-    padding: 2rem 1rem;
-  }
-
-  .brand-title {
-    font-size: 1.8rem;
-  }
-
-  .auth-illustration {
-    width: 140px;
-    height: 140px;
-  }
-
-  .auth-right {
-    padding: 2rem 1.5rem;
-  }
-
-  .two-input {
-    flex-direction: column;
-  }
-}
-
-.link-text {
+/* 8. Resend Link (NO UNDERLINE) */
+.resend-link,
+.auth-right a {
+  text-decoration: none !important; /* 👈 Forces removal of underline */
+  color: var(--accent-color);
   font-weight: bold;
   cursor: pointer;
-  color: #8B5E3C;
-  text-decoration: underline;
-  transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
 }
 
-.link-text:hover {
-  color: #5a3a20;
+.resend-link:hover,
+.auth-right a:hover {
+  text-decoration: underline !important; /* Optional hover effect */
 }
 
-/* === FORGOT PASSWORD PAGE LAYOUT === */
-.forgot-password-container {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;             /* 👈 This is key for centering */
-  justify-content: center;   /* Center Horizontally */
-  align-items: center;       /* Center Vertically */
-  background: #fdf6ec;       /* Match your app background */
-  padding: 20px;
-}
-
-.forgot-password-card {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(139, 94, 60, 0.15); /* Soft brown shadow */
-  width: 100%;
-  max-width: 450px;          /* Keep it nice and compact */
-  border: 1px solid rgba(139, 94, 60, 0.1);
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-page { flex-direction: column; }
+  .auth-left { height: 30vh; border-radius: 0 0 30px 30px; }
+  .auth-right { height: 70vh; border-radius: 0; padding: 20px; }
 }

@@ -20,6 +20,10 @@ const MedicineSchema = new mongoose.Schema({
   frequency: {
     type: String, // e.g., "Daily"
     default: "Daily"
+  },
+  instructions: {
+    type: String,
+    required: false 
   }
 }, { timestamps: true });
 

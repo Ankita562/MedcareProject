@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // 👈 IMPORT ADDED
 import "./Dashboard.css"; 
 
 const AddEditMedicine = () => {
   const [form, setForm] = useState({
     name: "",
     dosage: "",
-    time: "", // Changed 'frequency' to 'time' to match your Backend Model
+    time: "", 
     notes: "",
   });
 
@@ -22,7 +23,7 @@ const AddEditMedicine = () => {
     // 1. Get User ID from LocalStorage
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {
-      alert("Please login first!");
+      toast.error("Please login first!");
       navigate("/");
       return;
     }
@@ -34,63 +35,86 @@ const AddEditMedicine = () => {
         name: form.name,
         dosage: form.dosage,
         time: form.time,
-        // We can add 'notes' to the backend model later if you want!
+        instructions: form.notes, // Sending notes as 'instructions' to match model
+      });
+      
+      // 3. Success Toast
+      toast.success("Medicine added successfully! 💊", {
+        position: "top-center",
+        autoClose: 2000, 
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
       });
 
-      alert("Medicine added successfully! 💊");
-      navigate("/dashboard"); // Go back to dashboard
-      
+      // 4. Navigate back
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+
     } catch (err) {
       console.error(err);
-      alert("Error adding medicine. Check console.");
+      toast.error("Failed to add medicine. Please try again.");
     }
   };
 
   return (
-    <div className="dashboard-container">
-      <h2>Add New Medicine</h2>
-      <form onSubmit={handleSubmit} className="form-box">
+    <div className="dashboard-container" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh'}}>
+      <div className="dashboard-card" style={{padding: '40px', width: '100%', maxWidth: '500px'}}>
+        <h2 style={{color: '#8B5E3C', marginBottom: '20px'}}>Add New Medicine</h2>
         
-        <label>Medicine Name</label>
-        <input
-          name="name"
-          placeholder="e.g. Paracetamol"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-        
-        <label>Dosage</label>
-        <input
-          name="dosage"
-          placeholder="e.g. 500mg"
-          value={form.dosage}
-          onChange={handleChange}
-          required
-        />
-        
-        <label>Time to Take</label>
-        <input
-          name="time"
-          type="time" // Special time picker input
-          value={form.time}
-          onChange={handleChange}
-          required
-        />
+        <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+          
+          <div>
+            <label style={{fontWeight: 'bold', display: 'block', marginBottom: '5px'}}>Medicine Name</label>
+            <input
+              name="name"
+              placeholder="e.g. Paracetamol"
+              value={form.name}
+              onChange={handleChange}
+              required
+              style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc'}}
+            />
+          </div>
+          
+          <div>
+            <label style={{fontWeight: 'bold', display: 'block', marginBottom: '5px'}}>Dosage</label>
+            <input
+              name="dosage"
+              placeholder="e.g. 500mg"
+              value={form.dosage}
+              onChange={handleChange}
+              required
+              style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc'}}
+            />
+          </div>
+          
+          <div>
+            <label style={{fontWeight: 'bold', display: 'block', marginBottom: '5px'}}>Time to Take</label>
+            <input
+              name="time"
+              type="time" 
+              value={form.time}
+              onChange={handleChange}
+              required
+              style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc'}}
+            />
+          </div>
 
-        <button type="submit" className="btn primary" style={{marginTop: '20px'}}>
-          💾 Save Medicine
-        </button>
+          <button type="submit" style={{marginTop: '20px', padding: '12px', background: '#8B5E3C', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer'}}>
+            💾 Save Medicine
+          </button>
 
-        <button 
-          type="button" 
-          className="btn" 
-          style={{marginTop: '10px', background: '#ccc'}}
-          onClick={() => navigate("/dashboard")}
-        >
-          Cancel
-        </button>
-      </form>
+          <button 
+            type="button" 
+            style={{marginTop: '10px', padding: '10px', background: '#f0f0f0', color: '#333', border: 'none', borderRadius: '8px', cursor: 'pointer'}}
+            onClick={() => navigate("/dashboard")}
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

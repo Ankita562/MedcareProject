@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Dashboard.css"; // Reusing your main styles
+import "./Dashboard.css"; // Using Dashboard styles for consistency
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Profile = () => {
     bloodGroup: storedUser?.bloodGroup || "",
     gender: storedUser?.gender || "Female",
     email: storedUser?.email || "",
-    address: storedUser?.address || "", // 👈 NEW FIELD
+    address: storedUser?.address || "", 
   });
 
   const handleChange = (e) => {
@@ -25,35 +25,57 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      // 1. Send update to Backend
-      // Note: Make sure your backend route '/api/auth/update/:id' exists and handles updates!
-      // If not, you might need to create it. For now, assuming basic update logic:
+      // 1. Send update to Backend (Make sure URL matches the route we just made)
       const res = await axios.put(`http://localhost:5000/api/auth/update/${storedUser._id}`, formData);
 
-      // 2. Update LocalStorage with new data (Crucial for other pages to see changes)
-      const updatedUser = { ...storedUser, ...formData };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      // 2. Update LocalStorage with the NEW data from backend response
+      // (This ensures the UI updates instantly with the real saved data)
+      localStorage.setItem("user", JSON.stringify(res.data));
 
       setIsEditing(false);
       alert("Profile Updated Successfully! ✅");
+      
+      // Optional: Reload to refresh the Navbar name immediately
+      window.location.reload(); 
+
     } catch (err) {
       console.error(err);
-      // Fallback: If backend update route isn't ready, just update local storage for demo
-      const updatedUser = { ...storedUser, ...formData };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      setIsEditing(false);
-      alert("Profile Saved (Local)! ✅");
+      alert("Failed to update profile. Check console for details.");
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("isLoggedIn"); // Ensure this is cleared too
     navigate("/login");
+  };
+
+  // ⭐ NEW: Handle Delete Account
+  const handleDeleteAccount = async () => {
+    // 1. Confirmation Popup
+    const confirmDelete = window.confirm(
+      "⚠ Are you sure you want to PERMANENTLY delete your account?\n\nThis action cannot be undone."
+    );
+
+    if (confirmDelete) {
+      try {
+        // 2. Call Backend
+        await axios.delete(`http://localhost:5000/api/auth/delete-account/${storedUser._id}`);
+        
+        // 3. Cleanup & Redirect
+        localStorage.clear(); // Clear all data
+        alert("Your account has been deleted.");
+        window.location.href = "/register"; // Force reload to register page
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete account. Please try again.");
+      }
+    }
   };
 
   return (
     <div className="dashboard-container" style={{display: "flex", justifyContent: "center", alignItems: "center", minHeight: "90vh"}}>
-      <div className="dashboard-card large-card" style={{maxWidth: "500px", width: "100%", padding: "40px"}}>
+      <div className="dashboard-card large-card" style={{maxWidth: "500px", width: "100%", padding: "40px", background: "white", borderRadius: "15px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)"}}>
         
         {/* AVATAR */}
         <div style={{textAlign: "center", marginBottom: "30px"}}>
@@ -74,7 +96,7 @@ const Profile = () => {
             
             <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px"}}>
                 <div>
-                    <label>First Name</label>
+                    <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>First Name</label>
                     <input 
                         className="input-field" 
                         name="firstName" 
@@ -85,7 +107,7 @@ const Profile = () => {
                     />
                 </div>
                 <div>
-                    <label>Last Name</label>
+                    <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Last Name</label>
                     <input 
                         className="input-field" 
                         name="lastName" 
@@ -99,7 +121,7 @@ const Profile = () => {
 
             <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px"}}>
                 <div>
-                    <label>Age</label>
+                    <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Age</label>
                     <input 
                         type="number"
                         name="age" 
@@ -110,7 +132,7 @@ const Profile = () => {
                     />
                 </div>
                 <div>
-                    <label>Blood Group</label>
+                    <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Blood Group</label>
                     <input 
                         name="bloodGroup" 
                         value={formData.bloodGroup} 
@@ -122,7 +144,7 @@ const Profile = () => {
             </div>
 
             <div>
-                <label>Gender</label>
+                <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Gender</label>
                 <select 
                     name="gender" 
                     value={formData.gender} 
@@ -136,9 +158,8 @@ const Profile = () => {
                 </select>
             </div>
 
-            {/* 👇 NEW CITY FIELD */}
             <div>
-                <label style={{color: "#8B5E3C", fontWeight: "bold"}}>City / Location</label>
+                <label style={{color: "#8B5E3C", fontWeight: "bold", fontSize:"0.9rem"}}>City / Location</label>
                 <input 
                     name="address" 
                     value={formData.address} 
@@ -150,7 +171,7 @@ const Profile = () => {
             </div>
 
             <div>
-                <label>Email (Read Only)</label>
+                <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Email (Read Only)</label>
                 <input 
                     value={formData.email} 
                     disabled 
@@ -185,7 +206,26 @@ const Profile = () => {
                 🚪 Logout
             </button>
         </div>
-
+          
+        {/* ⭐ DELETE ACCOUNT SECTION */}
+         <div style={{ marginTop: "40px", borderTop: "1px solid #eee", paddingTop: "20px", textAlign: "center" }}>
+            <p style={{ color: "#999", fontSize: "0.9rem", marginBottom: "10px" }}>Danger Zone</p>
+            <button 
+               onClick={handleDeleteAccount}
+               style={{ 
+                  padding: "10px 20px", 
+                  background: "#ffebee", 
+                  color: "#d32f2f", 
+                  border: "1px solid #ffcdd2", 
+                  borderRadius: "5px", 
+                  cursor: "pointer", 
+                  fontSize: "0.9rem",
+                  fontWeight: "bold"
+               }}
+            >
+               🗑️ Delete Account Permanently
+            </button>
+         </div>
       </div>
     </div>
   );
