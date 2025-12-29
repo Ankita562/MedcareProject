@@ -9,275 +9,204 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "medcares832@gmail.com",
-    pass: "ecip vfek jtmi pdiz",
+    pass: "ecip vfek jtmi pdiz", // Make sure this App Password is correct
   },
 });
- 
-// 1. REGISTER ROUTE (Sends Verification Email)
+
+// 1. REGISTER ROUTE
 router.post("/register", async (req, res) => {
   try {
-    // 1. Check if user already exists
     const userExists = await User.findOne({ email: req.body.email });
-    if (userExists) {
-      return res.status(400).json("Email already registered!");
-    }
+    if (userExists) return res.status(400).json("Email already registered!");
 
-    // 2. Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-    // 3. Generate a Verification Token
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
-    // 4. Create new user (isVerified is false by default from Model)
     const newUser = new User({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
-      password: hashedPassword, // Store hashed password
+      password: hashedPassword,
       verificationToken: verificationToken,
       isVerified: false,
     });
 
-    // 5. Save to MongoDB
     await newUser.save();
 
-    // 6. Send Verification Email
     const verifyLink = `http://localhost:3000/#/verify-email/${verificationToken}`;
-
-    const mailOptions = {
+    await transporter.sendMail({
       from: "MedCare Support <medcares832@gmail.com>",
       to: newUser.email,
       subject: "Verify your MedCare Account",
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h2 style="color: #8B5E3C;">Welcome to MedCare, ${newUser.firstName}!</h2>
-          <p>Please verify your email address to activate your account and access the dashboard.</p>
-          <a href="${verifyLink}" style="background-color: #8B5E3C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px; font-weight: bold;">Verify Email</a>
-        </div>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    // 7. Return success message 
-    res.status(200).json({ 
-      message: "Registration successful! Please check your email to verify your account." 
+      html: `<h2>Welcome!</h2><p>Click to verify:</p><a href="${verifyLink}">Verify Email</a>`,
     });
 
+    res.status(200).json({ message: "Registration successful! Check your email." });
   } catch (err) {
-    console.error(err);
     res.status(500).json(err);
   }
 });
 
-// VERIFY EMAIL ROUTE
+// 2. VERIFY EMAIL ROUTE
 router.post("/verify-email/:token", async (req, res) => {
   try {
-    // Finding user with this specific token
     const user = await User.findOne({ verificationToken: req.params.token });
+    if (!user) return res.status(400).json("Invalid link.");
     
-    if (!user) {
-      return res.status(400).json("Invalid or expired verification link.");
-    }
-
-    // Verify user and remove the token
     user.isVerified = true;
     user.verificationToken = undefined;
     await user.save();
-
-    res.status(200).json("Email verified successfully! You can now login.");
-
+    res.status(200).json("Email verified successfully!");
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-//LOGIN ROUTE (Checks Verification)
+// 3. LOGIN ROUTE
 router.post("/login", async (req, res) => {
   try {
-    // 1. Find user by email
     const user = await User.findOne({ email: req.body.email });
-    
-    if (!user) {
-      return res.status(404).json("User not found");
-    }
+    if (!user) return res.status(404).json("User not found");
+    if (!user.isVerified) return res.status(400).json("Please verify your email first.");
 
-    // 2. CHECK IF VERIFIED
-    if (!user.isVerified) {
-      return res.status(400).json("Please verify your email address before logging in. Check your inbox.");
-    }
-
-    // 3. Check Password (Using bcrypt comparison)
     const validPassword = await bcrypt.compare(req.body.password, user.password);
-    
-    if (!validPassword) {
-      return res.status(400).json("Wrong password");
-    }
+    if (!validPassword) return res.status(400).json("Wrong password");
 
-    // 4. Success! Send user data (excluding password)
     const { password, verificationToken, ...others } = user._doc;
     res.status(200).json(others);
-    
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// FORGOT PASSWORD ROUTE
+// 4. FORGOT PASSWORD
 router.post("/forgot-password", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
-    
-    if (!user) {
-      return res.status(404).json({ message: "Account not found." });
-    }
+    if (!user) return res.status(404).json({ message: "Account not found." });
 
     const resetLink = `http://localhost:3000/#/reset-password/${user._id}`;
-
-    const mailOptions = {
-      from: "MedCare Support <medcares832@gmail.com>",
+    await transporter.sendMail({
+      from: "MedCare Support",
       to: user.email,
-      subject: "Password Reset Request - MedCare",
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h3 style="color: #8B5E3C;">Hello ${user.firstName},</h3>
-          <p>Click the button below to reset your password:</p>
-          <a href="${resetLink}" style="background-color: #8B5E3C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px; font-weight: bold;">Reset Password</a>
-        </div>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "Email sent successfully" });
-
+      subject: "Reset Password",
+      html: `<a href="${resetLink}">Reset Password</a>`,
+    });
+    res.status(200).json({ message: "Reset link sent." });
   } catch (err) {
     res.status(500).json({ message: "Error sending email." });
   }
 });
 
-//  RESET PASSWORD ROUTE
+// 5. RESET PASSWORD
 router.post("/reset-password/:id", async (req, res) => {
   try {
-    const { id } = req.params;
-    const { password } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const user = await User.findById(id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Hash the new password before saving
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-    
+    user.password = await bcrypt.hash(req.body.password, salt);
     await user.save();
-
     res.status(200).json({ message: "Password updated successfully" });
-
   } catch (err) {
     res.status(500).json({ message: "Error updating password" });
   }
 });
 
-// 6. RESEND VERIFICATION EMAIL ROUTE 
-router.post("/resend-verification", async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    // 1. Find User
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json("User with this email does not exist.");
-    }
-
-    // 2. Check if already verified
-    if (user.isVerified) {
-      return res.status(400).json("This account is already verified. Please login.");
-    }
-
-    // Generate a NEW token if one is missing
-    let token = user.verificationToken;
-    if (!token) {
-       token = crypto.randomBytes(32).toString("hex");
-       user.verificationToken = token;
-       await user.save(); // Save the new token to DB
-    }
-
-    // 3. Prepare Link
-    const verifyLink = `http://localhost:3000/#/verify-email/${token}`;
-
-    // 4. Send Email
-    const mailOptions = {
-      from: "MedCare Support <medcares832@gmail.com>",
-      to: user.email,
-      subject: "Resend: Verify your MedCare Account",
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-          <h2 style="color: #8B5E3C;">Verification Email Resent</h2>
-          <p>You requested a new verification link. Click below to verify your account:</p>
-          <a href="${verifyLink}" style="background-color: #8B5E3C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px; font-weight: bold;">Verify Email</a>
-        </div>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.status(200).json("Verification email sent! Check your inbox.");
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json("Failed to send email.");
-  }
-});
-
-// 8. UPDATE PROFILE ROUTE
+// 6. UPDATE PROFILE (Triggers Guardian Verification)
 router.put("/update/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     const { guardianEmail, ...otherUpdates } = req.body;
 
-    // Check if Guardian Email is New/Changed
+    // Check if Guardian Email changed
     if (guardianEmail && guardianEmail !== user.guardianEmail) {
-        
-        // 1. Generate a random verification token
         const token = crypto.randomBytes(32).toString("hex");
         user.guardianToken = token;
-        user.isGuardianVerified = false; // Reset status
+        user.isGuardianVerified = false;
         user.guardianEmail = guardianEmail;
 
-        // 2. Send Verification Email to Guardian
         const verificationLink = `http://localhost:3000/verify-guardian/${token}`;
         
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: "MedCare Support <medcares832@gmail.com>",
             to: guardianEmail,
-            subject: "MedCare: Please Verify Your Guardian Status",
+            subject: "MedCare: Verify Guardian Status",
             html: `
               <h3>Hello,</h3>
-              <p>${user.firstName} ${user.lastName} has added you as their Emergency Guardian on MedCare.</p>
-              <p>Please click the link below to verify your email and accept notifications:</p>
-              <a href="${verificationLink}" style="padding: 10px 20px; background: #8B5E3C; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
-              <p>If you did not agree to this, please ignore this email.</p>
+              <p>${user.firstName} added you as a Guardian.</p>
+              <a href="${verificationLink}">Verify Email</a>
             `
         });
     }
 
-    // Apply other updates
     Object.assign(user, otherUpdates);
     const updatedUser = await user.save();
-    
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// 7. DELETE ACCOUNT ROUTE
+// 7. VERIFY GUARDIAN TOKEN (The link clicked in email)
+router.post("/verify-guardian", async (req, res) => {
+  try {
+    const { token } = req.body;
+    const user = await User.findOne({ guardianToken: token });
+
+    if (!user) return res.status(400).json({ message: "Invalid link." });
+
+    user.isGuardianVerified = true;
+    user.guardianToken = undefined; 
+    await user.save();
+
+    res.status(200).json({ message: "Guardian verified!" });
+  } catch (err) {
+    res.status(500).json({ message: "Verification failed." });
+  }
+});
+
+// ⭐ 8. RESEND GUARDIAN LINK 
+router.post("/resend-guardian-link", async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        // Find user by GUARDIAN email
+        const user = await User.findOne({ guardianEmail: email });
+        if (!user) return res.status(404).json({ message: "No user found with this guardian." });
+
+        // Generate new token
+        const token = crypto.randomBytes(32).toString("hex");
+        user.guardianToken = token;
+        await user.save();
+
+        // ⭐ HERE IS THE FIX: Added /#/ 
+        const verificationLink = `http://localhost:3000/#/verify-guardian/${token}`;
+
+        await transporter.sendMail({
+            from: "MedCare Support <medcares832@gmail.com>",
+            to: email,
+            subject: "Action Required: Verify Guardian Access (Resent)",
+            html: `
+                <h3>Guardian Verification Needed</h3>
+                <p>You have been listed as a Guardian for <strong>${user.firstName}</strong>.</p>
+                <a href="${verificationLink}" style="padding: 10px; background: #C05621; color: white;">Verify Now</a>
+            `,
+        });
+
+        res.status(200).json({ message: "Link resent successfully!" });
+    } catch (err) {
+        console.error("Resend Error:", err);
+        res.status(500).json({ message: "Failed to resend link." });
+    }
+});
+
+// 9. DELETE ACCOUNT
 router.delete("/delete-account/:userId", async (req, res) => {
   try {
-    // 1. Delete the user
     await User.findByIdAndDelete(req.params.userId);
-    res.status(200).json("Account has been deleted.");
+    res.status(200).json("Account deleted.");
   } catch (err) {
     res.status(500).json(err);
   }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // ⭐ FIXED: Added useEffect
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css"; 
@@ -19,6 +19,41 @@ const Profile = () => {
     address: storedUser?.address || "",
     guardianEmail: storedUser?.guardianEmail || "" 
   });
+
+  // --- LOGIC STARTS HERE ---
+  const [needsGuardian, setNeedsGuardian] = useState(false);
+
+  // 1. Logic to Hide/Show based on Age Change
+  useEffect(() => {
+    const currentAge = parseInt(formData.age);
+    if (!isNaN(currentAge)) {
+      // If Age is SAFE (18-60)
+      if (currentAge >= 18 && currentAge <= 60) {
+        setNeedsGuardian(false);
+        // Clear the email so it doesn't persist
+        if (formData.guardianEmail) {
+            setFormData(prev => ({ ...prev, guardianEmail: "" }));
+        }
+      } 
+      // If Age is NOT SAFE (<18 or >60)
+      else {
+        setNeedsGuardian(true);
+      }
+    }
+  }, [formData.age]); // Runs whenever "Age" field changes
+
+  // 2. Resend Link Function
+  const resendGuardianLink = async () => {
+    if (!formData.guardianEmail) return;
+    try {
+        await axios.post("http://localhost:5000/api/auth/resend-guardian-link", { 
+            email: formData.guardianEmail 
+        });
+        alert("✅ Verification link resent! Check inbox.");
+    } catch (error) {
+        alert("❌ Failed to resend.");
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -144,27 +179,45 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* ⭐ NEW: Guardian Email Section with Verification Status */}
+            {/* ⭐ FIXED: Guardian Email Section (Logic + Resend Button) */}
+            {needsGuardian && (
             <div style={{background: "#fdf2f2", padding: "15px", borderRadius: "10px", border: "1px solid #f8d7da"}}>
                 <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px"}}>
                     <label style={{color: "#c53030", fontWeight: "bold", fontSize:"0.9rem"}}>
                        🛡️ Guardian Email
                     </label>
                     
-                    {/* STATUS BADGE */}
-                    {storedUser?.guardianEmail && (
-                        <span style={{
-                            fontSize: "0.75rem", 
-                            padding: "4px 8px", 
-                            borderRadius: "12px",
-                            background: storedUser.isGuardianVerified ? "#C6F6D5" : "#FED7D7",
-                            color: storedUser.isGuardianVerified ? "#22543D" : "#822727",
-                            fontWeight: "bold",
-                            border: storedUser.isGuardianVerified ? "1px solid #9AE6B4" : "1px solid #FEB2B2"
-                        }}>
-                            {storedUser.isGuardianVerified ? "✅ Verified" : "⏳ Pending"}
-                        </span>
-                    )}
+                    <div style={{display: "flex", alignItems: "center", gap: "8px"}}>
+                        {/* STATUS BADGE */}
+                        {storedUser?.guardianEmail && (
+                            <span style={{
+                                fontSize: "0.75rem", 
+                                padding: "4px 8px", 
+                                borderRadius: "12px",
+                                background: storedUser.isGuardianVerified ? "#C6F6D5" : "#FED7D7",
+                                color: storedUser.isGuardianVerified ? "#22543D" : "#822727",
+                                fontWeight: "bold",
+                                border: storedUser.isGuardianVerified ? "1px solid #9AE6B4" : "1px solid #FEB2B2"
+                            }}>
+                                {storedUser.isGuardianVerified ? "✅ Verified" : "⏳ Pending"}
+                            </span>
+                        )}
+
+                        {/* ⭐ RESEND BUTTON ADDED HERE */}
+                        <button 
+                            onClick={resendGuardianLink}
+                            style={{
+                                fontSize: "0.75rem", 
+                                background: "transparent", 
+                                border: "none", 
+                                color: "#C05621", 
+                                textDecoration: "underline", 
+                                cursor: "pointer"
+                            }}
+                        >
+                            Resend Link
+                        </button>
+                    </div>
                 </div>
                 
                 <input 
@@ -180,6 +233,7 @@ const Profile = () => {
                    (Required if Age &lt; 18 or &gt; 60)
                 </p>
             </div>
+            )}
 
             <div>
                 <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Gender</label>

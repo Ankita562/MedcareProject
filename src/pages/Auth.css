@@ -41,19 +41,13 @@ body.dark-mode .auth-left {
 
 /* 3. Right Side (Login Form) */
 .auth-right {
-  flex: 1;
-  background: var(--card-bg); /* Matches Dark Mode Variable */
-  color: var(--text-color);   /* Matches Dark Mode Variable */
-  
-  padding: 4rem 3rem;
+  background-color: #FFF8F0; /* "Floral White" - Warm and soft, not blinding */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  
-  border-top-left-radius: 50px;
-  border-bottom-left-radius: 50px;
-  box-shadow: -5px 0 20px rgba(0,0,0,0.1);
-  transition: background 0.3s ease, color 0.3s ease;
+  padding: 40px;
+  /* Ensure text is dark so it shows up against the soft background */
+  color: #2D3748; 
 }
 
 .form-title {
@@ -66,23 +60,25 @@ body.dark-mode .auth-left {
 /* 4. Inputs */
 .auth-form input {
   width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  font-size: 16px;
+  padding: 12px 15px;
+  margin-top: 5px;
+  margin-bottom: 15px;
   
-  /* Variables for Colors */
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--text-color);
+  /* IMPORTANT: This makes the box visible */
+  background: #FFFFFF;       /* White box */
+  border: 2px solid #E2E8F0; /* Light Grey Border */
+  border-radius: 10px;       /* Rounded corners */
   
-  border-radius: 8px;
+  /* IMPORTANT: This makes the text inside visible */
+  color: #1A202C;            /* Dark Text */
+  font-size: 1rem;
   outline: none;
-  transition: 0.3s;
+  transition: all 0.3s ease;
 }
 
 .auth-form input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 8px rgba(139, 94, 60, 0.25);
+  border-color: #C05621; /* Your Theme Orange/Brown */
+  box-shadow: 0 0 0 3px rgba(192, 86, 33, 0.1); /* Soft orange glow */
 }
 
 .auth-form label {
@@ -93,25 +89,20 @@ body.dark-mode .auth-left {
 }
 
 /* ============================
-   5. FIXED PASSWORD EYE ICON
+   5. PASSWORD EYE ICON
    ============================ */
 .password-field {
   position: relative;
-  display: flex;
-  flex-direction: column; /* Ensures label sits on top */
+  width: 100%;
 }
 
 .toggle-eye {
   position: absolute;
   right: 15px;
-  
-  /* Align from the BOTTOM to sit perfectly inside the input */
-  bottom: 12px; 
-  
+  top: 50%;
+  transform: translateY(-65%); /* Adjusts vertical center */
   cursor: pointer;
-  color: var(--muted-text);
-  font-size: 1.2rem;
-  z-index: 10;
+  color: #718096; /* Grey icon color */
 }
 
 /* ============================

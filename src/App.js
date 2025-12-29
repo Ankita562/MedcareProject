@@ -27,6 +27,8 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerifyGuardian from "./pages/VerifyGuardian";
 import Activities from "./pages/Activities";
+import LandingPage from "./pages/LandingPage";
+
 // Data
 import { fakePatientDetails } from "./data/fakeData";
 
@@ -34,12 +36,11 @@ import { fakePatientDetails } from "./data/fakeData";
 import "./App.css";
 
 // ⭐ INTERNAL LAYOUT COMPONENT
-// This handles the "Show/Hide Sidebar" logic based on the URL
 const Layout = ({ children, isLoggedIn, sidebarOpen, navbarProps }) => {
   const location = useLocation();
 
-  // Define paths where the Sidebar/Navbar should NEVER appear
   const hideSidebarPaths = [
+    "/",  // Landing Page
     "/login",
     "/register",
     "/signup",
@@ -49,52 +50,45 @@ const Layout = ({ children, isLoggedIn, sidebarOpen, navbarProps }) => {
     "/verify-guardian"
   ];
 
-  // Show sidebar ONLY if logged in AND we are NOT on a hidden path
-  const showSidebar = isLoggedIn && !hideSidebarPaths.some(path => location.pathname.startsWith(path));
+  const showSidebar = isLoggedIn && !hideSidebarPaths.some(hidePath => {
+    if (hidePath === "/") {
+      return location.pathname === "/"; 
+    }
+    return location.pathname.startsWith(hidePath);
+  });
 
   return (
     <>
-      {/* 1. Navbar (Only if showSidebar is true) */}
       {showSidebar && <Navbar {...navbarProps} />}
 
-      {/* 2. Main Content Wrapper */}
       <main
         className={`main-content fade-in ${showSidebar ? (sidebarOpen ? "expanded" : "collapsed") : ""}`}
         style={{
           minHeight: "100vh",
-          paddingTop: showSidebar ? "80px" : "0px", 
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          paddingBottom: "20px",
-          transition: "margin-left 0.3s ease"
+          paddingTop: showSidebar ? "20px" : "0px", 
         }}
       >
         {children}
       </main>
 
-      {/* 3. Footer (Only if showSidebar is true) */}
       {showSidebar && <Footer />}
     </>
   );
 };
 
 function App() {
-  // State
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => localStorage.getItem("isLoggedIn") === "true"
   );
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const [patientInfo] = useState(fakePatientDetails);
   
-  // Dark Mode State
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("darkMode") === "true"
   );
 
-  // Sidebar State
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Effects
   useEffect(() => {
     localStorage.setItem("isLoggedIn", isLoggedIn);
   }, [isLoggedIn]);
@@ -110,14 +104,12 @@ function App() {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
   };
 
-  // Props object to pass to the Layout -> Navbar
   const navbarProps = {
     onLogout: handleLogout,
     isLoggedIn: isLoggedIn,
@@ -126,7 +118,6 @@ function App() {
     setSidebarOpen: setSidebarOpen
   };
 
-  // ⭐ NO <Router> TAG HERE (It's already in index.js)
   return (
     <div className={`app-container ${darkMode ? "dark-mode" : "light-mode"}`}>
       
@@ -136,22 +127,25 @@ function App() {
         theme={darkMode ? "dark" : "light"}
       />
       
-      {/* WRAP ROUTES IN OUR SMART LAYOUT */}
       <Layout isLoggedIn={isLoggedIn} sidebarOpen={sidebarOpen} navbarProps={navbarProps}>
         <Routes>
-          {/* Public Routes */}
+          {/* =========================================================
+              ⭐ PUBLIC ROUTES (Accessible by everyone)
+          ========================================================= */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Auth onLogin={() => setIsLoggedIn(true)} />} />
           <Route path="/register" element={<Auth onLogin={() => setIsLoggedIn(true)} />} />
-          <Route path="/verify-email/:token" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+          
+          {/* ✅ Moved Verify Guardian Here (No Login Required) */}
+          <Route path="/verify-guardian/:token" element={<VerifyGuardian />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/"
-            element={isLoggedIn ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
-          />
 
+          {/* =========================================================
+              🔒 PROTECTED ROUTES (Login Required)
+          ========================================================= */}
           <Route
             path="/dashboard"
             element={isLoggedIn ? <Dashboard patient={patientInfo} darkMode={darkMode} /> : <Navigate to="/login" />}
@@ -170,10 +164,9 @@ function App() {
           <Route path="/appointments" element={isLoggedIn ? <DoctorAppointment /> : <Navigate to="/login" />} />
           <Route path="/medicines/new" element={isLoggedIn ? <AddEditMedicine /> : <Navigate to="/login" />} />
           <Route path="/medicines/:id" element={isLoggedIn ? <AddEditMedicine /> : <Navigate to="/login" />} />
-          <Route path="/verify-guardian/:token" element={<VerifyGuardian />} />
           <Route path="/scan-report" element={isLoggedIn ? <ScanReport /> : <Navigate to="/login" />} />
 
-          {/* Fallback */}
+          {/* Fallback - Redirects unknown links to Landing Page */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout>

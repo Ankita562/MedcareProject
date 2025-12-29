@@ -1,261 +1,559 @@
-/*MEDCARE GLOBAL THEME */
-
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
-/*Light Mode (Default)*/
+/* --- GLOBAL VARIABLES (Warm & Accessible Theme) --- */
 :root {
-  --bg-color: #FFF7ED;           
-  --card-bg: #FFFFFF;           
-  --card-border: #E8D7C3;          
-  --text-color: #3B2C22;          
-  --muted-text: #8F7A6C;           
-  --accent-color: #8B5E3C;        
-  --secondary-color: #C58F63;      
-  --highlight: #F3E6D6;            
-  --btn-gradient: linear-gradient(135deg, #8B5E3C, #C58F63);
-  --shadow-color: rgba(139, 94, 60, 0.25);
+  --primary: #C05621;       /* Strong Orange/Brown for Action */
+  --primary-hover: #9C4221;
+  --secondary: #2C5282;     /* Calming Blue for Trust */
+  --bg-color: #FFF5F0;      /* Very Light Cream (Easy on eyes) */
+  --card-bg: #FFFFFF;
+  --text-main: #2D3748;     /* Dark Grey (High Contrast) */
+  --text-light: #718096;
+  --success: #48BB78;
+  --danger: #E53E3E;
+  --radius: 16px;           /* Soft rounded corners */
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Retain your existing variables for compatibility */
+  --accent-color: var(--primary);
+  --btn-gradient: linear-gradient(135deg, #C05621, #9C4221);
 }
 
-/* Dark Mode */
-body.dark,
+/* Dark Mode Overrides */
 body.dark-mode {
-  --bg-color: #231A15;        
-  --card-bg: #3B2C22;         
-  --card-border: #4A3A32;         
-  --text-color: #F0E2D3;           
-  --muted-text: #CBB8A7;         
-  --accent-color: #C58F63;      
-  --secondary-color: #D9B895;     
-  --highlight: #2A211C;            
-
-  --btn-gradient: linear-gradient(135deg, #C58F63, #D9B895);
-  --shadow-color: rgba(197, 143, 99, 0.25);
+  --bg-color: #1A202C;
+  --card-bg: #2D3748;
+  --text-main: #F7FAFC;
+  --text-light: #A0AEC0;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
 }
 
-/* Base Layout*/
 body {
-  background: var(--bg-color);
-  color: var(--text-color);
-  font-family: "Poppins", sans-serif;
   margin: 0;
-  padding: 0;
-  transition: background 0.4s ease, color 0.4s ease;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.app-container {
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(192, 86, 33, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(192, 86, 33, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(192, 86, 33, 0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+/* --- LANDING PAGE STYLES --- */
+.landing-container {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
-main {
-  flex: 1;
+.landing-hero {
+  margin-bottom: 60px;
+  padding: 40px 20px;
+}
+
+.hero-title {
+  font-size: 3.5rem; /* Large for older eyes */
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: var(--text-light);
+  margin-bottom: 40px;
+}
+
+/* --- LARGE ACCESSIBLE BUTTONS --- */
+.btn-large {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 18px 40px;
+  font-size: 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+
+.btn-large:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+/* --- FEATURE CARDS --- */
+.features-section {
   padding: 20px;
-  min-height: 80vh;
-  background: var(--bg-color);
-  color: var(--text-color);
 }
 
-/* Buttons */
-button,
-.btn {
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: var(--text-main);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+  border-top: 5px solid var(--primary);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+}
+
+.icon-circle {
+  background: var(--bg-color);
+  color: var(--primary);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 2px solid var(--primary);
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.feature-card p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* --- RESPONSIVENESS --- */
+@media (max-width: 768px) {
+  .hero-title { font-size: 2.5rem; }
+  .hero-subtitle { font-size: 1.2rem; }
+  .btn-large { width: 100%; justify-content: center; }
+  .feature-grid { grid-template-columns: 1fr; }
+  
+  /* Fix Main Content Layout */
+  .main-content.expanded, .main-content.collapsed {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* =========================================
+   DESKTOP LAYOUT SYSTEM (Fixes the Overlap)
+   ========================================= */
+
+.main-content {
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  width: 100%;
+  padding: 20px; /* Adds breathing room around your dashboard */
+  box-sizing: border-box; /* Ensures padding doesn't break width */
+}
+
+/* 1. When Sidebar is FULLY OPEN (Desktop) */
+.main-content.expanded {
+  margin-left: 250px;       /* Moves content to the right */
+  width: calc(100% - 250px); /* Shrinks content width to fit */
+}
+
+/* 2. When Sidebar is COLLAPSED (Desktop) */
+.main-content.collapsed {
+  margin-left: 80px;        /* Moves content slightly right */
+  width: calc(100% - 80px); /* Adjusts width */
+}
+
+/* 3. MOBILE OVERRIDE (Phones/Tablets) */
+/* On mobile, we DO NOT shift content. Sidebar floats on top. */
+@media (max-width: 768px) {
+  .main-content.expanded, 
+  .main-content.collapsed {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 15px !important;
+  }
+}
+
+/* =========================================
+   SIDEBAR & NAVIGATION STYLES
+   (Add this to the bottom of App.css)
+   ========================================= */
+
+/* =========================================
+   SIDEBAR & NAVIGATION STYLES (Compact & Full View)
+   ========================================= */
+
+/* The Sidebar Container */
+.sidebar {
+  height: 100vh;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: var(--card-bg);
+  border-right: 1px solid var(--card-border);
+  z-index: 1000;
+  transition: width 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ⭐ Hides scrollbar unless absolutely necessary */
+  box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+}
+
+/* Collapsed State */
+.sidebar.closed {
+  width: 70px; /* Made slightly narrower for better look */
+}
+
+/* --- 1. HEADER (MedCare Logo) --- */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px; /* Reduced vertical padding */
+  min-height: 60px;   /* Compact header */
+  border-bottom: 2px solid #E2E8F0; 
+  margin-bottom: 5px;
+}
+
+.sidebar-brand {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.sidebar-toggle {
+  background: none;
   border: none;
   cursor: pointer;
+  color: var(--muted-text);
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- 2. LINKS CONTAINER (The Menu) --- */
+.sidebar-links {
+  flex: 1; 
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* ⭐ REDUCED GAP (was 8px) - Brings items closer */
+  overflow-y: auto; 
+}
+
+/* Individual Nav Item */
+.sidebar-links a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--muted-text);
+  padding: 10px 15px; /* ⭐ REDUCED PADDING (was 12px) - Makes buttons shorter */
   border-radius: 10px;
-  padding: 10px 18px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-size: 0.95rem; /* Slightly smaller text for compact fit */
+}
+
+.sidebar-links a:hover {
+  background-color: var(--bg-color);
+  color: var(--accent-color);
+  transform: translateX(3px);
+}
+
+.sidebar-links a.active {
+  background: var(--btn-gradient);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* Icons inside links */
+.sidebar-links .icon {
+  min-width: 22px; /* Slightly smaller icons */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-text {
+  margin-left: 12px;
   font-weight: 500;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: opacity 0.2s;
+}
+
+.sidebar.closed .nav-text {
+  opacity: 0;
+  display: none;
+}
+
+/* --- 3. BOTTOM SECTION (Profile & Logout) --- */
+.sidebar-bottom {
+  padding: 15px 10px; /* Reduced padding */
+  border-top: 2px solid #E2E8F0; 
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* Tighter gap */
+  background-color: var(--card-bg);
+}
+
+.user-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.logout-btn {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 10px 15px; /* Compact logout button */
+  border-radius: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
   font-family: "Poppins", sans-serif;
 }
 
-/* Primary Button */
-.btn-primary,
-button.primary {
-  background: var(--btn-gradient);
-  color: #fff;
-  box-shadow: 0 4px 10px var(--shadow-color);
+.logout-btn:hover {
+  background: var(--danger);
+  color: white;
 }
 
-.btn-primary:hover,
-button.primary:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 18px var(--shadow-color);
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .sidebar { width: 0; border: none; }
+  .sidebar.open { width: 250px; }
 }
 
-/* Outline Button */
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--accent-color);
-  color: var(--accent-color);
-}
+/* =========================================
+   FIX: VISIBLE INPUTS & REDUCED BRIGHTNESS
+   ========================================= */
 
-.btn-outline:hover {
-  background: var(--accent-color);
-  color: #fff;
-  box-shadow: 0 4px 12px var(--shadow-color);
-}
-
-/*  Cards */
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 6px 15px rgba(139, 94, 60, 0.08);
-  transition: all 0.4s ease;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px var(--shadow-color);
-}
-
-/* Theme Toggle */
-.theme-toggle {
-  display: flex;
-  justify-content: flex-end;
-  padding: 15px 30px 0 0;
-}
-
-.theme-toggle button {
-  background: var(--btn-gradient);
-  border-radius: 25px;
-  padding: 8px 18px;
-  font-size: 0.9rem;
-  box-shadow: 0 4px 10px var(--shadow-color);
-}
-
-.theme-toggle button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 18px var(--shadow-color);
-}
-
-/*  Footer*/
-footer {
-  background: var(--card-bg);
-  color: var(--muted-text);
-  text-align: center;
-  padding: 15px 0;
-  font-size: 0.9rem;
-  border-top: 1px solid var(--card-border);
-}
-
-/* Form Inputs */
+/* 1. Make Text Boxes Stand Out */
 input,
 textarea,
 select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
+  padding: 12px 15px; /* Larger click area */
+  border: 2px solid #D1D5DB; /* Darker Grey Border (Visible!) */
+  border-radius: 10px;
   font-size: 1rem;
-  color: var(--text-color);
-  background: var(--card-bg);
+  color: #1F2937; /* Dark Text Color */
+  background: #F3F4F6; /* Light Grey Background (Not White) */
   transition: all 0.3s ease;
+  box-sizing: border-box; /* Prevents width issues */
 }
 
+/* When you click inside the box */
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.25);
+  background: #FFFFFF; /* Turns white when typing */
+  border-color: var(--primary); /* Turns Orange/Brown */
+  box-shadow: 0 0 0 4px rgba(192, 86, 33, 0.1); /* Soft glow */
   outline: none;
 }
 
-/* Typography */
-h1, h2, h3 {
-  color: var(--accent-color);
+/* 2. Soften the Login Card (Too Bright Fix) */
+/* If your login page uses a specific container, add this: */
+.auth-right, 
+.login-card { 
+  background-color: #FFFAF0 !important; /* "Floral White" - warmer & softer than pure white */
+}
+
+/* 3. Darker Placeholder Text (e.g. "Enter your email") */
+::placeholder {
+  color: #9CA3AF; /* Medium Grey instead of invisible light grey */
+  opacity: 1;
+}
+/* --- New Landing Page Styles --- */
+.welcome-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 28px 23px;
+  border-radius: 99px;
+  border: 1px solid #feebc8;
+  color: #c05621;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.landing-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+.progress-card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  max-width: 800px;
+  margin: 0 auto 48px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.progress-percentage {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #c05621;
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  background: #edf2f7;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ed8936, #c05621);
+  transition: width 0.5s ease;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+  margin-bottom: 64px;
+}
+
+.step-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  border: 2px solid #f7fafc;
+  transition: all 0.3s;
+}
+
+.step-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  border-color: #fbd38d;
+}
+
+.step-content {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.step-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c05621; /* Default gradient color */
+}
+
+.step-text h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-btn {
+  background: linear-gradient(90deg, #ed8936, #c05621);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
   font-weight: 600;
-  margin-top: 0;
+  cursor: pointer;
 }
 
-p, label, span {
-  color: var(--text-color);
-}
-
-a {
-  color: var(--accent-color);
-  text-decoration: none;
-}
-
-a:hover {
-  color: var(--secondary-color);
-}
-
-/*  Utility Styles*/
-.text-center {
+.final-cta {
+  background: linear-gradient(135deg, #c05621, #f4d9cf);
+  border-radius: 24px;
+  padding: 60px;
+  color: white;
   text-align: center;
 }
 
-.fade-in {
-  animation: fadeIn 0.5s ease;
+.cta-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+.btn-main {
+  background: white;
+  color: #c05621;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
 }
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  main { padding: 15px; }
-  .theme-toggle { justify-content: center; padding-right: 0; }
-}
-
-@media (max-width: 480px) {
-  main { padding: 10px; }
-  .theme-toggle button { font-size: 0.8rem; }
-}
-
-/* RESPONSIVE LAYOUT SYSTEM*/
-.main-content {
-  transition: margin-left 0.3s ease;
-  width: 100%;
-}
-
-.main-content.expanded {
-  margin-left: 240px;
-  width: calc(100% - 240px); 
-}
-
-.main-content.collapsed {
-  margin-left: 70px;
-  width: calc(100% - 70px);
-}
-
-@media (max-width: 768px) {
-  .main-content.expanded,
-  .main-content.collapsed {
-    margin-left: 70px !important; 
-    width: auto !important; 
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    overflow-x: hidden; 
-  }
-
-  h1, h2, h3, p {
-    word-wrap: break-word;
-  }
-}
-
-/* MOBILE SIDEBAR OVERLAY*/
-
-@media (max-width: 768px) {
-  
-  .sidebar {
-    position: fixed;
-    height: 100vh;
-    z-index: 10000; 
-    box-shadow: 4px 0 15px rgba(0,0,0,0.2); 
-  }
-
-  .sidebar.open {
-    width: 250px;
-  }
-
-  .sidebar.closed {
-    width: 70px;
-  }
-}
-
