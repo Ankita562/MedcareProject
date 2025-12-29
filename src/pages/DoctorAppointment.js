@@ -38,7 +38,7 @@ const DoctorAppointment = () => {
     setTimeout(() => {
       setShowCheck(true);
       setTimeout(() => {
-        window.open("https://www.apollo247.com/book-appointment", "_blank", "noopener,noreferrer");
+        window.open("https://www.apollo247.com/doctors", "_blank", "noopener,noreferrer");
         setShowPopup(false);
         setShowCheck(false);
       }, 1000);

@@ -10,15 +10,15 @@ const MedicineSchema = new mongoose.Schema({
     required: true,
   },
   dosage: {
-    type: String, // e.g., "500mg"
+    type: String, 
     required: true,
   },
   time: {
-    type: String, // e.g., "8:00 AM"
+    type: String, 
     required: true,
   },
   frequency: {
-    type: String, // e.g., "Daily"
+    type: String,
     default: "Daily"
   },
   instructions: {

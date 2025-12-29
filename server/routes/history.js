@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const History = require("../models/History"); // 👈 Importing your existing model
+const History = require("../models/History"); 
 
 // 1. ADD RECORD
 router.post("/add", async (req, res) => {

@@ -19,6 +19,7 @@ import EmergencyContacts from "./pages/EmergencyContacts";
 import ScanReport from "./pages/ScanReport";
 import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
+import Activities from "./pages/Activities";
 // Data
 import { fakePatientDetails } from "./data/fakeData";
 
@@ -208,6 +209,7 @@ function App() {
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/activities" element={isLoggedIn ? <Activities /> : <Navigate to="/login" />} />
         </Routes>
       </main>
 

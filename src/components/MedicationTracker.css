@@ -1,6 +1,4 @@
-/* =======================================
-   🤎 Tracker Page – Brown × Beige Theme
-   ======================================= */
+/* Tracker Page */
 
 .tracker-page {
   padding: 2rem;
@@ -23,9 +21,7 @@
   margin-bottom: 2rem;
 }
 
-/* =======================================
-   Cards Layout
-   ======================================= */
+/* Cards Layout */
 .tracker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
@@ -51,9 +47,7 @@
   text-align: center;
 }
 
-/* =======================================
-   Inputs
-   ======================================= */
+/* Inputs */
 .tracker-card input,
 .tracker-card textarea {
   width: 100%;
@@ -74,9 +68,7 @@
   background: #FFF8F1;
 }
 
-/* =======================================
-   Buttons
-   ======================================= */
+/* Buttons*/
 .tracker-actions {
   display: flex;
   justify-content: center;
@@ -119,9 +111,7 @@
   transform: translateY(-2px);
 }
 
-/* =======================================
-   Dark Mode
-   ======================================= */
+/*Dark Mode */
 
 body.dark .tracker-page {
   background: linear-gradient(180deg, #2A1C14 0%, #1C120D 100%);
@@ -146,7 +136,6 @@ body.dark textarea:focus {
   background: #3A2A1F;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .tracker-page {
     padding: 1rem;

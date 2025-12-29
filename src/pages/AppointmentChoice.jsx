@@ -1,6 +1,7 @@
 // src/pages/DoctorAppointment.js
 import React, { useState } from "react";
 import "./DoctorAppointment.css";
+import DoctorSearch from "../components/DoctorSearch";
 
 const DoctorAppointment = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -25,7 +26,9 @@ const DoctorAppointment = () => {
 
   return (
     <div className="appointment-page-container">
-      <div className="appointment-card">
+      
+      {/* SECTION 1: Top Card with Buttons */}
+      <div className="appointment-card" style={{ marginBottom: "30px" }}>
         <h1>📅 Doctor Appointment</h1>
         <p className="subtitle">
           Schedule your medical consultations easily and conveniently.
@@ -43,12 +46,13 @@ const DoctorAppointment = () => {
             💊 Add Appointment Manually
           </button>
         </div>
-
-        <div className="coming-soon">
-          <p>✨ Coming soon: Search doctors by specialty, availability, and location.</p>
-        </div>
       </div>
-
+  
+      {/* SECTION 2: Doctor Search (Now sits cleanly below the top card) */}
+      <div style={{ marginTop: "20px" }}>
+         <DoctorSearch />
+      </div>
+      
       {/* ✅ Confirmation Popup */}
       {showPopup && (
         <div className="popup-overlay">

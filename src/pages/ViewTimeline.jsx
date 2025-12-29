@@ -6,7 +6,7 @@ import {
   FileText, 
   Activity, 
   Clock,
-  Filter // 👈 Added Filter Icon
+  Filter 
 } from "lucide-react";
 import "./ViewTimeline.css"; 
 
@@ -15,7 +15,7 @@ const ViewTimeline = () => {
   const [timelineData, setTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // ⭐ 1. Add Filter State
+  //  1. Add Filter State
   const [filterType, setFilterType] = useState("All");
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const ViewTimeline = () => {
         apptRes.data.forEach(item => {
           events.push({
             id: item._id,
-            type: "Appointment", // Matches Filter Key
+            type: "Appointment",
             date: new Date(item.date),
             title: `Visited Dr. ${item.doctorName} (${item.specialty})`,
             desc: `Scheduled for ${item.time}. Status: ${item.status || "Upcoming"}`,
@@ -49,7 +49,7 @@ const ViewTimeline = () => {
         medRes.data.forEach(item => {
           events.push({
             id: item._id,
-            type: "Medicine", // Matches Filter Key
+            type: "Medicine",
             date: new Date(item.createdAt), 
             title: `Started Medication: ${item.name}`,
             desc: `Dosage: ${item.dosage}. Frequency: ${item.time}`,
@@ -63,7 +63,7 @@ const ViewTimeline = () => {
           reportRes.data.forEach(item => {
             events.push({
               id: item._id,
-              type: "Report", // Matches Filter Key
+              type: "Report", 
               date: new Date(item.createdAt),
               title: `Uploaded Report: ${item.title || "Medical Document"}`,
               desc: `Type: ${item.type || "Lab Report"}`,
@@ -77,7 +77,7 @@ const ViewTimeline = () => {
         historyRes.data.forEach(item => {
           events.push({
             id: item._id,
-            type: "Diagnosis", // Matches Filter Key
+            type: "Diagnosis", 
             date: new Date(item.diagnosisDate || item.createdAt),
             title: `Diagnosed: ${item.condition}`,
             desc: `Dr. ${item.doctor} | Treatment: ${item.treatment}`,
@@ -99,7 +99,7 @@ const ViewTimeline = () => {
     fetchTimeline();
   }, [user?._id]);
 
-  // ⭐ 2. Filter Logic
+  // 2. Filter Logic
   const filteredData = filterType === "All" 
     ? timelineData 
     : timelineData.filter(item => item.type === filterType);
@@ -121,7 +121,7 @@ const ViewTimeline = () => {
           Your complete medical journey, automatically tracking every appointment, prescription, and report.
         </p>
 
-        {/* ⭐ 3. The Filter Dropdown UI */}
+        {/* 3. The Filter Dropdown UI */}
         <div style={{marginTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", gap: "10px"}}>
           <Filter size={18} color="#8B5E3C" />
           <span style={{fontWeight: "600", color: "#555"}}>Filter by:</span>

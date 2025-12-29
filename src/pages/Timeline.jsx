@@ -36,10 +36,10 @@ const Timeline = () => {
   // Helper to pick color based on type
   const getColor = (type) => {
     switch (type) {
-      case "appointment": return "#4A90E2"; // Blue
-      case "medicine": return "#E57373";    // Red
-      case "report": return "#8B5E3C";      // Brown (Theme)
-      case "history": return "#66BB6A";     // Green
+      case "appointment": return "#4A90E2";
+      case "medicine": return "#E57373";   
+      case "report": return "#8B5E3C";     
+      case "history": return "#66BB6A";     
       default: return "#ccc";
     }
   };

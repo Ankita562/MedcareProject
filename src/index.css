@@ -149,9 +149,7 @@ input:focus, textarea:focus, select:focus {
   outline: none;
 }
 
-/* ===========================================
-   🪟 CARD COMPONENTS (Universal Style)
-   =========================================== */
+/* CARD COMPONENTS (Universal Style) */
 .card {
   background: var(--card);
   border-radius: 14px;
@@ -165,9 +163,7 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 10px 25px var(--shadow);
 }
 
-/* ===========================================
-   ✨ UTILITIES
-   =========================================== */
+/*  UTILITIES*/
 .text-center {
   text-align: center;
 }
@@ -187,9 +183,7 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-/* ===========================================
-   📱 RESPONSIVENESS
-   =========================================== */
+/* RESPONSIVENESS*/
 @media (max-width: 768px) {
   body {
     font-size: 15px;

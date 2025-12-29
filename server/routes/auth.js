@@ -1,12 +1,10 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
-const crypto = require("crypto"); // Built-in Node module for generating tokens
-const bcrypt = require("bcrypt"); // For secure password hashing
+const crypto = require("crypto"); 
+const bcrypt = require("bcrypt"); 
 
-// ==========================================
 // EMAIL CONFIGURATION 
-// ==========================================
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -14,10 +12,8 @@ const transporter = nodemailer.createTransport({
     pass: "ecip vfek jtmi pdiz",
   },
 });
-
-// ==========================================
+ 
 // 1. REGISTER ROUTE (Sends Verification Email)
-// ==========================================
 router.post("/register", async (req, res) => {
   try {
     // 1. Check if user already exists
@@ -26,7 +22,7 @@ router.post("/register", async (req, res) => {
       return res.status(400).json("Email already registered!");
     }
 
-    // 2. Hash the password (Security Best Practice)
+    // 2. Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
@@ -64,7 +60,7 @@ router.post("/register", async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    // 7. Return success message (Do NOT log them in yet)
+    // 7. Return success message 
     res.status(200).json({ 
       message: "Registration successful! Please check your email to verify your account." 
     });
@@ -75,12 +71,10 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ==========================================
 // VERIFY EMAIL ROUTE
-// ==========================================
 router.post("/verify-email/:token", async (req, res) => {
   try {
-    // Find user with this specific token
+    // Finding user with this specific token
     const user = await User.findOne({ verificationToken: req.params.token });
     
     if (!user) {
@@ -99,9 +93,7 @@ router.post("/verify-email/:token", async (req, res) => {
   }
 });
 
-// ==========================================
 //LOGIN ROUTE (Checks Verification)
-// ==========================================
 router.post("/login", async (req, res) => {
   try {
     // 1. Find user by email
@@ -111,7 +103,7 @@ router.post("/login", async (req, res) => {
       return res.status(404).json("User not found");
     }
 
-    // 2. ⭐ CHECK IF VERIFIED
+    // 2. CHECK IF VERIFIED
     if (!user.isVerified) {
       return res.status(400).json("Please verify your email address before logging in. Check your inbox.");
     }
@@ -132,9 +124,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ==========================================
 // FORGOT PASSWORD ROUTE
-// ==========================================
 router.post("/forgot-password", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -166,9 +156,7 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
-// ==========================================
 //  RESET PASSWORD ROUTE
-// ==========================================
 router.post("/reset-password/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -192,9 +180,7 @@ router.post("/reset-password/:id", async (req, res) => {
   }
 });
 
-// ==========================================
-// 6. RESEND VERIFICATION EMAIL ROUTE (Fixed)
-// ==========================================
+// 6. RESEND VERIFICATION EMAIL ROUTE 
 router.post("/resend-verification", async (req, res) => {
   try {
     const { email } = req.body;
@@ -210,7 +196,7 @@ router.post("/resend-verification", async (req, res) => {
       return res.status(400).json("This account is already verified. Please login.");
     }
 
-    // ⭐ FIX: Generate a NEW token if one is missing
+    // Generate a NEW token if one is missing
     let token = user.verificationToken;
     if (!token) {
        token = crypto.randomBytes(32).toString("hex");
@@ -244,35 +230,53 @@ router.post("/resend-verification", async (req, res) => {
   }
 });
 
-// ==========================================
 // 8. UPDATE PROFILE ROUTE
-// ==========================================
 router.put("/update/:id", async (req, res) => {
   try {
-    // Find user by ID and update their details
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body }, // Updates only the fields provided
-      { new: true }       // Returns the updated user object
-    );
+    const user = await User.findById(req.params.id);
+    const { guardianEmail, ...otherUpdates } = req.body;
 
+    // Check if Guardian Email is New/Changed
+    if (guardianEmail && guardianEmail !== user.guardianEmail) {
+        
+        // 1. Generate a random verification token
+        const token = crypto.randomBytes(32).toString("hex");
+        user.guardianToken = token;
+        user.isGuardianVerified = false; // Reset status
+        user.guardianEmail = guardianEmail;
+
+        // 2. Send Verification Email to Guardian
+        const verificationLink = `http://localhost:3000/verify-guardian/${token}`;
+        
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: guardianEmail,
+            subject: "MedCare: Please Verify Your Guardian Status",
+            html: `
+              <h3>Hello,</h3>
+              <p>${user.firstName} ${user.lastName} has added you as their Emergency Guardian on MedCare.</p>
+              <p>Please click the link below to verify your email and accept notifications:</p>
+              <a href="${verificationLink}" style="padding: 10px 20px; background: #8B5E3C; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+              <p>If you did not agree to this, please ignore this email.</p>
+            `
+        });
+    }
+
+    // Apply other updates
+    Object.assign(user, otherUpdates);
+    const updatedUser = await user.save();
+    
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// ==========================================
 // 7. DELETE ACCOUNT ROUTE
-// ==========================================
 router.delete("/delete-account/:userId", async (req, res) => {
   try {
     // 1. Delete the user
     await User.findByIdAndDelete(req.params.userId);
-    
-    // Optional: You could also delete related data (appointments, etc.) here if needed
-    // await Appointment.deleteMany({ userId: req.params.userId });
-
     res.status(200).json("Account has been deleted.");
   } catch (err) {
     res.status(500).json(err);

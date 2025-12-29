@@ -33,6 +33,9 @@ const UserSchema = new mongoose.Schema({
   gender: { type: String, default: "" },
   bloodGroup: { type: String, default: "" },
   address: { type: String },
+  guardianEmail: { type: String, default: "" },
+  isGuardianVerified: { type: Boolean, default: false },
+  guardianToken: { type: String, default: null },
   photo: { type: String, default: "" }
   },
   { timestamps: true });

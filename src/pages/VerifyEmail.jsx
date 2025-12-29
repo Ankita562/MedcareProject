@@ -10,11 +10,9 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verify = async () => {
       try {
-        // Call backend to verify the token
+        // Calling backend to verify the token
         await axios.post(`http://localhost:5000/api/auth/verify-email/${token}`);
         setStatus("✅ Email Verified! Redirecting to login...");
-        
-        // Wait 3 seconds then go to login
         setTimeout(() => navigate("/login"), 3000);
       } catch (err) {
         console.error(err);

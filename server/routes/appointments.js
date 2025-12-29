@@ -1,7 +1,7 @@
 const router = require("express").Router();
-const Appointment = require("../models/Appointment"); // Assuming you have this model
+const Appointment = require("../models/Appointment"); 
 
-// 1. GET ALL (Existing)
+// 1. GET ALL 
 router.get("/:userId", async (req, res) => {
   try {
     const appointments = await Appointment.find({ userId: req.params.userId });
@@ -11,7 +11,7 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// 2. ADD APPOINTMENT (Existing)
+// 2. ADD APPOINTMENT
 router.post("/add", async (req, res) => {
   try {
     const newAppointment = new Appointment(req.body);
@@ -22,7 +22,7 @@ router.post("/add", async (req, res) => {
   }
 });
 
-// 3. DELETE APPOINTMENT (⭐ NEW)
+// 3. DELETE APPOINTMENT 
 router.delete("/:id", async (req, res) => {
   try {
     await Appointment.findByIdAndDelete(req.params.id);

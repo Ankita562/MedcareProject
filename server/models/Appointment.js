@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const AppointmentSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true }, // Links appointment to YOU
+    userId: { type: String, required: true }, 
     doctorName: { type: String, required: true },
-    specialty: { type: String, default: "General" }, // e.g., Dentist, Cardio
-    date: { type: String, required: true }, // e.g., 2025-10-20
-    time: { type: String, required: true }, // e.g., 10:30 AM
+    specialty: { type: String, default: "General" }, 
+    date: { type: String, required: true }, 
+    time: { type: String, required: true }, 
     location: { type: String, default: "Clinic" },
-    status: { type: String, default: "Upcoming" } // Upcoming / Completed
+    status: { type: String, default: "Upcoming" } 
   },
   { timestamps: true }
 );

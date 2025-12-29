@@ -8,7 +8,7 @@ const ReportSchema = new mongoose.Schema(
     date: { type: String, required: true },
     type: { type: String, default: "General" },
     notes: { type: String },
-    fileUrl: { type: String }, // 👈 NEW FIELD
+    fileUrl: { type: String }, 
   },
   { timestamps: true }
 );

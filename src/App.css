@@ -1,50 +1,38 @@
-/* ===========================================
-   🤎 MEDCARE GLOBAL THEME
-   Brown × Beige | Light & Dark Mode
-   =========================================== */
+/*MEDCARE GLOBAL THEME */
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
-/* ===========================================
-   🌞 Light Mode (Default)
-   =========================================== */
+/*Light Mode (Default)*/
 :root {
-  --bg-color: #FFF7ED;             /* Cream Beige */
-  --card-bg: #FFFFFF;              /* White Card */
-  --card-border: #E8D7C3;          /* Soft Sand Border */
-  --text-color: #3B2C22;           /* Deep Coffee */
-  --muted-text: #8F7A6C;           /* Muted Mocha */
-
-  --accent-color: #8B5E3C;         /* Primary Brown */
-  --secondary-color: #C58F63;      /* Caramel */
-  --highlight: #F3E6D6;            /* Light Beige Highlight */
-
+  --bg-color: #FFF7ED;           
+  --card-bg: #FFFFFF;           
+  --card-border: #E8D7C3;          
+  --text-color: #3B2C22;          
+  --muted-text: #8F7A6C;           
+  --accent-color: #8B5E3C;        
+  --secondary-color: #C58F63;      
+  --highlight: #F3E6D6;            
   --btn-gradient: linear-gradient(135deg, #8B5E3C, #C58F63);
-  --shadow-color: rgba(139, 94, 60, 0.25); /* Brown Shadow */
+  --shadow-color: rgba(139, 94, 60, 0.25);
 }
 
-/* ===========================================
-   🌙 Dark Mode
-   =========================================== */
+/* Dark Mode */
 body.dark,
 body.dark-mode {
-  --bg-color: #231A15;             /* Deep Cocoa */
-  --card-bg: #3B2C22;              /* Coffee Card */
-  --card-border: #4A3A32;          /* Dark Clay Border */
-  --text-color: #F0E2D3;           /* Soft Cream Text */
-  --muted-text: #CBB8A7;           /* Soft Sand Muted */
-
-  --accent-color: #C58F63;         /* Caramel Primary */
-  --secondary-color: #D9B895;      /* Warm Gold Secondary */
-  --highlight: #2A211C;            /* Dark Highlight */
+  --bg-color: #231A15;        
+  --card-bg: #3B2C22;         
+  --card-border: #4A3A32;         
+  --text-color: #F0E2D3;           
+  --muted-text: #CBB8A7;         
+  --accent-color: #C58F63;      
+  --secondary-color: #D9B895;     
+  --highlight: #2A211C;            
 
   --btn-gradient: linear-gradient(135deg, #C58F63, #D9B895);
   --shadow-color: rgba(197, 143, 99, 0.25);
 }
 
-/* ===========================================
-   🌍 Base Layout
-   =========================================== */
+/* Base Layout*/
 body {
   background: var(--bg-color);
   color: var(--text-color);
@@ -68,9 +56,7 @@ main {
   color: var(--text-color);
 }
 
-/* ===========================================
-   🔘 Buttons
-   =========================================== */
+/* Buttons */
 button,
 .btn {
   border: none;
@@ -110,9 +96,7 @@ button.primary:hover {
   box-shadow: 0 4px 12px var(--shadow-color);
 }
 
-/* ===========================================
-   🧊 Cards
-   =========================================== */
+/*  Cards */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -127,9 +111,7 @@ button.primary:hover {
   box-shadow: 0 10px 25px var(--shadow-color);
 }
 
-/* ===========================================
-   🌗 Theme Toggle
-   =========================================== */
+/* Theme Toggle */
 .theme-toggle {
   display: flex;
   justify-content: flex-end;
@@ -149,9 +131,7 @@ button.primary:hover {
   box-shadow: 0 6px 18px var(--shadow-color);
 }
 
-/* ===========================================
-   🦶 Footer
-   =========================================== */
+/*  Footer*/
 footer {
   background: var(--card-bg);
   color: var(--muted-text);
@@ -161,9 +141,7 @@ footer {
   border-top: 1px solid var(--card-border);
 }
 
-/* ===========================================
-   📄 Form Inputs
-   =========================================== */
+/* Form Inputs */
 input,
 textarea,
 select {
@@ -185,9 +163,7 @@ select:focus {
   outline: none;
 }
 
-/* ===========================================
-   ✨ Typography
-   =========================================== */
+/* Typography */
 h1, h2, h3 {
   color: var(--accent-color);
   font-weight: 600;
@@ -207,9 +183,7 @@ a:hover {
   color: var(--secondary-color);
 }
 
-/* ===========================================
-   💫 Utility Styles
-   =========================================== */
+/*  Utility Styles*/
 .text-center {
   text-align: center;
 }
@@ -223,9 +197,7 @@ a:hover {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ===========================================
-   📱 Responsive Design
-   =========================================== */
+/* Responsive Design */
 @media (max-width: 768px) {
   main { padding: 15px; }
   .theme-toggle { justify-content: center; padding-right: 0; }
@@ -236,68 +208,52 @@ a:hover {
   .theme-toggle button { font-size: 0.8rem; }
 }
 
-/* =========================================
-   RESPONSIVE LAYOUT SYSTEM
-   ========================================= */
-
-/* Base Transition */
+/* RESPONSIVE LAYOUT SYSTEM*/
 .main-content {
   transition: margin-left 0.3s ease;
   width: 100%;
 }
 
-/* DESKTOP BEHAVIOR (Standard Push) */
-/* When sidebar is OPEN, push content 240px */
 .main-content.expanded {
   margin-left: 240px;
-  width: calc(100% - 240px); /* Prevent horizontal scroll */
+  width: calc(100% - 240px); 
 }
 
-/* When sidebar is CLOSED, push content 70px */
 .main-content.collapsed {
   margin-left: 70px;
   width: calc(100% - 70px);
 }
 
-/* MOBILE BEHAVIOR (Max Width 768px) */
 @media (max-width: 768px) {
-  
-  /* FIX: Don't force a specific pixel width. Let it fill naturally. */
   .main-content.expanded,
   .main-content.collapsed {
     margin-left: 70px !important; 
-    width: auto !important; /* Fills remaining space automatically */
+    width: auto !important; 
     padding-left: 10px !important;
     padding-right: 10px !important;
-    overflow-x: hidden; /* Stops horizontal scrolling */
+    overflow-x: hidden; 
   }
 
-  /* Ensure text doesn't overflow cards */
   h1, h2, h3, p {
     word-wrap: break-word;
   }
 }
 
-/* =========================================
-   MOBILE SIDEBAR OVERLAY
-   ========================================= */
+/* MOBILE SIDEBAR OVERLAY*/
 
 @media (max-width: 768px) {
   
   .sidebar {
     position: fixed;
     height: 100vh;
-    /* Ensure it sits ON TOP of the content */
     z-index: 10000; 
-    box-shadow: 4px 0 15px rgba(0,0,0,0.2); /* Stronger shadow for depth */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2); 
   }
 
-  /* When OPEN on mobile, it covers the content */
   .sidebar.open {
     width: 250px;
   }
 
-  /* When CLOSED on mobile, it stays small */
   .sidebar.closed {
     width: 70px;
   }

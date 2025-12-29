@@ -10,20 +10,20 @@ const ScanReport = () => {
   const [uploading, setUploading] = useState(false);
   const [cameraFile, setCameraFile] = useState(null);
 
-  // 🌗 Sync dark/light mode
+  // Sync dark/light mode
   useEffect(() => {
     document.body.classList.toggle("dark", darkMode);
     document.body.classList.toggle("light", !darkMode);
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  // 📁 Handle file input
+  //  Handle file input
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles((prev) => [...prev, ...selectedFiles]);
   };
 
-  // 📸 Handle camera capture
+  // Handle camera capture
   const handleCameraCapture = (e) => {
     const capturedFile = e.target.files[0];
     if (capturedFile) {
@@ -32,7 +32,7 @@ const ScanReport = () => {
     }
   };
 
-  // 🧲 Drag-and-drop handlers
+  // Drag-and-drop handlers
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
@@ -47,7 +47,7 @@ const ScanReport = () => {
 
   const handleDragLeave = () => setIsDragging(false);
 
-  // 🚀 Upload simulation
+  // Upload simulation
   const handleUpload = () => {
     if (files.length === 0) return alert("Please select or capture a file.");
     setUploading(true);
@@ -64,8 +64,6 @@ const ScanReport = () => {
       <div className="scan-report-container fade-in">
         <h1>📄 Scan Report Upload</h1>
         <p>Upload, capture, and manage your scanned medical reports easily.</p>
-
-        {/* Drag & Drop Zone */}
         <div
           className={`drop-zone ${isDragging ? "dragging" : ""}`}
           onDragOver={handleDragOver}
@@ -85,7 +83,7 @@ const ScanReport = () => {
           />
         </div>
 
-        {/* 📸 Capture from Camera */}
+        {/* Capture from Camera */}
         <div className="camera-section">
           <p className="camera-text">Or capture a report directly using camera:</p>
           <label className="camera-btn">
@@ -99,7 +97,7 @@ const ScanReport = () => {
           </label>
         </div>
 
-        {/* 🖼 File Preview */}
+        {/* File Preview */}
         {files.length > 0 && (
           <div className="file-preview">
             {files.map((file, idx) => (
@@ -119,7 +117,7 @@ const ScanReport = () => {
           </div>
         )}
 
-        {/* 🚀 Upload Button */}
+        {/* Upload Button */}
         <button
           className="upload-btn"
           onClick={handleUpload}
@@ -128,7 +126,7 @@ const ScanReport = () => {
           {uploading ? "⏳ Uploading..." : "🚀 Upload Reports"}
         </button>
 
-        {/* 🌗 Mode Toggle */}
+        {/* Mode Toggle */}
         <button
           className="toggle-mode-btn"
           onClick={() => setDarkMode((prev) => !prev)}

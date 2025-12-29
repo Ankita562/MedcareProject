@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const Appointment = require("../models/Appointment");
-const Medicine = require("../models/Medicine"); // Assuming you have this
-const Report = require("../models/Report");     // Assuming you have this
+const Medicine = require("../models/Medicine");
+const Report = require("../models/Report");     
 const History = require("../models/History");
 
 router.get("/:userId", async (req, res) => {
@@ -11,12 +11,11 @@ router.get("/:userId", async (req, res) => {
     // 1. Fetch data from all sources in parallel
     const [appointments, medicines, reports, histories] = await Promise.all([
       Appointment.find({ userId }),
-      Medicine.find({ userId }),    // Note: If you don't have createdAt, this might need adjustment
+      Medicine.find({ userId }),    
       Report.find({ userId }),
       History.find({ userId })
     ]);
 
-    // 2. Normalize them into a common "Timeline Event" format
     const timelineEvents = [];
 
     // Process Appointments
@@ -26,7 +25,7 @@ router.get("/:userId", async (req, res) => {
         type: "appointment",
         title: `Visited ${appt.doctorName} (${appt.specialty})`,
         description: `Routine checkup at ${appt.location || "Clinic"}`,
-        date: appt.date, // "YYYY-MM-DD"
+        date: appt.date, 
         icon: "calendar"
       });
     });
@@ -43,14 +42,13 @@ router.get("/:userId", async (req, res) => {
       });
     });
 
-    // Process Medicines (Using created date or fallback)
+    // Process Medicines 
     medicines.forEach(med => {
       timelineEvents.push({
         _id: med._id,
         type: "medicine",
         title: `Started new medicine: ${med.name}`,
         description: `${med.dosage || "Prescribed dosage"} - ${med.frequency || "Daily"}`,
-        // If medicine doesn't have a date field, use today or a generic past date
         date: med.createdAt ? med.createdAt.toISOString().split('T')[0] : "2025-01-01", 
         icon: "pill"
       });

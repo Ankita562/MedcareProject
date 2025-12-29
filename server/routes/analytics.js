@@ -15,7 +15,7 @@ router.post("/log", async (req, res) => {
   }
 });
 
-// 2. POST: Add Entry from Report (Call this when parsing a PDF)
+// 2. POST: Add Entry from Report (This is called when parsing a PDF)
 router.post("/log-from-report", async (req, res) => {
   try {
     const newLog = new HealthLog({

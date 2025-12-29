@@ -8,7 +8,6 @@ const LogHealthModal = ({ isOpen, onClose, userId, onSuccess }) => {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // If modal is closed, don't render anything
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -16,7 +15,7 @@ const LogHealthModal = ({ isOpen, onClose, userId, onSuccess }) => {
     setLoading(true);
 
     try {
-      // 👇 Sending data to your new backend route
+      // Sending data to the backend route
       await axios.post("http://localhost:5000/api/analytics/log", {
         userId,
         category,
@@ -25,7 +24,7 @@ const LogHealthModal = ({ isOpen, onClose, userId, onSuccess }) => {
       });
       
       setLoading(false);
-      onSuccess(); // 🔄 Tells the parent page to refresh the graph!
+      onSuccess(); // Tells the parent page to refresh the graph!
       onClose();   // Close the modal
       
       // Reset form
@@ -109,7 +108,7 @@ const LogHealthModal = ({ isOpen, onClose, userId, onSuccess }) => {
   );
 };
 
-// --- STYLES (Matching your Brown Theme) ---
+//STYLES 
 const overlayStyle = {
   position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
   backgroundColor: "rgba(0,0,0,0.5)", 

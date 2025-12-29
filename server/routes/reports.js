@@ -15,7 +15,6 @@ const storage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    // Save as: timestamp-filename.pdf
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
@@ -23,7 +22,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // 2. ADD REPORT (Now handles files!)
-// Note: 'file' matches the name attribute in the frontend form
 router.post("/add", upload.single("file"), async (req, res) => {
   try {
     const reportData = {

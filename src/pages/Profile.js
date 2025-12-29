@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Dashboard.css"; // Using Dashboard styles for consistency
+import "./Dashboard.css"; 
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -16,7 +16,8 @@ const Profile = () => {
     bloodGroup: storedUser?.bloodGroup || "",
     gender: storedUser?.gender || "Female",
     email: storedUser?.email || "",
-    address: storedUser?.address || "", 
+    address: storedUser?.address || "",
+    guardianEmail: storedUser?.guardianEmail || "" 
   });
 
   const handleChange = (e) => {
@@ -24,48 +25,48 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
+    // VALIDATION: Check if Guardian Email is same as User Email
+    if (formData.guardianEmail && formData.guardianEmail.toLowerCase() === formData.email.toLowerCase()) {
+       alert("⛔ Error: Guardian Email cannot be the same as your own Email.");
+       return; 
+    }
+
     try {
-      // 1. Send update to Backend (Make sure URL matches the route we just made)
+      // 1. Send update to Backend
       const res = await axios.put(`http://localhost:5000/api/auth/update/${storedUser._id}`, formData);
 
-      // 2. Update LocalStorage with the NEW data from backend response
-      // (This ensures the UI updates instantly with the real saved data)
+      // 2. Update LocalStorage
       localStorage.setItem("user", JSON.stringify(res.data));
 
       setIsEditing(false);
       alert("Profile Updated Successfully! ✅");
       
-      // Optional: Reload to refresh the Navbar name immediately
       window.location.reload(); 
 
     } catch (err) {
       console.error(err);
-      alert("Failed to update profile. Check console for details.");
+      alert("Failed to update profile.");
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("isLoggedIn"); // Ensure this is cleared too
+    localStorage.removeItem("isLoggedIn"); 
     navigate("/login");
   };
 
-  // ⭐ NEW: Handle Delete Account
+  // Handle Delete Account
   const handleDeleteAccount = async () => {
-    // 1. Confirmation Popup
     const confirmDelete = window.confirm(
       "⚠ Are you sure you want to PERMANENTLY delete your account?\n\nThis action cannot be undone."
     );
 
     if (confirmDelete) {
       try {
-        // 2. Call Backend
         await axios.delete(`http://localhost:5000/api/auth/delete-account/${storedUser._id}`);
-        
-        // 3. Cleanup & Redirect
-        localStorage.clear(); // Clear all data
+        localStorage.clear();
         alert("Your account has been deleted.");
-        window.location.href = "/register"; // Force reload to register page
+        window.location.href = "/register";
       } catch (err) {
         console.error(err);
         alert("Failed to delete account. Please try again.");
@@ -143,6 +144,43 @@ const Profile = () => {
                 </div>
             </div>
 
+            {/* ⭐ NEW: Guardian Email Section with Verification Status */}
+            <div style={{background: "#fdf2f2", padding: "15px", borderRadius: "10px", border: "1px solid #f8d7da"}}>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px"}}>
+                    <label style={{color: "#c53030", fontWeight: "bold", fontSize:"0.9rem"}}>
+                       🛡️ Guardian Email
+                    </label>
+                    
+                    {/* STATUS BADGE */}
+                    {storedUser?.guardianEmail && (
+                        <span style={{
+                            fontSize: "0.75rem", 
+                            padding: "4px 8px", 
+                            borderRadius: "12px",
+                            background: storedUser.isGuardianVerified ? "#C6F6D5" : "#FED7D7",
+                            color: storedUser.isGuardianVerified ? "#22543D" : "#822727",
+                            fontWeight: "bold",
+                            border: storedUser.isGuardianVerified ? "1px solid #9AE6B4" : "1px solid #FEB2B2"
+                        }}>
+                            {storedUser.isGuardianVerified ? "✅ Verified" : "⏳ Pending"}
+                        </span>
+                    )}
+                </div>
+                
+                <input 
+                    type="email"
+                    name="guardianEmail" 
+                    value={formData.guardianEmail} 
+                    onChange={handleChange} 
+                    disabled={!isEditing}
+                    placeholder="parent@example.com"
+                    style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #f5c6cb"}}
+                />
+                <p style={{fontSize: "0.8rem", color: "#c53030", marginTop: "5px", fontStyle: "italic"}}>
+                   (Required if Age &lt; 18 or &gt; 60)
+                </p>
+            </div>
+
             <div>
                 <label style={{fontSize:"0.9rem", fontWeight:"bold", color:"#555"}}>Gender</label>
                 <select 
@@ -207,7 +245,7 @@ const Profile = () => {
             </button>
         </div>
           
-        {/* ⭐ DELETE ACCOUNT SECTION */}
+        {/* DELETE ACCOUNT SECTION */}
          <div style={{ marginTop: "40px", borderTop: "1px solid #eee", paddingTop: "20px", textAlign: "center" }}>
             <p style={{ color: "#999", fontSize: "0.9rem", marginBottom: "10px" }}>Danger Zone</p>
             <button 

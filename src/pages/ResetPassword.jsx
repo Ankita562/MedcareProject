@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom"; 
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react"; // 👈 Import Icons
+import { Eye, EyeOff } from "lucide-react"; 
 import "./Auth.css"; 
 
 const ResetPassword = () => {
@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // ⭐ VISIBILITY STATES
+  // VISIBILITY STATES
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -83,14 +83,14 @@ const ResetPassword = () => {
             <label style={{fontWeight: "bold", display:"block", marginBottom:"5px"}}>New Password</label>
             <div style={inputWrapperStyle}>
               <input 
-                type={showPassword ? "text" : "password"} // ⭐ Dynamic Type
+                type={showPassword ? "text" : "password"} 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
                 placeholder="Enter new password"
                 style={{
                     width: "100%", 
-                    padding: "10px 40px 10px 10px", // Extra padding right for icon
+                    padding: "10px 40px 10px 10px", 
                     borderRadius: "8px", 
                     border: "1px solid #ccc",
                     outline: "none"
@@ -109,14 +109,14 @@ const ResetPassword = () => {
             <label style={{fontWeight: "bold", display:"block", marginBottom:"5px"}}>Confirm Password</label>
             <div style={inputWrapperStyle}>
               <input 
-                type={showConfirmPassword ? "text" : "password"} // ⭐ Dynamic Type
+                type={showConfirmPassword ? "text" : "password"} 
                 value={confirmPassword} 
                 onChange={(e) => setConfirmPassword(e.target.value)} 
                 required 
                 placeholder="Confirm new password"
                 style={{
                     width: "100%", 
-                    padding: "10px 40px 10px 10px", // Extra padding right for icon
+                    padding: "10px 40px 10px 10px", 
                     borderRadius: "8px", 
                     border: "1px solid #ccc",
                     outline: "none"

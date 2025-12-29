@@ -1,7 +1,7 @@
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom"; 
+import { Routes, Route, Navigate, useLocation } from "react-router-dom"; 
 
 // Components
 import Navbar from "./components/Navbar";
@@ -25,12 +25,58 @@ import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
-
+import VerifyGuardian from "./pages/VerifyGuardian";
+import Activities from "./pages/Activities";
 // Data
 import { fakePatientDetails } from "./data/fakeData";
 
 // Styles
 import "./App.css";
+
+// ⭐ INTERNAL LAYOUT COMPONENT
+// This handles the "Show/Hide Sidebar" logic based on the URL
+const Layout = ({ children, isLoggedIn, sidebarOpen, navbarProps }) => {
+  const location = useLocation();
+
+  // Define paths where the Sidebar/Navbar should NEVER appear
+  const hideSidebarPaths = [
+    "/login",
+    "/register",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+    "/verify-email",
+    "/verify-guardian"
+  ];
+
+  // Show sidebar ONLY if logged in AND we are NOT on a hidden path
+  const showSidebar = isLoggedIn && !hideSidebarPaths.some(path => location.pathname.startsWith(path));
+
+  return (
+    <>
+      {/* 1. Navbar (Only if showSidebar is true) */}
+      {showSidebar && <Navbar {...navbarProps} />}
+
+      {/* 2. Main Content Wrapper */}
+      <main
+        className={`main-content fade-in ${showSidebar ? (sidebarOpen ? "expanded" : "collapsed") : ""}`}
+        style={{
+          minHeight: "100vh",
+          paddingTop: showSidebar ? "80px" : "0px", 
+          paddingLeft: "20px",
+          paddingRight: "20px",
+          paddingBottom: "20px",
+          transition: "margin-left 0.3s ease"
+        }}
+      >
+        {children}
+      </main>
+
+      {/* 3. Footer (Only if showSidebar is true) */}
+      {showSidebar && <Footer />}
+    </>
+  );
+};
 
 function App() {
   // State
@@ -40,12 +86,12 @@ function App() {
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
   const [patientInfo] = useState(fakePatientDetails);
   
-  // ⭐ Dark Mode State
+  // Dark Mode State
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("darkMode") === "true"
   );
 
-  // ⭐ Sidebar State
+  // Sidebar State
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Effects
@@ -53,7 +99,6 @@ function App() {
     localStorage.setItem("isLoggedIn", isLoggedIn);
   }, [isLoggedIn]);
 
-  // Handle Body Classes for Dark Mode
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add("dark-mode");
@@ -72,45 +117,27 @@ function App() {
     setIsLoggedIn(false);
   };
 
+  // Props object to pass to the Layout -> Navbar
+  const navbarProps = {
+    onLogout: handleLogout,
+    isLoggedIn: isLoggedIn,
+    darkMode: darkMode,
+    setDarkMode: setDarkMode,
+    setSidebarOpen: setSidebarOpen
+  };
+
+  // ⭐ NO <Router> TAG HERE (It's already in index.js)
   return (
     <div className={`app-container ${darkMode ? "dark-mode" : "light-mode"}`}>
-      
-      {/* SHOW NAVBAR ONLY WHEN LOGGED IN */}
-      {isLoggedIn && (
-        <Navbar
-          onLogout={handleLogout}
-          isLoggedIn={isLoggedIn}
-          darkMode={darkMode}              // 👈 ADDED THIS
-          setDarkMode={setDarkMode}        // 👈 ADDED THIS (Fixes the crash)
-          setSidebarOpen={setSidebarOpen}
-        />
-      )}
       
       <ToastContainer 
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light" 
+        theme={darkMode ? "dark" : "light"}
       />
       
-      {/* MAIN CONTENT */}
-      <main
-        className={`main-content fade-in ${isLoggedIn ? (sidebarOpen ? "expanded" : "collapsed") : ""}`}
-        style={{
-          minHeight: "100vh",
-          paddingTop: isLoggedIn ? "80px" : "0px",
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          paddingBottom: "20px",
-          transition: "margin-left 0.3s ease"
-        }}
-      >
+      {/* WRAP ROUTES IN OUR SMART LAYOUT */}
+      <Layout isLoggedIn={isLoggedIn} sidebarOpen={sidebarOpen} navbarProps={navbarProps}>
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Auth onLogin={() => setIsLoggedIn(true)} />} />
@@ -132,7 +159,7 @@ function App() {
 
           <Route path="/details" element={isLoggedIn ? <PatientDetailsForm onSubmit={() => setDetailsSubmitted(true)} /> : <Navigate to="/login" />} />
           <Route path="/next-step" element={detailsSubmitted ? <AppointmentChoice /> : <Navigate to="/details" />} />
-          
+          <Route path="/activities" element={isLoggedIn ? <Activities /> : <Navigate to="/login" />} />
           <Route path="/timeline" element={isLoggedIn ? <ViewTimeline /> : <Navigate to="/login" />} />
           <Route path="/analytics" element={isLoggedIn ? <Analytics /> : <Navigate to="/login" />} />
           <Route path="/medical-history" element={isLoggedIn ? <MedicalHistory /> : <Navigate to="/login" />} />
@@ -143,16 +170,14 @@ function App() {
           <Route path="/appointments" element={isLoggedIn ? <DoctorAppointment /> : <Navigate to="/login" />} />
           <Route path="/medicines/new" element={isLoggedIn ? <AddEditMedicine /> : <Navigate to="/login" />} />
           <Route path="/medicines/:id" element={isLoggedIn ? <AddEditMedicine /> : <Navigate to="/login" />} />
-          
+          <Route path="/verify-guardian/:token" element={<VerifyGuardian />} />
           <Route path="/scan-report" element={isLoggedIn ? <ScanReport /> : <Navigate to="/login" />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </main>
+      </Layout>
 
-      {/* FOOTER */}
-      {isLoggedIn && <Footer />}
     </div>
   );
 }

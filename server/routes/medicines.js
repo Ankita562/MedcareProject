@@ -22,7 +22,7 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-// 3. DELETE MEDICINE (Delete)
+// 3. DELETE MEDICINE 
 router.delete("/:id", async (req, res) => {
   try {
     await Medicine.findByIdAndDelete(req.params.id);

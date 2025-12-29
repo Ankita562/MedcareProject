@@ -2,7 +2,7 @@
   background: var(--card-bg);
   padding: 40px 30px;
   border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(139, 94, 60, 0.15); /* brown shadow */
+  box-shadow: 0 8px 25px rgba(139, 94, 60, 0.15);
   width: 100%;
   max-width: 480px;
   margin: 60px auto;
@@ -13,14 +13,14 @@
 
 .patient-form h1 {
   text-align: center;
-  color: var(--accent-color); /* brown */
+  color: var(--accent-color); 
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
 }
 
 .form-subtitle {
   text-align: center;
-  color: var(--muted-text); /* mocha */
+  color: var(--muted-text); 
   margin-bottom: 1.8rem;
   font-size: 0.95rem;
 }
@@ -49,14 +49,14 @@
 .patient-form input:focus,
 .patient-form select:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.25); /* brown glow */
+  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.25); 
   outline: none;
 }
 
 .patient-form button {
   width: 100%;
   padding: 12px 18px;
-  background: linear-gradient(135deg, #8B5E3C, #C58F63); /* brown → caramel */
+  background: linear-gradient(135deg, #8B5E3C, #C58F63); 
   color: white;
   border: none;
   border-radius: 10px;
@@ -68,7 +68,7 @@
 
 .patient-form button:hover {
   transform: scale(1.03);
-  box-shadow: 0 6px 16px rgba(139, 94, 60, 0.35); /* caramel glow */
+  box-shadow: 0 6px 16px rgba(139, 94, 60, 0.35); 
 }
 
 .patient-form button:disabled {
@@ -79,7 +79,7 @@
 .form-message {
   text-align: center;
   margin-top: 1rem;
-  color: var(--accent-color); /* warm brown */
+  color: var(--accent-color); 
   font-weight: 500;
 }
 

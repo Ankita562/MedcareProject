@@ -128,3 +128,84 @@
     font-size: 0.9rem;
   }
 }
+/* Dashboard.css - Add to the bottom */
+
+/* 1. The Dark Background Overlay */
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark dimming effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* Sit on top of everything */
+  backdrop-filter: blur(4px); /* Blur the background */
+}
+
+/* 2. The Alert Box */
+.alert-box {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-top: 8px solid #E53E3E; /* Red warning top */
+}
+
+/* 3. Typography & Button */
+.alert-icon-large {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+  animation: shake 2s infinite;
+}
+
+.alert-title {
+  font-size: 1.8rem;
+  color: #2D3748;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.alert-message {
+  font-size: 1.2rem;
+  color: #E53E3E;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+.alert-dismiss-btn {
+  background: #E53E3E;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 6px rgba(229, 62, 62, 0.3);
+}
+
+.alert-dismiss-btn:hover {
+  transform: scale(1.05);
+  background: #C53030;
+}
+
+/* Animations */
+@keyframes popUp {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
