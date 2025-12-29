@@ -114,12 +114,12 @@ Create a new branch
 ```Bash
 git checkout -b feature-branch
 ```
-## Commit your changes 
+Commit your changes 
 ```Bash
 git commit -m 'Add new feature'
 ```
-## Push to the branch 
+Push to the branch 
 ```Bash
 git push origin feature-branch
 ```
-## Open a Pull Request.
+Open a Pull Request.
