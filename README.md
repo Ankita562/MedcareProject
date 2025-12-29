@@ -105,12 +105,21 @@ Start the Frontend:
 # Inside /client
 npm start
 ```
-📸 Screenshots
+### 📸 Screenshots
 (Add screenshots of your Dashboard, Analytics, and Scanning feature here)
 
-🤝 Contributing
+### 🤝 Contributing
 Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Commit your changes (git commit -m 'Add new feature').
-Push to the branch (git push origin feature-branch).
-Open a Pull Request.
+Create a new branch 
+```Bash
+git checkout -b feature-branch
+```
+## Commit your changes 
+```Bash
+git commit -m 'Add new feature'
+```
+## Push to the branch 
+```Bash
+git push origin feature-branch
+```
+## Open a Pull Request.
