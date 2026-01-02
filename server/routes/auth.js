@@ -17,6 +17,8 @@ const transporter = nodemailer.createTransport({
     rejectUnauthorized: false // Add this if you're getting certificate errors
   }
 });
+console.log('EMAIL_USER:', process.env.EMAIL_USER ? '✅ Loaded' : '❌ Missing');
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '✅ Loaded' : '❌ Missing');
 
 // Test the connection
 transporter.verify(function(error, success) {
