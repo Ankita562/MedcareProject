@@ -43,7 +43,8 @@ const Auth = ({ onLogin }) => {
       setSuccessMsg(res.data); // "Verification email sent!"
       setError("");
     } catch (err) {
-      setError(err.response?.data || "Failed to resend email.");
+      const errorMsg = err.response?.data?.message || (typeof err.response?.data === 'string' ? err.response?.data : "Failed to resend email.");
+      setError(errorMsg);
       setSuccessMsg("");
     } finally {
       setLoading(false);
@@ -93,7 +94,7 @@ const Auth = ({ onLogin }) => {
       }
 
     } catch (err) {
-      const serverMessage = err.response?.data?.message || err.response?.data;
+      const serverMessage = err.response?.data?.message || (typeof err.response?.data === 'string' ? err.response?.data : "Something went wrong!");
       setError(serverMessage || "Something went wrong!");
     }
   };

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios"; // 👈 Import Axios
+import axios from "axios"; 
 import "./Auth.css"; 
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(""); // 👈 State for error message
+  const [error, setError] = useState(""); 
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
