@@ -24,7 +24,10 @@ dotenv.config();
 const app = express();
 // MIDDLEWARE
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: "https://medcare-project-green.vercel.app", 
+    credentials: true
+}));
 
 // ROUTES 
 app.use("/api/auth", authRoute);
