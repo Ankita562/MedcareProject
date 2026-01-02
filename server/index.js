@@ -5,6 +5,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 
+dotenv.config();
+
 // Import Routes
 const authRoute = require("./routes/auth");
 const analyticsRoute = require("./routes/analytics");
@@ -18,8 +20,6 @@ const reminderRoute = require("./routes/reminders");
 const contactRoute = require("./routes/contacts");
 const guardianRoute = require("./routes/guardian");
 const activityRoute = require("./routes/activities");
-
-dotenv.config();
 
 const app = express();
 // MIDDLEWARE
