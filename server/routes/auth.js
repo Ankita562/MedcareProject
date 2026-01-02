@@ -33,8 +33,8 @@ router.post("/register", async (req, res) => {
     });
 
     await newUser.save();
-
-    const verifyLink = `http://localhost:3000/#/verify-email/${verificationToken}`;
+    const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
+    const verifyLink = `${clientURL}/#/verify-email/${verificationToken}`;
     await transporter.sendMail({
       from: "MedCare Support <medcares832@gmail.com>",
       to: newUser.email,
@@ -86,7 +86,8 @@ router.post("/forgot-password", async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(404).json({ message: "Account not found." });
 
-    const resetLink = `http://localhost:3000/#/reset-password/${user._id}`;
+    const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
+    const resetLink = `${clientURL}/#/reset-password/${user._id}`;
     await transporter.sendMail({
       from: "MedCare Support",
       to: user.email,
@@ -127,7 +128,9 @@ router.put("/update/:id", async (req, res) => {
         user.isGuardianVerified = false;
         user.guardianEmail = guardianEmail;
 
-        const verificationLink = `http://localhost:3000/verify-guardian/${token}`;
+        const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
+        // Added /#/ to match your frontend routing style
+        const verificationLink = `${clientURL}/#/verify-guardian/${token}`;
         
         await transporter.sendMail({
             from: "MedCare Support <medcares832@gmail.com>",
@@ -182,7 +185,8 @@ router.post("/resend-guardian-link", async (req, res) => {
         await user.save();
 
         // ⭐ HERE IS THE FIX: Added /#/ 
-        const verificationLink = `http://localhost:3000/#/verify-guardian/${token}`;
+        const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
+        const verificationLink = `${clientURL}/#/verify-guardian/${token}`;
 
         await transporter.sendMail({
             from: "MedCare Support <medcares832@gmail.com>",
@@ -199,6 +203,37 @@ router.post("/resend-guardian-link", async (req, res) => {
     } catch (err) {
         console.error("Resend Error:", err);
         res.status(500).json({ message: "Failed to resend link." });
+    }
+});
+
+// 8.5 RESEND VERIFICATION EMAIL (Missing Route)
+router.post("/resend-verification", async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json("User not found.");
+        if (user.isVerified) return res.status(400).json("Account already verified.");
+
+        // Generate new token
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+        user.verificationToken = verificationToken;
+        await user.save();
+
+        // Use the live URL
+        const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
+        const verifyLink = `${clientURL}/#/verify-email/${verificationToken}`;
+
+        await transporter.sendMail({
+            from: "MedCare Support <medcares832@gmail.com>",
+            to: user.email,
+            subject: "Verify your MedCare Account (Resent)",
+            html: `<h2>Welcome Back!</h2><p>Click to verify:</p><a href="${verifyLink}">Verify Email</a>`,
+        });
+
+        res.status(200).json("Verification link resent!");
+    } catch (err) {
+        res.status(500).json(err);
     }
 });
 
