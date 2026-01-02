@@ -557,3 +557,73 @@ select:focus {
   border: none;
   cursor: pointer;
 }
+
+/* Expanded CTA Styles */
+.final-cta-expanded {
+  background: linear-gradient(135deg, #C05621, #9C4221);
+  border-radius: 30px;
+  padding: 100px 40px;
+  color: white;
+  text-align: center;
+  margin-top: 40px;
+  box-shadow: 0 20px 40px rgba(156, 66, 33, 0.3);
+}
+
+.cta-title-large {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color:#E2E8F0;
+}
+
+.cta-description-large {
+  font-size: 1.4rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+}
+
+.cta-group-large {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-main-large {
+  background: white;
+  color: #C05621;
+  padding: 18px 45px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+/* Footer Styles */
+.footer-container {
+  padding: 20px;
+  background-color: var(--card-bg);
+  border-top: 1px solid #E2E8F0;
+  text-align: center;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text-light);
+}
+
+.footer-email, .footer-feedback {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-email:hover, .footer-feedback:hover {
+  text-decoration: underline;
+}
+
+.separator {
+  margin: 0 10px;
+  color: #CBD5E0;
+}

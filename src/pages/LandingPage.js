@@ -1,89 +1,49 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Heart, Calendar, Pill, FileText, Activity, Bell, 
-  CheckCircle, User, Shield, Clock,
-  Sparkles, ArrowRight, Play
+  Calendar, Pill, FileText, User, 
+  Clock, Sparkles, ArrowRight, Activity, Bell, Shield, Mail, MapPin
 } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [completedSteps, setCompletedSteps] = useState([]);
+  const [completedSteps] = useState([]); // This would ideally be synced with backend data
+  const [contactData, setContactData] = useState({ name: '', email: '', message: '' });
 
   const steps = [
-    {
-      id: 1,
-      title: "Complete Your Profile",
-      description: "Add your personal information, medical history, and emergency contacts",
-      icon: User,
-      color: "from-blue-500 to-indigo-600",
-      action: "Set Up Profile",
-      link: "/profile",
-      time: "2 min"
-    },
-    {
-      id: 2,
-      title: "Add Your Medications",
-      description: "Track your prescriptions and set up medication reminders",
-      icon: Pill,
-      color: "from-purple-500 to-pink-600",
-      action: "Add Medicines",
-      link: "/medicines/new",
-      time: "3 min"
-    },
-    {
-      id: 3,
-      title: "Book Your First Appointment",
-      description: "Schedule a visit with your preferred healthcare provider",
-      icon: Calendar,
-      color: "from-amber-500 to-orange-600",
-      action: "Book Appointment",
-      link: "/appointments",
-      time: "5 min"
-    },
-    {
-      id: 4,
-      title: "Upload Medical Records",
-      description: "Store your lab reports, prescriptions, and medical documents securely",
-      icon: FileText,
-      color: "from-green-500 to-emerald-600",
-      action: "Upload Reports",
-      link: "/reports",
-      time: "4 min"
-    }
+    { id: 1, title: "Complete Your Profile", description: "Add personal info and history", icon: User, color: "bg-gradient-0", link: "/profile", time: "2 min" },
+    { id: 2, title: "Add Your Medications", description: "Set up reminders", icon: Pill, color: "bg-gradient-1", link: "/medicines/new", time: "3 min" },
+    { id: 3, title: "Book Appointment", description: "Schedule a visit", icon: Calendar, color: "bg-gradient-2", link: "/appointments", time: "5 min" },
+    { id: 4, title: "Upload Records", description: "Securely store documents", icon: FileText, color: "bg-gradient-3", link: "/reports", time: "4 min" }
   ];
 
-  const features = [
-    { icon: Activity, title: "Health Analytics", description: "Track vitals and get trends" },
-    { icon: Bell, title: "Smart Reminders", description: "Never miss a dose" },
-    { icon: Shield, title: "Secure & Private", description: "Encrypted health data" },
-    { icon: Clock, title: "Health Timeline", description: "Your entire journey" }
-  ];
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    // Logic to send to medcares832@gmail.com
+    console.log("Feedback data:", contactData);
+    alert("Thank you! Your feedback has been sent to our team.");
+    setContactData({ name: '', email: '', message: '' });
+  };
 
   const progress = (completedSteps.length / steps.length) * 100;
 
   return (
-    <div className="landing-page-container" style={{ background: 'linear-gradient(to bottom right, #fffaf0, #fff5f0, #fff)' }}>
-      {/* Hero Section */}
+    <div className="landing-page-container">
       <div className="max-w-7xl mx-auto px-8 py-12">
+        {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="welcome-pill">
             <Sparkles size={16} />
             <span>Welcome to MedCare+</span>
           </div>
           <h2 className="landing-title">Let's Get You Started!</h2>
-          <p className="landing-subtitle">
-            Take a few minutes to set up your health profile and unlock all the features MedCare has to offer.
-          </p>
+          <p className="landing-subtitle">Complete your health profile to unlock all features.</p>
         </div>
 
-        {/* Progress Bar Component */}
+        {/* Progress Card */}
         <div className="progress-card">
           <div className="progress-header">
-            <div>
-              <h3>Your Setup Progress</h3>
-              <p>{completedSteps.length} of {steps.length} steps completed</p>
-            </div>
+            <h3>Your Setup Progress</h3>
             <div className="progress-percentage">{Math.round(progress)}%</div>
           </div>
           <div className="progress-track">
@@ -93,27 +53,23 @@ const LandingPage = () => {
 
         {/* Steps Grid */}
         <div className="steps-grid">
-          {steps.map((step, index) => {
+          {steps.map((step) => {
             const Icon = step.icon;
-            const isDone = completedSteps.includes(index);
             return (
-              <div key={step.id} className={`step-card ${isDone ? 'completed' : ''}`}>
+              <div key={step.id} className="step-card">
                 <div className="step-content">
-                  <div className={`step-icon-wrapper bg-gradient-${index}`}>
+                  <div className={`step-icon-wrapper ${step.color}`}>
                     <Icon size={24} color="white" />
                   </div>
                   <div className="step-text">
-                    <h4>{step.title} {isDone && <CheckCircle size={16} color="#48bb78" />}</h4>
+                    <h4>{step.title}</h4>
                     <p>{step.description}</p>
                   </div>
                 </div>
                 <div className="step-footer">
                    <span className="step-time"><Clock size={12} /> {step.time}</span>
-                   <button 
-                    className={`step-btn ${isDone ? 'done' : ''}`}
-                    onClick={() => navigate(step.link)}
-                   >
-                     {isDone ? 'Done' : step.action} <ArrowRight size={14} />
+                   <button className="step-btn" onClick={() => navigate(step.link)}>
+                     Start <ArrowRight size={14} />
                    </button>
                 </div>
               </div>
@@ -121,16 +77,69 @@ const LandingPage = () => {
           })}
         </div>
 
-        {/* Final CTA */}
-        <div className="final-cta">
-          <h2>Ready to Take Control?</h2>
-          <p>Complete your setup and start your journey to better health.</p>
-          <div className="cta-group">
-            <button className="btn-main" onClick={() => navigate('/login')}>Get Started Now</button>
-            <button className="btn-alt" onClick={() => navigate('/dashboard')}>View Dashboard</button>
+        {/* Expanded Final CTA */}
+        <div className="final-cta-expanded">
+          <h2 className="cta-title-large">Ready to Take Control?</h2>
+          <p className="cta-description-large">
+            Complete your setup today and experience smarter health management. 
+            Join our community prioritizing their daily wellness.
+          </p>
+          <div className="cta-group-large">
+            <button className="btn-main-large" onClick={() => navigate('/login')}>Get Started Now</button>
+            <button className="btn-alt-large" onClick={() => navigate('/dashboard')}>View Dashboard</button>
           </div>
         </div>
+
+        {/* Contact & Feedback Form */}
+        <section className="contact-section" id="feedback">
+          <div className="contact-card">
+            <div className="contact-info">
+              <h3>Get in Touch</h3>
+              <p>Have questions or feedback? We'd love to hear from you.</p>
+              <div className="contact-details">
+                <div className="contact-item">
+                  <Mail size={20} /> <span>medcares832@gmail.com</span>
+                </div>
+                <div className="contact-item">
+                  <MapPin size={20} /> <span>Bengaluru, India</span>
+                </div>
+              </div>
+            </div>
+            
+            <form className="contact-form" onSubmit={handleContactSubmit}>
+              <input 
+                type="text" placeholder="Your Name" required 
+                value={contactData.name}
+                onChange={(e) => setContactData({...contactData, name: e.target.value})}
+              />
+              <input 
+                type="email" placeholder="Your Email" required 
+                value={contactData.email}
+                onChange={(e) => setContactData({...contactData, email: e.target.value})}
+              />
+              <textarea 
+                placeholder="How can we help you?" rows="4" required
+                value={contactData.message}
+                onChange={(e) => setContactData({...contactData, message: e.target.value})}
+              ></textarea>
+              <button type="submit" className="btn-submit">Send Feedback</button>
+            </form>
+          </div>
+        </section>
       </div>
+
+      {/* Footer */}
+      <footer className="footer-container">
+        <div className="footer-content">
+          <p>© MedCare — 2025</p>
+          <div className="footer-links">
+            <span>Contact: </span>
+            <a href="mailto:medcares832@gmail.com">medcares832@gmail.com</a>
+            <span className="separator">|</span>
+            <a href="#feedback">Give Feedback</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
