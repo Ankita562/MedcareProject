@@ -5,22 +5,28 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt"); 
 
 // EMAIL CONFIGURATION 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: 'smtp.gmail.com', 
-  port: 465,
-  secure: true, 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+const nodemailer = require('nodemailer');
 
-  tls: {
-    ciphers: 'SSLv3',
-    rejectUnauthorized: false,
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // true for 465, false for 587
+  auth: {
+    user: 'your-email@gmail.com',
+    pass: 'your-app-password' // NOT your regular Gmail password!
   },
-  // FORCING IPv4
-  family: 4 
+  tls: {
+    rejectUnauthorized: false // Add this if you're getting certificate errors
+  }
+});
+
+// Test the connection
+transporter.verify(function(error, success) {
+  if (error) {
+    console.log('SMTP Error:', error);
+  } else {
+    console.log('✅ Server is ready to send emails');
+  }
 });
 
 // 1. REGISTER ROUTE
