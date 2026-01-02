@@ -6,16 +6,21 @@ const bcrypt = require("bcrypt");
 
 // EMAIL CONFIGURATION 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465, 
-  secure: true, 
+  service: 'gmail',
+  host: 'smtp.gmail.com', 
+  port: 587,
+  secure: false, 
   auth: {
-    user: "medcares832@gmail.com",
+    user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+
   tls: {
-    rejectUnauthorized: true 
-  }
+    ciphers: 'SSLv3',
+    rejectUnauthorized: false,
+  },
+  // FORCING IPv4
+  family: 4 
 });
 
 // 1. REGISTER ROUTE
