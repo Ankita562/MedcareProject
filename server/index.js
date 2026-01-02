@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 
 dotenv.config();
-
+console.log("EMAIL PASS LOADED:", process.env.EMAIL_PASS ? "YES" : "NO");
 // Import Routes
 const authRoute = require("./routes/auth");
 const analyticsRoute = require("./routes/analytics");

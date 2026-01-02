@@ -16,6 +16,8 @@ const transporter = nodemailer.createTransport({
 // 1. REGISTER ROUTE
 router.post("/register", async (req, res) => {
   try {
+    // Debug: Check if password loaded (Don't log the actual password)
+    if (!process.env.EMAIL_PASS) console.error("CRITICAL: EMAIL_PASS is missing!");
     const userExists = await User.findOne({ email: req.body.email });
     if (userExists) return res.status(400).json("Email already registered!");
 
@@ -44,7 +46,8 @@ router.post("/register", async (req, res) => {
 
     res.status(200).json({ message: "Registration successful! Check your email." });
   } catch (err) {
-    res.status(500).json(err);
+    console.error("Register Error:", err); // logs error to Render console
+    res.status(500).json({ message: err.message || "Server Error during registration" });
   }
 });
 
@@ -76,7 +79,8 @@ router.post("/login", async (req, res) => {
     const { password, verificationToken, ...others } = user._doc;
     res.status(200).json(others);
   } catch (err) {
-    res.status(500).json(err);
+    console.error("Error:", err); 
+    res.status(500).json({ message: err.message || "Server Error" });
   }
 });
 
@@ -232,8 +236,9 @@ router.post("/resend-verification", async (req, res) => {
         });
 
         res.status(200).json("Verification link resent!");
-    } catch (err) {
-        res.status(500).json(err);
+      } catch (err) {
+    console.error("Error:", err); // Print error to Render logs
+    res.status(500).json({ message: err.message || "Server Error" });
     }
 });
 
