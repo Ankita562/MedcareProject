@@ -18,7 +18,7 @@ const EmergencyContacts = () => {
     const fetchContacts = async () => {
       if (!user?._id) return;
       try {
-        const res = await axios.get(`http://localhost:5000/api/contacts/${user._id}`);
+        const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/contacts/${user._id}`);
         setContacts(res.data);
       } catch (err) {
         console.error("Error fetching contacts", err);
@@ -37,7 +37,7 @@ const EmergencyContacts = () => {
 
     try {
       // ✅ FIX: URL changed from ".../add" to just ".../contacts"
-      const res = await axios.post("http://localhost:5000/api/contacts", {
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/contacts", {
         userId: user._id,
         name,
         relation,
@@ -60,7 +60,7 @@ const EmergencyContacts = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to remove this contact?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/contacts/${id}`);
+        await axios.delete(`https://medcare-api-vw0f.onrender.com/api/contacts/${id}`);
         setContacts(contacts.filter(c => c._id !== id));
         toast.info("Contact removed.");
       } catch (err) {

@@ -37,7 +37,7 @@ const Auth = ({ onLogin }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/resend-verification", {
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-verification", {
         email: form.email
       });
       setSuccessMsg(res.data); // "Verification email sent!"
@@ -58,7 +58,7 @@ const Auth = ({ onLogin }) => {
     try {
       if (isLogin) {
         // --- LOGIN ---
-        const res = await axios.post("http://localhost:5000/api/auth/login", {
+        const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/login", {
           email: form.email,
           password: form.password,
         });
@@ -80,7 +80,7 @@ const Auth = ({ onLogin }) => {
           return;
         }
 
-        const res = await axios.post("http://localhost:5000/api/auth/register", {
+        const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/register", {
           firstName: form.firstName,
           lastName: form.lastName,
           email: form.email,

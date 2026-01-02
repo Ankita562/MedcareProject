@@ -25,7 +25,7 @@ const MedicalReports = () => {
     const fetchReports = async () => {
       if (user?._id) {
         try {
-          const res = await axios.get(`http://localhost:5000/api/reports/${user._id}`);
+          const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/reports/${user._id}`);
           setReports(res.data);
         } catch (err) { console.error(err); }
       }
@@ -47,7 +47,7 @@ const MedicalReports = () => {
     if (file) formData.append("file", file);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/reports/add", formData, {
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/reports/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setReports([res.data, ...reports]); 
@@ -94,7 +94,7 @@ const MedicalReports = () => {
     toast.info("Scanning document... Please wait 🕵️");
     
     // Build full URL
-    const fullUrl = `http://localhost:5000/${reportUrl}`;
+    const fullUrl = `https://medcare-api-vw0f.onrender.com/${reportUrl}`;
     let extractedText = "";
 
     try {
@@ -113,7 +113,7 @@ const MedicalReports = () => {
       console.log("Final Extracted Text:", extractedText);
 
       // Send to Backend
-      const res = await axios.post("http://localhost:5000/api/activities/add", {
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/activities/add", {
         userId: user._id,
         text: extractedText
       });
@@ -181,7 +181,7 @@ const MedicalReports = () => {
                   
                   {report.fileUrl && (
                     <div style={{marginTop: "15px", display: "flex", gap: "10px"}}>
-                        <a href={`http://localhost:5000/${report.fileUrl}`} target="_blank" rel="noopener noreferrer" className="btn" style={{flex: 1, textAlign: "center", background: "#333", color: "white", textDecoration: "none", padding: "8px"}}>
+                        <a href={`https://medcare-api-vw0f.onrender.com/${report.fileUrl}`} target="_blank" rel="noopener noreferrer" className="btn" style={{flex: 1, textAlign: "center", background: "#333", color: "white", textDecoration: "none", padding: "8px"}}>
                           👁️ View
                         </a>
                         <button onClick={() => handleScan(report.fileUrl)} disabled={scanning} className="btn" style={{flex: 1, background: "#6B46C1", color: "white", border: "none", cursor: "pointer"}}>

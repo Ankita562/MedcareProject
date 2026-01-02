@@ -19,7 +19,7 @@ const VerifyGuardian = () => {
     const verifyToken = async () => {
       try {
         // Attempt to verify automatically
-        await axios.post("http://localhost:5000/api/auth/verify-guardian", { token });
+        await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/verify-guardian", { token });
         setStatus("success");
         setTimeout(() => navigate("/login"), 3000);
       } catch (err) {
@@ -42,7 +42,7 @@ const VerifyGuardian = () => {
     
     try {
       // Ensure this endpoint exists in your backend!
-      await axios.post("http://localhost:5000/api/auth/resend-guardian-link", { email: resendEmail });
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { email: resendEmail });
       setResendStatus("success");
     } catch (err) {
       console.error(err);

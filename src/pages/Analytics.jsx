@@ -23,7 +23,7 @@ const Analytics = () => {
       if (!user) return;
       
       // Call your API
-      const res = await axios.get(`http://localhost:5000/api/analytics/${user._id}`);
+      const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/analytics/${user._id}`);
       const allLogs = res.data;
 
       // Filter the data into two categories for the charts

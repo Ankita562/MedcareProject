@@ -21,7 +21,7 @@ const DoctorAppointment = () => {
   const fetchAppointments = async () => {
     if (!user?._id) return;
     try {
-      const res = await axios.get(`http://localhost:5000/api/appointments/${user._id}`);
+      const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/appointments/${user._id}`);
       setAppointments(res.data);
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -49,7 +49,7 @@ const DoctorAppointment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/appointments/add", {
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/appointments/add", {
         userId: user._id,
         doctorName,
         date,
@@ -69,7 +69,7 @@ const DoctorAppointment = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Delete this appointment record?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/appointments/${id}`);
+        await axios.delete(`https://medcare-api-vw0f.onrender.com/api/appointments/${id}`);
         fetchAppointments();
       } catch (err) {
         console.error("Failed to delete", err);

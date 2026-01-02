@@ -30,7 +30,7 @@ const AddEditMedicine = () => {
 
     try {
       // 2. Send to Backend
-      await axios.post("http://localhost:5000/api/medicines/add", {
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/medicines/add", {
         userId: user._id, // LINK TO USER
         name: form.name,
         dosage: form.dosage,

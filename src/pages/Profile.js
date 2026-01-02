@@ -46,7 +46,7 @@ const Profile = () => {
   const resendGuardianLink = async () => {
     if (!formData.guardianEmail) return;
     try {
-        await axios.post("http://localhost:5000/api/auth/resend-guardian-link", { 
+        await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { 
             email: formData.guardianEmail 
         });
         alert("✅ Verification link resent! Check inbox.");
@@ -68,7 +68,7 @@ const Profile = () => {
 
     try {
       // 1. Send update to Backend
-      const res = await axios.put(`http://localhost:5000/api/auth/update/${storedUser._id}`, formData);
+      const res = await axios.put(`https://medcare-api-vw0f.onrender.com/api/auth/update/${storedUser._id}`, formData);
 
       // 2. Update LocalStorage
       localStorage.setItem("user", JSON.stringify(res.data));
@@ -98,7 +98,7 @@ const Profile = () => {
 
     if (confirmDelete) {
       try {
-        await axios.delete(`http://localhost:5000/api/auth/delete-account/${storedUser._id}`);
+        await axios.delete(`https://medcare-api-vw0f.onrender.com/api/auth/delete-account/${storedUser._id}`);
         localStorage.clear();
         alert("Your account has been deleted.");
         window.location.href = "/register";

@@ -11,7 +11,7 @@ const VerifyEmail = () => {
     const verify = async () => {
       try {
         // Calling backend to verify the token
-        await axios.post(`http://localhost:5000/api/auth/verify-email/${token}`);
+        await axios.post(`https://medcare-api-vw0f.onrender.com/api/auth/verify-email/${token}`);
         setStatus("✅ Email Verified! Redirecting to login...");
         setTimeout(() => navigate("/login"), 3000);
       } catch (err) {

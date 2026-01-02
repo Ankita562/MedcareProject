@@ -24,10 +24,10 @@ const ViewTimeline = () => {
 
       try {
         const [apptRes, medRes, reportRes, historyRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/appointments/${user._id}`),
-          axios.get(`http://localhost:5000/api/medicines/${user._id}`),
-          axios.get(`http://localhost:5000/api/reports/${user._id}`),
-          axios.get(`http://localhost:5000/api/history/${user._id}`)
+          axios.get(`https://medcare-api-vw0f.onrender.com/api/appointments/${user._id}`),
+          axios.get(`https://medcare-api-vw0f.onrender.com/api/medicines/${user._id}`),
+          axios.get(`https://medcare-api-vw0f.onrender.com/api/reports/${user._id}`),
+          axios.get(`https://medcare-api-vw0f.onrender.com/api/history/${user._id}`)
         ]);
 
         let events = [];

@@ -16,7 +16,7 @@ const LogHealthModal = ({ isOpen, onClose, userId, onSuccess }) => {
 
     try {
       // Sending data to the backend route
-      await axios.post("http://localhost:5000/api/analytics/log", {
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/analytics/log", {
         userId,
         category,
         value,

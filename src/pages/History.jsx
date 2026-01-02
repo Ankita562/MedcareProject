@@ -16,7 +16,7 @@ const History = () => {
   const fetchHistory = async () => {
     if (!user?._id) return;
     try {
-      const res = await axios.get(`http://localhost:5000/api/history/${user._id}`);
+      const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/history/${user._id}`);
       setHistoryList(res.data);
     } catch (err) {
       console.error("Error fetching history:", err);
@@ -31,7 +31,7 @@ const History = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/history/add", {
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/history/add", {
         userId: user._id,
         title,
         date,
@@ -49,7 +49,7 @@ const History = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Delete this record permanently?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/history/${id}`);
+        await axios.delete(`https://medcare-api-vw0f.onrender.com/api/history/${id}`);
         fetchHistory();
       } catch (err) {
         console.error(err);

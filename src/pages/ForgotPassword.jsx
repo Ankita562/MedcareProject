@@ -18,7 +18,7 @@ const ForgotPassword = () => {
 
     try {
       // Call Backend API
-      await axios.post("http://localhost:5000/api/auth/forgot-password", { email });
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/forgot-password", { email });
       setSubmitted(true);
     } catch (err) {
       // Handle Error (User not found)

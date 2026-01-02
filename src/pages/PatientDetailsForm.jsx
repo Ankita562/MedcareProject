@@ -99,7 +99,7 @@ const PatientDetailsForm = ({ onSubmit }) => {
   const resendGuardianLink = async () => {
     if (!formData.guardianEmail) return;
     try {
-        await axios.post("http://localhost:5000/api/auth/resend-guardian-link", { 
+        await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { 
             email: formData.guardianEmail 
         });
         alert("✅ Verification link resent! Check the inbox.");

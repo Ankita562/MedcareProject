@@ -14,7 +14,7 @@ const Activities = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/activities/${user._id}`);
+        const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/activities/${user._id}`);
         setActivities(res.data);
       } catch (err) {
         console.error(err);
@@ -41,7 +41,7 @@ const Activities = () => {
 
     // 4. Call Backend to Save & Notify Guardian
     try {
-      const res = await axios.post("http://localhost:5000/api/activities/complete", {
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/activities/complete", {
         userId: user._id,
         title: act.title,
         category: act.category,

@@ -29,7 +29,7 @@ const ResetPassword = () => {
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/auth/reset-password/${id}`, { password });
+      await axios.post(`https://medcare-api-vw0f.onrender.com/api/auth/reset-password/${id}`, { password });
       
       setMessage("Password reset successful! Redirecting to login...");
       setTimeout(() => navigate("/login"), 3000); 

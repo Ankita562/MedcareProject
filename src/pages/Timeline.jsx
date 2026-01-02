@@ -11,7 +11,7 @@ const Timeline = () => {
     const fetchTimeline = async () => {
       if (!user?._id) return;
       try {
-        const res = await axios.get(`http://localhost:5000/api/timeline/${user._id}`);
+        const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/timeline/${user._id}`);
         setEvents(res.data);
         setLoading(false);
       } catch (err) {

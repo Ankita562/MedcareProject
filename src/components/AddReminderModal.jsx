@@ -21,7 +21,7 @@ const AddReminderModal = ({ isOpen, onClose, userId, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/reminders/add", {
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/reminders/add", {
         userId, title, datetime, frequency, selectedDays
       });
       onSuccess();

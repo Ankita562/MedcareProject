@@ -36,11 +36,11 @@ const Dashboard = () => {
 
     try {
       const [medRes, apptRes, reportRes, remRes, analyticsRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/medicines/${user._id}`),
-        axios.get(`http://localhost:5000/api/appointments/${user._id}`),
-        axios.get(`http://localhost:5000/api/reports/${user._id}`),
-        axios.get(`http://localhost:5000/api/reminders/${user._id}`),
-        axios.get(`http://localhost:5000/api/analytics/${user._id}`)
+        axios.get(`https://medcare-api-vw0f.onrender.com/api/medicines/${user._id}`),
+        axios.get(`https://medcare-api-vw0f.onrender.com/api/appointments/${user._id}`),
+        axios.get(`https://medcare-api-vw0f.onrender.com/api/reports/${user._id}`),
+        axios.get(`https://medcare-api-vw0f.onrender.com/api/reminders/${user._id}`),
+        axios.get(`https://medcare-api-vw0f.onrender.com/api/analytics/${user._id}`)
       ]);
 
       setMedicines(medRes.data);
@@ -146,7 +146,7 @@ const Dashboard = () => {
     setCheckedItems(prev => ({ ...prev, [itemId]: true }));
 
     try {
-      const res = await axios.post("http://localhost:5000/api/guardian/notify", {
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/guardian/notify", {
         userId: user._id, type: type, itemName: itemName 
       });
       if(res.data === "Guardian notified successfully!") {
@@ -162,21 +162,21 @@ const Dashboard = () => {
 
   const deleteMedicine = async (id, name) => {
     if (window.confirm(`Delete ${name}?`)) {
-      try { await axios.delete(`http://localhost:5000/api/medicines/${id}`); toast.success("Deleted"); fetchData(); } 
+      try { await axios.delete(`https://medcare-api-vw0f.onrender.com/api/medicines/${id}`); toast.success("Deleted"); fetchData(); } 
       catch (err) { toast.error("Failed"); }
     }
   };
 
   const deleteReminder = async (id) => {
      if(window.confirm("Delete reminder?")) {
-        try { await axios.delete(`http://localhost:5000/api/reminders/${id}`); fetchData(); } 
+        try { await axios.delete(`https://medcare-api-vw0f.onrender.com/api/reminders/${id}`); fetchData(); } 
         catch(err) { console.error(err); }
      }
   };
 
   const cancelAppointment = async (id) => {
     if (window.confirm("Cancel appointment?")) {
-      try { await axios.delete(`http://localhost:5000/api/appointments/${id}`); fetchData(); } 
+      try { await axios.delete(`https://medcare-api-vw0f.onrender.com/api/appointments/${id}`); fetchData(); } 
       catch (err) { console.error(err); }
     }
   };
