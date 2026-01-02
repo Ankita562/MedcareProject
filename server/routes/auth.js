@@ -5,15 +5,13 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt"); 
 
 // EMAIL CONFIGURATION 
-const nodemailer = require('nodemailer');
-
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false, // true for 465, false for 587
   auth: {
-    user: 'your-email@gmail.com',
-    pass: 'your-app-password' // NOT your regular Gmail password!
+     user: process.env.EMAIL_USER, // Use environment variable
+    pass: process.env.EMAIL_PASS  // NOT your regular Gmail password!
   },
   tls: {
     rejectUnauthorized: false // Add this if you're getting certificate errors
@@ -54,7 +52,7 @@ router.post("/register", async (req, res) => {
     const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
     const verifyLink = `${clientURL}/#/verify-email/${verificationToken}`;
     await transporter.sendMail({
-      from: "MedCare Support <medcares832@gmail.com>",
+      from: "MedCare Support <${process.env.EMAIL_USER}>",
       to: newUser.email,
       subject: "Verify your MedCare Account",
       html: `<h2>Welcome!</h2><p>Click to verify:</p><a href="${verifyLink}">Verify Email</a>`,
@@ -109,7 +107,7 @@ router.post("/forgot-password", async (req, res) => {
     const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
     const resetLink = `${clientURL}/#/reset-password/${user._id}`;
     await transporter.sendMail({
-      from: "MedCare Support",
+      from: `MedCare Support <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Reset Password",
       html: `<a href="${resetLink}">Reset Password</a>`,
@@ -153,7 +151,7 @@ router.put("/update/:id", async (req, res) => {
         const verificationLink = `${clientURL}/#/verify-guardian/${token}`;
         
         await transporter.sendMail({
-            from: "MedCare Support <medcares832@gmail.com>",
+            from: "MedCare Support <${process.env.EMAIL_USER}>",
             to: guardianEmail,
             subject: "MedCare: Verify Guardian Status",
             html: `
@@ -209,7 +207,7 @@ router.post("/resend-guardian-link", async (req, res) => {
         const verificationLink = `${clientURL}/#/verify-guardian/${token}`;
 
         await transporter.sendMail({
-            from: "MedCare Support <medcares832@gmail.com>",
+            from: "MedCare Support <${process.env.EMAIL_USER}>",
             to: email,
             subject: "Action Required: Verify Guardian Access (Resent)",
             html: `
@@ -245,7 +243,7 @@ router.post("/resend-verification", async (req, res) => {
         const verifyLink = `${clientURL}/#/verify-email/${verificationToken}`;
 
         await transporter.sendMail({
-            from: "MedCare Support <medcares832@gmail.com>",
+            from: "MedCare Support <${process.env.EMAIL_USER}>",
             to: user.email,
             subject: "Verify your MedCare Account (Resent)",
             html: `<h2>Welcome Back!</h2><p>Click to verify:</p><a href="${verifyLink}">Verify Email</a>`,
