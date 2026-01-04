@@ -49,8 +49,8 @@ const Auth = ({ onLogin }) => {
       // 2. Get the token from response
       const { verificationToken, firstName } = res.data;
 
-      // 3. Create the Link (With the # hash!)
-      const verifyLink = `https://medcare-frontend.vercel.app/#/verify-email/${verificationToken}`;
+      // 3. Create the Link 
+    const verifyLink = `https://medcare-project-green.vercel.app/#/verify-email/${verificationToken}`;
 
       // 4. Send Email via EmailJS
       await emailjs.send(
@@ -109,7 +109,7 @@ const Auth = ({ onLogin }) => {
         const { verificationToken, firstName } = res.data;
 
         // 3. Create the Verify Link
-        const verifyLink = `https://medcare-frontend.vercel.app/#/verify-email/${verificationToken}`;
+        const verifyLink = `https://medcare-project-green.vercel.app/#/verify-email/${verificationToken}`;
 
         // 4. Send Email via EmailJS
         await emailjs.send(
