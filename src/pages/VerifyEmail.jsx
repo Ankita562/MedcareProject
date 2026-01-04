@@ -19,7 +19,7 @@ const VerifyEmail = ({ onLogin }) => {
         localStorage.setItem("user", JSON.stringify(res.data));
         localStorage.setItem("isLoggedIn", "true");
 
-        // Update App.js state so the sidebar appears
+        // Update App.js state so the sidebar appears immediately
         if (onLogin) onLogin();
 
         setStatus("✅ Verified! Redirecting to Dashboard...");

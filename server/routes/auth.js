@@ -64,8 +64,7 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ message: err.message || "Server Error" });
   }
 });
-
-// 2. VERIFY EMAIL ROUTE 
+// 2. VERIFY EMAIL ROUTE (Updated for Auto-Login)
 router.post("/verify-email/:token", async (req, res) => {
   try {
     const user = await User.findOne({ verificationToken: req.params.token });
