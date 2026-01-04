@@ -5,16 +5,14 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt"); 
 
 // EMAIL CONFIGURATION 
+// EMAIL CONFIGURATION (Updated for Render/Cloud)
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // true for 465, false for 587
+  port: 465,        // <--- CHANGE THIS (Was 587)
+  secure: true,     // <--- CHANGE THIS (Was false)
   auth: {
-     user: process.env.EMAIL_USER, // Use environment variable
-    pass: process.env.EMAIL_PASS  // NOT your regular Gmail password!
-  },
-  tls: {
-    rejectUnauthorized: false // Add this if you're getting certificate errors
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 console.log('EMAIL_USER:', process.env.EMAIL_USER ? '✅ Loaded' : '❌ Missing');
