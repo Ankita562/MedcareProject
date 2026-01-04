@@ -65,7 +65,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// 2. VERIFY EMAIL ROUTE
+// 2. VERIFY EMAIL ROUTE 
 router.post("/verify-email/:token", async (req, res) => {
   try {
     const user = await User.findOne({ verificationToken: req.params.token });
@@ -74,7 +74,11 @@ router.post("/verify-email/:token", async (req, res) => {
     user.isVerified = true;
     user.verificationToken = undefined;
     await user.save();
-    res.status(200).json("Email verified successfully!");
+
+    // ⭐ CHANGE: Return user data (excluding password) so frontend can log in
+    const { password, verificationToken, ...others } = user._doc;
+    res.status(200).json(others);
+
   } catch (err) {
     res.status(500).json(err);
   }

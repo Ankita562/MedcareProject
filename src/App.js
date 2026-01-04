@@ -137,9 +137,7 @@ function App() {
           <Route path="/register" element={<Auth onLogin={() => setIsLoggedIn(true)} />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/verify-email/:token" element={<VerifyEmail />} />
-          
-          {/* ✅ Moved Verify Guardian Here (No Login Required) */}
+          <Route path="/verify-email/:token" element={<VerifyEmail onLogin={() => setIsLoggedIn(true)} />} />
           <Route path="/verify-guardian/:token" element={<VerifyGuardian />} />
 
 
