@@ -37,16 +37,39 @@ const Auth = ({ onLogin }) => {
     }
 
     setLoading(true);
+    setError("");
+    setSuccessMsg("");
+
     try {
+      // 1. Ask Backend for a new token
       const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-verification", {
         email: form.email
       });
-      setSuccessMsg(res.data); // "Verification email sent!"
-      setError("");
+
+      // 2. Get the token from response
+      const { verificationToken, firstName } = res.data;
+
+      // 3. Create the Link (With the # hash!)
+      const verifyLink = `https://medcare-frontend.vercel.app/#/verify-email/${verificationToken}`;
+
+      // 4. Send Email via EmailJS
+      await emailjs.send(
+        "service_lt52jez",     
+        "template_rgln76n",     
+        {
+          to_email: form.email,
+          to_name: firstName,
+          verify_link: verifyLink
+        },
+        "4row3jIQabLW4zaY2"      
+      );
+
+      setSuccessMsg("Verification link sent! Check your email.");
+
     } catch (err) {
-      const errorMsg = err.response?.data?.message || (typeof err.response?.data === 'string' ? err.response?.data : "Failed to resend email.");
+      console.error(err);
+      const errorMsg = err.response?.data?.message || "Failed to resend email.";
       setError(errorMsg);
-      setSuccessMsg("");
     } finally {
       setLoading(false);
     }

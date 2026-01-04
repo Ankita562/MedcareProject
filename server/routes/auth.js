@@ -224,35 +224,30 @@ router.post("/resend-guardian-link", async (req, res) => {
     }
 });
 
-// 8.5 RESEND VERIFICATION EMAIL (Missing Route)
+// 8.5 RESEND VERIFICATION (Updated for EmailJS)
 router.post("/resend-verification", async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
 
-        if (!user) return res.status(404).json("User not found.");
-        if (user.isVerified) return res.status(400).json("Account already verified.");
+        if (!user) return res.status(404).json({ message: "User not found." });
+        if (user.isVerified) return res.status(400).json({ message: "Account already verified." });
 
         // Generate new token
         const verificationToken = crypto.randomBytes(32).toString("hex");
         user.verificationToken = verificationToken;
         await user.save();
 
-        // Use the live URL
-        const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
-        const verifyLink = `${clientURL}/#/verify-email/${verificationToken}`;
-
-        await transporter.sendMail({
-            from: "MedCare Support <${process.env.EMAIL_USER}>",
-            to: user.email,
-            subject: "Verify your MedCare Account (Resent)",
-            html: `<h2>Welcome Back!</h2><p>Click to verify:</p><a href="${verifyLink}">Verify Email</a>`,
+        // STOP sending email here. Return the token to React instead.
+        res.status(200).json({
+            message: "Token generated",
+            verificationToken: verificationToken,
+            firstName: user.firstName
         });
 
-        res.status(200).json("Verification link resent!");
-      } catch (err) {
-    console.error("Error:", err); // Print error to Render logs
-    res.status(500).json({ message: err.message || "Server Error" });
+    } catch (err) {
+        console.error("Error:", err);
+        res.status(500).json({ message: err.message || "Server Error" });
     }
 });
 
