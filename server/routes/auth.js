@@ -30,10 +30,9 @@ transporter.verify(function(error, success) {
 });
 
 // 1. REGISTER ROUTE
+// 1. REGISTER ROUTE (Modified for EmailJS)
 router.post("/register", async (req, res) => {
   try {
-    // Debug: Check if password loaded (Don't log the actual password)
-    if (!process.env.EMAIL_PASS) console.error("CRITICAL: EMAIL_PASS is missing!");
     const userExists = await User.findOne({ email: req.body.email });
     if (userExists) return res.status(400).json("Email already registered!");
 
@@ -51,19 +50,20 @@ router.post("/register", async (req, res) => {
     });
 
     await newUser.save();
-    const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
-    const verifyLink = `${clientURL}/#/verify-email/${verificationToken}`;
-    await transporter.sendMail({
-      from: "MedCare Support <${process.env.EMAIL_USER}>",
-      to: newUser.email,
-      subject: "Verify your MedCare Account",
-      html: `<h2>Welcome!</h2><p>Click to verify:</p><a href="${verifyLink}">Verify Email</a>`,
+
+    // --------------------------------------------------------------------
+    // CHANGE: We removed transporter.sendMail()
+    // INSTEAD: We send the token to the Frontend
+    // --------------------------------------------------------------------
+    res.status(200).json({
+      message: "User created successfully!",
+      verificationToken: verificationToken, // <--- Frontend needs this!
+      firstName: newUser.firstName
     });
 
-    res.status(200).json({ message: "Registration successful! Check your email." });
   } catch (err) {
-    console.error("Register Error:", err); // logs error to Render console
-    res.status(500).json({ message: err.message || "Server Error during registration" });
+    console.error("Register Error:", err);
+    res.status(500).json({ message: err.message || "Server Error" });
   }
 });
 

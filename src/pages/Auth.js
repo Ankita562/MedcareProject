@@ -1,3 +1,4 @@
+import emailjs from '@emailjs/browser';
 import axios from "axios";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -51,36 +52,29 @@ const Auth = ({ onLogin }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccessMsg("");
 
     try {
       if (isLogin) {
-        // --- LOGIN ---
+        // --- LOGIN LOGIC (No changes) ---
         const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/login", {
           email: form.email,
           password: form.password,
         });
-
         localStorage.setItem("user", JSON.stringify(res.data));
         localStorage.setItem("isLoggedIn", "true");
-
         if (onLogin) onLogin();
         navigate("/dashboard");
 
       } else {
-        // --- REGISTER ---
-        if (!form.firstName || !form.lastName) {
-          setError("Please fill in your first and last name.");
-          return;
-        }
-        if (form.password.length < 4) {
-          setError("Password must be at least 4 characters long.");
-          return;
-        }
+        // --- REGISTER LOGIC (Updated for EmailJS) ---
+        if (!form.firstName || !form.lastName) setError("Please fill name.");
+        if (form.password.length < 4) setError("Password too short.");
 
+        // 1. Call Backend to create user
         const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/register", {
           firstName: form.firstName,
           lastName: form.lastName,
@@ -88,14 +82,33 @@ const Auth = ({ onLogin }) => {
           password: form.password,
         });
 
-        alert(res.data.message);
+        // 2. Get the token from the backend response
+        const { verificationToken, firstName } = res.data;
+
+        // 3. Create the Verify Link
+        const verifyLink = `https://medcare-frontend.vercel.app/#/verify-email/${verificationToken}`;
+
+        // 4. Send Email via EmailJS
+        await emailjs.send(
+          "service_lt52jez",     
+          "template_rgln76n",   
+          {
+            to_email: form.email,   
+            to_name: firstName,      
+            verify_link: verifyLink 
+          },
+          "4row3jIQabLW4zaY2"      
+        );
+
+        setSuccessMsg("Registration successful! Check your email to verify.");
         setIsLogin(true);
         setForm({ ...form, password: "" });
       }
 
     } catch (err) {
-      const serverMessage = err.response?.data?.message || (typeof err.response?.data === 'string' ? err.response?.data : "Something went wrong!");
-      setError(serverMessage || "Something went wrong!");
+      console.error(err);
+      const serverMessage = err.response?.data?.message || "Something went wrong!";
+      setError(serverMessage);
     }
   };
 
