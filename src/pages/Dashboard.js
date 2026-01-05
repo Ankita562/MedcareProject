@@ -104,6 +104,7 @@ const Dashboard = () => {
   };
   
   // 3. Reminder Checker
+  // 3. Reminder Checker (Fixed: Ignores Timezone Offsets)
   useEffect(() => {
     const interval = setInterval(() => {
       if (Notification.permission !== "granted") return;
@@ -111,23 +112,35 @@ const Dashboard = () => {
 
       reminders.forEach(rem => {
         const remDate = new Date(rem.datetime);
+        
+        // ⭐ FIX: Compare UTC (Stored) Hours with Local (Wall Clock) Hours
+        // This ensures that if you set "4:30 PM", it rings at "4:30 PM" on your clock.
         const isTimeMatch = 
-           remDate.getHours() === now.getHours() && 
-           remDate.getMinutes() === now.getMinutes();
+           remDate.getUTCHours() === now.getHours() && 
+           remDate.getUTCMinutes() === now.getMinutes();
 
+        // Unique key to prevent spamming
         const notificationKey = `notified-${rem._id}-${now.toDateString()}-${now.getHours()}:${now.getMinutes()}`;
         const alreadyNotified = localStorage.getItem(notificationKey);
 
         if (isTimeMatch && !alreadyNotified) {
+             console.log("✅ Triggering Reminder:", rem.title); 
+             
+             // A. Show Center Alert
              setActiveAlert(rem);
+
+             // B. Show Browser Notification
              new Notification(`⏰ Reminder: ${rem.title}`, {
                body: "It's time to take action!",
                icon: "/favicon.ico"
              });
+             
+             // C. Mark as done locally
              localStorage.setItem(notificationKey, "true");
         }
       });
-    }, 2000);
+    }, 2000); // Check every 2 seconds
+
     return () => clearInterval(interval);
   }, [reminders]);
 

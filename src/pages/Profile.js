@@ -1,35 +1,64 @@
 import React, { useState, useEffect } from "react"; 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import emailjs from '@emailjs/browser'; // <--- ⭐ NEW IMPORT
+import emailjs from '@emailjs/browser'; 
 import "./Dashboard.css"; 
 
 const Profile = () => {
   const navigate = useNavigate();
-  // Load user from local storage
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+  
+  // ⭐ CHANGE 1: Use State for the user, not just a variable
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")));
   
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: storedUser?.firstName || "",
-    lastName: storedUser?.lastName || "",
-    age: storedUser?.age || "",
-    bloodGroup: storedUser?.bloodGroup || "",
-    gender: storedUser?.gender || "Female",
-    email: storedUser?.email || "",
-    address: storedUser?.address || "",
-    guardianEmail: storedUser?.guardianEmail || "" 
+    firstName: currentUser?.firstName || "",
+    lastName: currentUser?.lastName || "",
+    age: currentUser?.age || "",
+    bloodGroup: currentUser?.bloodGroup || "",
+    gender: currentUser?.gender || "Female",
+    email: currentUser?.email || "",
+    address: currentUser?.address || "",
+    guardianEmail: currentUser?.guardianEmail || "" 
   });
 
   const [needsGuardian, setNeedsGuardian] = useState(false);
 
-  // 1. Logic to Hide/Show based on Age Change
+  // ⭐ CHANGE 2: Fetch latest data immediately on load
+  useEffect(() => {
+    const fetchLatestUser = async () => {
+      if (currentUser?._id) {
+        try {
+          const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/auth/find/${currentUser._id}`);
+          
+          // Update Local Storage
+          localStorage.setItem("user", JSON.stringify(res.data));
+          
+          // Update State (This flips the badge instantly)
+          setCurrentUser(res.data);
+          
+          // Also sync form data just in case
+          setFormData(prev => ({
+             ...prev,
+             guardianEmail: res.data.guardianEmail || ""
+          }));
+
+        } catch (err) {
+          console.error("Error refreshing profile:", err);
+        }
+      }
+    };
+    fetchLatestUser();
+  }, []); // Runs once when page loads
+
+  // 3. Logic to Hide/Show based on Age Change
   useEffect(() => {
     const currentAge = parseInt(formData.age);
     if (!isNaN(currentAge)) {
       if (currentAge >= 18 && currentAge <= 60) {
         setNeedsGuardian(false);
-        if (formData.guardianEmail) {
+        // Only clear if we are editing
+        if (isEditing && formData.guardianEmail) {
             setFormData(prev => ({ ...prev, guardianEmail: "" }));
         }
       } 
@@ -37,39 +66,31 @@ const Profile = () => {
         setNeedsGuardian(true);
       }
     }
-  }, [formData.age]);
+  }, [formData.age, isEditing]);
 
-  // ⭐ 2. FIXED: Resend Guardian Link (Now uses EmailJS)
   const resendGuardianLink = async () => {
     if (!formData.guardianEmail) return;
     
-    // Ask for confirmation to prevent spamming
     if(!window.confirm(`Resend verification email to ${formData.guardianEmail}?`)) return;
 
     try {
-        // Step A: Get Token from Backend
         const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { 
             email: formData.guardianEmail 
         });
         
-        // Step B: Extract Token & Name
         const { guardianToken, firstName } = res.data;
-
-        // Step C: Create the Link (Using your CORRECT domain)
         const verifyLink = `https://medcare-project-green.vercel.app/#/verify-guardian/${guardianToken}`;
 
-        // Step D: Send via EmailJS
         await emailjs.send(
-            "service_lt52jez",       // Your Service ID
-            "template_rgln76n",      // Your Template ID
+            "service_lt52jez",       
+            "template_rgln76n",      
             {
                 to_email: formData.guardianEmail,
                 to_name: "Guardian",
                 verify_link: verifyLink,
-                // You can add a custom message if your template supports it
                 message: `${firstName} has added you as their emergency guardian on MedCare.`
             },
-            "4row3jIQabLW4zaY2"      // Your Public Key
+            "4row3jIQabLW4zaY2"      
         );
 
         alert("✅ Verification link sent! Check the guardian's inbox.");
@@ -90,12 +111,15 @@ const Profile = () => {
     }
 
     try {
-      const res = await axios.put(`https://medcare-api-vw0f.onrender.com/api/auth/update/${storedUser._id}`, formData);
+      const res = await axios.put(`https://medcare-api-vw0f.onrender.com/api/auth/update/${currentUser._id}`, formData);
+      
+      // Update local storage and state
       localStorage.setItem("user", JSON.stringify(res.data));
-
+      setCurrentUser(res.data);
       setIsEditing(false);
+      
       alert("Profile Updated Successfully! ✅");
-      window.location.reload(); 
+      // No reload needed anymore!
 
     } catch (err) {
       console.error(err);
@@ -116,7 +140,7 @@ const Profile = () => {
 
     if (confirmDelete) {
       try {
-        await axios.delete(`https://medcare-api-vw0f.onrender.com/api/auth/delete-account/${storedUser._id}`);
+        await axios.delete(`https://medcare-api-vw0f.onrender.com/api/auth/delete-account/${currentUser._id}`);
         localStorage.clear();
         alert("Your account has been deleted.");
         window.location.href = "/register";
@@ -206,22 +230,21 @@ const Profile = () => {
                     </label>
                     
                     <div style={{display: "flex", alignItems: "center", gap: "8px"}}>
-                        {/* STATUS BADGE */}
-                        {storedUser?.guardianEmail && (
+                        {/* ⭐ CHANGE 3: Use currentUser to check status, not storedUser */}
+                        {currentUser?.guardianEmail && (
                             <span style={{
                                 fontSize: "0.75rem", 
                                 padding: "4px 8px", 
                                 borderRadius: "12px",
-                                background: storedUser.isGuardianVerified ? "#C6F6D5" : "#FED7D7",
-                                color: storedUser.isGuardianVerified ? "#22543D" : "#822727",
+                                background: currentUser.isGuardianVerified ? "#C6F6D5" : "#FED7D7",
+                                color: currentUser.isGuardianVerified ? "#22543D" : "#822727",
                                 fontWeight: "bold",
-                                border: storedUser.isGuardianVerified ? "1px solid #9AE6B4" : "1px solid #FEB2B2"
+                                border: currentUser.isGuardianVerified ? "1px solid #9AE6B4" : "1px solid #FEB2B2"
                             }}>
-                                {storedUser.isGuardianVerified ? "✅ Verified" : "⏳ Pending"}
+                                {currentUser.isGuardianVerified ? "✅ Verified" : "⏳ Pending"}
                             </span>
                         )}
 
-                        {/* RESEND BUTTON */}
                         <button 
                             onClick={resendGuardianLink}
                             style={{

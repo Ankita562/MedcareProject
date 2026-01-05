@@ -101,23 +101,21 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// 4. FORGOT PASSWORD
+// 4. FORGOT PASSWORD (Updated for EmailJS)
 router.post("/forgot-password", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(404).json({ message: "Account not found." });
 
-    const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
-    const resetLink = `${clientURL}/#/reset-password/${user._id}`;
-    await transporter.sendMail({
-      from: `MedCare Support <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Reset Password",
-      html: `<a href="${resetLink}">Reset Password</a>`,
+    
+    res.status(200).json({
+        message: "User found",
+        userId: user._id,       
+        firstName: user.firstName,
+        email: user.email
     });
-    res.status(200).json({ message: "Reset link sent." });
   } catch (err) {
-    res.status(500).json({ message: "Error sending email." });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
@@ -164,6 +162,16 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
+// GET SINGLE USER (Add this to auth.js)
+router.get("/find/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    const { password, ...others } = user._doc;
+    res.status(200).json(others);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 // 7. VERIFY GUARDIAN TOKEN (The link clicked in email)
 router.post("/verify-guardian", async (req, res) => {
   try {

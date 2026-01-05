@@ -11,7 +11,9 @@ const Auth = ({ onLogin }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false); // New loading state
+  
+  // ⭐ IMPROVED: Loading state now controls the main button too
+  const [loading, setLoading] = useState(false); 
 
   const [form, setForm] = useState({
     firstName: "",
@@ -21,7 +23,7 @@ const Auth = ({ onLogin }) => {
   });
 
   const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState(""); // New success message state
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,7 +31,7 @@ const Auth = ({ onLogin }) => {
     setSuccessMsg("");
   };
 
-  // ⭐ NEW FUNCTION: Handle Resend Email
+  // Handle Resend Email
   const handleResendEmail = async () => {
     if (!form.email) {
       setError("Please enter your email address to resend the link.");
@@ -41,18 +43,13 @@ const Auth = ({ onLogin }) => {
     setSuccessMsg("");
 
     try {
-      // 1. Ask Backend for a new token
       const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-verification", {
         email: form.email
       });
 
-      // 2. Get the token from response
       const { verificationToken, firstName } = res.data;
+      const verifyLink = `https://medcare-project-green.vercel.app/#/verify-email/${verificationToken}`;
 
-      // 3. Create the Link 
-    const verifyLink = `https://medcare-project-green.vercel.app/#/verify-email/${verificationToken}`;
-
-      // 4. Send Email via EmailJS
       await emailjs.send(
         "service_lt52jez",     
         "template_rgln76n",     
@@ -75,29 +72,31 @@ const Auth = ({ onLogin }) => {
     }
   };
 
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccessMsg("");
+    setLoading(true); // ⭐ START LOADING
 
     try {
       if (isLogin) {
-        // --- LOGIN LOGIC (No changes) ---
+        // --- LOGIN ---
         const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/login", {
           email: form.email,
           password: form.password,
         });
+        
         localStorage.setItem("user", JSON.stringify(res.data));
         localStorage.setItem("isLoggedIn", "true");
-        if (onLogin) onLogin();
+        
+        if (onLogin) onLogin(); // Update App state
         navigate("/dashboard");
 
       } else {
-        // --- REGISTER LOGIC (Updated for EmailJS) ---
-        if (!form.firstName || !form.lastName) setError("Please fill name.");
-        if (form.password.length < 4) setError("Password too short.");
+        // --- REGISTER ---
+        if (!form.firstName || !form.lastName) throw new Error("Please fill name.");
+        if (form.password.length < 4) throw new Error("Password too short.");
 
-        // 1. Call Backend to create user
         const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/register", {
           firstName: form.firstName,
           lastName: form.lastName,
@@ -105,13 +104,9 @@ const Auth = ({ onLogin }) => {
           password: form.password,
         });
 
-        // 2. Get the token from the backend response
         const { verificationToken, firstName } = res.data;
-
-        // 3. Create the Verify Link
         const verifyLink = `https://medcare-project-green.vercel.app/#/verify-email/${verificationToken}`;
 
-        // 4. Send Email via EmailJS
         await emailjs.send(
           "service_lt52jez",     
           "template_rgln76n",   
@@ -130,8 +125,10 @@ const Auth = ({ onLogin }) => {
 
     } catch (err) {
       console.error(err);
-      const serverMessage = err.response?.data?.message || "Something went wrong!";
+      const serverMessage = err.response?.data?.message || err.message || "Something went wrong!";
       setError(serverMessage);
+    } finally {
+      setLoading(false); // ⭐ STOP LOADING
     }
   };
 
@@ -176,15 +173,20 @@ const Auth = ({ onLogin }) => {
             </span>
           </div>
 
-          <motion.button whileTap={{ scale: 0.95 }} type="submit" className="auth-btn">
-            {isLogin ? "Login" : "Create Account"}
+          {/* ⭐ IMPROVED BUTTON: Shows Loading State */}
+          <motion.button 
+            whileTap={{ scale: 0.95 }} 
+            type="submit" 
+            className="auth-btn"
+            disabled={loading}
+            style={{ opacity: loading ? 0.7 : 1, cursor: loading ? "wait" : "pointer" }}
+          >
+            {loading ? "Processing..." : (isLogin ? "Login" : "Create Account")}
           </motion.button>
         </form>
 
-        {/* RESEND LINK & FOOTER */}
         <div className="toggle-auth" style={{ marginTop: "20px", fontSize: "0.95rem", color: "#666", textAlign: "center" }}>
           
-          {/* Only show "Resend" if on Login screen */}
           {isLogin && (
             <div style={{ marginBottom: "15px" }}>
               <span style={{ fontSize: "0.85rem", color: "#888" }}>Did not receive verification email? </span>
@@ -207,8 +209,6 @@ const Auth = ({ onLogin }) => {
             <>
               <span>Don't have an account? </span>
               <span onClick={() => setIsLogin(false)} style={{ color: "#8B5E3C", fontWeight: "bold", cursor: "pointer" }}>Sign Up</span>
-              <span style={{ margin: "0 10px", color: "#ccc" }}>|</span>
-              <span onClick={() => navigate("/forgot-password")} style={{ color: "#d9534f", fontWeight: "bold", cursor: "pointer" }}>Forgot Password?</span>
             </>
           ) : (
             <>

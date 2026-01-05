@@ -195,12 +195,6 @@ function App() {
             element={isLoggedIn ? <Analytics /> : <Navigate to="/login" replace />}
           />
 
-          {/* Chatbot */}
-          <Route
-            path="/chatbot"
-            element={isLoggedIn ? <ChatbotPage /> : <Navigate to="/login" replace />}
-          />
-
           {/* Contacts */}
           <Route
             path="/contacts"
