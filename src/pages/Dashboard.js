@@ -4,6 +4,7 @@ import axios from "axios";
 import "./Dashboard.css";
 import AddReminderModal from "../components/AddReminderModal"; 
 import { toast } from "react-toastify";
+import emailjs from '@emailjs/browser'; // ⭐ NEW: Import EmailJS
 import {
   Calendar, Pill, FileText, Bell, User, Activity, Trash2, CheckCircle
 } from "lucide-react";
@@ -24,11 +25,19 @@ const Dashboard = () => {
   const [reminders, setReminders] = useState([]);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   
-  // ⭐ NEW: State for the Center Screen Alert (The big popup)
+  // Center Alert State
   const [activeAlert, setActiveAlert] = useState(null);
-
-  // Track which items have been "Checked" in this session
   const [checkedItems, setCheckedItems] = useState({});
+
+  // ⭐ HELPER: Fixes Timezone Issue (Forces UTC display)
+  const formatTime = (isoString) => {
+    if (!isoString) return "";
+    return new Date(isoString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC' // <--- This prevents the +5:30 shift!
+    });
+  };
 
   // 1. Fetch Data
   const fetchData = useCallback(async () => {
@@ -73,90 +82,91 @@ const Dashboard = () => {
     fetchData();
   }, [fetchData]);
 
-  // 2. ⭐ NEW: Handle "Set Reminder" Click (Checks Permission FIRST)
+  // 2. Open Reminder Modal
   const handleOpenReminderModal = async () => {
-    // Check if browser supports notifications
     if (!("Notification" in window)) {
       alert("This browser does not support notifications.");
       return;
     }
-
-    // Check permission status
     if (Notification.permission === "granted") {
-      setIsReminderModalOpen(true); // Open directly if allowed
+      setIsReminderModalOpen(true);
     } else if (Notification.permission !== "denied") {
-      // Ask for permission now
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         toast.success("Notifications enabled! 🔔");
         setIsReminderModalOpen(true);
       } else {
-        toast.info("Reminders disabled. You won't get alerts.");
+        toast.info("Reminders disabled.");
       }
     } else {
-      // Permission was previously blocked
-      alert("Notifications are blocked. Please enable them in your browser settings to set reminders.");
+      alert("Notifications are blocked. Please enable them in settings.");
     }
   };
   
-  // 3. ⭐ UPDATED: Reminder Checker Engine (Triggers Center Alert)
+  // 3. Reminder Checker
   useEffect(() => {
     const interval = setInterval(() => {
-      // Skip logic if permission isn't granted yet
       if (Notification.permission !== "granted") return;
-
       const now = new Date();
 
       reminders.forEach(rem => {
         const remDate = new Date(rem.datetime);
-        
-        // Check if Hour and Minute match
         const isTimeMatch = 
            remDate.getHours() === now.getHours() && 
            remDate.getMinutes() === now.getMinutes();
 
-        // Unique key to prevent spamming
         const notificationKey = `notified-${rem._id}-${now.toDateString()}-${now.getHours()}:${now.getMinutes()}`;
         const alreadyNotified = localStorage.getItem(notificationKey);
 
         if (isTimeMatch && !alreadyNotified) {
-             console.log(`✅ TIME MATCH! Sending alert for: ${rem.title}`);
-             
-             // A. Show the CENTER SCREEN POPUP
              setActiveAlert(rem);
-
-             // B. Show System Notification (Tray)
              new Notification(`⏰ Reminder: ${rem.title}`, {
                body: "It's time to take action!",
                icon: "/favicon.ico"
              });
-             
-             // C. Mark as done for this specific minute
              localStorage.setItem(notificationKey, "true");
         }
       });
-    }, 2000); // Check every 2 seconds
-
+    }, 2000);
     return () => clearInterval(interval);
   }, [reminders]);
 
-  // 4. Guardian & Delete Logic (Kept exactly as is)
+  // ⭐ 4. UPDATED: Guardian Notification (Uses EmailJS)
   const notifyGuardian = async (type, itemId, itemName) => {
     if (!user?._id) return;
+    
+    // Visual Feedback Immediately
     setCheckedItems(prev => ({ ...prev, [itemId]: true }));
 
+    // A. Send Email to Guardian (Frontend Logic)
+    if (user.guardianEmail && user.isGuardianVerified) {
+        try {
+            await emailjs.send(
+                "service_lt52jez",     
+                "template_s12702u", 
+                {
+                    to_email: user.guardianEmail,
+                    patient_name: user.firstName,
+                    notification_type: type, // e.g. "Medicine Taken"
+                    message: `${type} Completed: ${itemName}`,
+                    time: new Date().toLocaleString()
+                },
+                "4row3jIQabLW4zaY2"    // Your Public Key
+            );
+            toast.success("Guardian notified via Email! 📧");
+        } catch (e) {
+            console.error("EmailJS Error:", e);
+            toast.warn("Could not send email (check console).");
+        }
+    }
+
+    // B. Sync with Backend (Optional, but good for records)
     try {
-      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/guardian/notify", {
+      await axios.post("https://medcare-api-vw0f.onrender.com/api/guardian/notify", {
         userId: user._id, type: type, itemName: itemName 
       });
-      if(res.data === "Guardian notified successfully!") {
-         toast.success(`Guardian notified: ${itemName} ✅`);
-      } else {
-         toast.success(`${itemName} marked as done! 👍`);
-      }
     } catch (err) {
-      console.error(err);
-      toast.info("Marked as done (Local).");
+      console.error("Backend sync error:", err);
     }
   };
 
@@ -184,8 +194,6 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       
-      {/* ⭐ NEW: CENTER SCREEN REMINDER ALERT */}
-      {/* This only shows when a reminder triggers */}
       {activeAlert && (
         <div className="alert-overlay">
            <div className="alert-box">
@@ -193,13 +201,7 @@ const Dashboard = () => {
               <h2 className="alert-title">Reminder!</h2>
               <p style={{color: "#666", marginBottom: "5px"}}>It's time for:</p>
               <h3 className="alert-message">{activeAlert.title}</h3>
-              
-              <button 
-                className="alert-dismiss-btn" 
-                onClick={() => setActiveAlert(null)}
-              >
-                ✅ Okay, Got it!
-              </button>
+              <button className="alert-dismiss-btn" onClick={() => setActiveAlert(null)}>✅ Okay, Got it!</button>
            </div>
         </div>
       )}
@@ -218,7 +220,7 @@ const Dashboard = () => {
           {nextAppt ? (
             <div className="fade-in" style={{position: "relative"}}>
                <button onClick={(e) => { e.stopPropagation(); cancelAppointment(nextAppt._id); }}
-                 style={{position: "absolute", top: 0, right: 0, background: "#FFF5F5", color: "red", border: "none", borderRadius: "50%", width: "25px", height: "25px", cursor: "pointer"}}>✖</button>
+                style={{position: "absolute", top: 0, right: 0, background: "#FFF5F5", color: "red", border: "none", borderRadius: "50%", width: "25px", height: "25px", cursor: "pointer"}}>✖</button>
 
                <p style={{fontWeight: "bold", fontSize: "1.2rem", margin: "10px 0 5px", color: "#333"}}>{nextAppt.doctorName}</p>
                <p style={{margin: 0, fontSize: "0.95rem", color: "#666"}}>{nextAppt.specialty}</p>
@@ -280,7 +282,7 @@ const Dashboard = () => {
           <p style={{color: "#666", fontSize: "0.9rem"}}>Uploaded Files</p>
         </div>
 
-        {/* CARD 4: REMINDERS (UPDATED BUTTON) */}
+        {/* CARD 4: REMINDERS */}
         <div className="dashboard-card" style={{position: "relative"}}>
           <div className="card-icon"><Bell /></div>
           <h3>Reminders</h3>
@@ -289,7 +291,11 @@ const Dashboard = () => {
                 <div style={{maxHeight: "150px", overflowY: "auto", paddingRight: "5px"}}>
                   {reminders.map(r => (
                     <div key={r._id} style={{display: "flex", justifyContent: "space-between", alignItems: "center", padding:"10px 0", borderBottom:"1px dashed #eee"}}>
-                       <div><span style={{display:"block", fontWeight:"600", fontSize: "0.9rem"}}>{r.title}</span><span style={{fontSize:"0.75rem", color:"#888"}}>{new Date(r.datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></div>
+                       <div>
+                           <span style={{display:"block", fontWeight:"600", fontSize: "0.9rem"}}>{r.title}</span>
+                           {/* ⭐ FIXED TIME DISPLAY HERE */}
+                           <span style={{fontSize:"0.75rem", color:"#888"}}>{formatTime(r.datetime)}</span>
+                       </div>
                        <button onClick={(e) => { e.stopPropagation(); deleteReminder(r._id); }} style={{border:"none", background:"#FFF5F5", color:"#E53E3E", cursor:"pointer", padding: "5px", borderRadius: "5px"}}>🗑️</button>
                     </div>
                   ))}
@@ -297,7 +303,6 @@ const Dashboard = () => {
              ) : <div style={{textAlign: "center", marginTop: "20px", color: "#999"}}><p style={{fontSize: "0.9rem"}}>No active reminders.</p></div>}
           </div>
           
-          {/* ⭐ Button now triggers permission check first */}
           <button className="dash-btn" onClick={handleOpenReminderModal} style={{marginTop: "auto"}}>+ Set Reminder</button>
         </div>
 

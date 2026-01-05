@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import emailjs from '@emailjs/browser'; // ⭐ IMPORT EMAILJS
 import { ShieldCheck, XCircle, RefreshCw } from "lucide-react"; 
 
 const VerifyGuardian = () => {
@@ -18,10 +19,10 @@ const VerifyGuardian = () => {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        // Attempt to verify automatically
         await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/verify-guardian", { token });
         setStatus("success");
-        setTimeout(() => navigate("/login"), 3000);
+        // Optional: Redirect to landing page instead of login since guardians don't login
+        setTimeout(() => navigate("/"), 4000);
       } catch (err) {
         setStatus("error");
         setErrorMessage(err.response?.data?.message || "Link expired or invalid.");
@@ -35,14 +36,34 @@ const VerifyGuardian = () => {
     }
   }, [token, navigate]);
 
-  // 2. Resend Function
+  // 2. ⭐ FIXED: Resend Function (Uses EmailJS)
   const handleResend = async () => {
     if (!resendEmail) return;
     setResendStatus("sending");
     
     try {
-      // Ensure this endpoint exists in your backend!
-      await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { email: resendEmail });
+      // Step A: Ask Backend for new token
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { email: resendEmail });
+      
+      // Step B: Get Token & Name from response
+      const { guardianToken, firstName } = res.data;
+
+      // Step C: Create the Link
+      const verifyLink = `https://medcare-project-green.vercel.app/#/verify-guardian/${guardianToken}`;
+
+      // Step D: Send Email via EmailJS
+      await emailjs.send(
+        "service_lt52jez",       // Your Service ID
+        "template_rgln76n",      // Your Template ID
+        {
+            to_email: resendEmail,
+            to_name: "Guardian",
+            verify_link: verifyLink,
+            message: `${firstName} has requested you to verify your email as their guardian.`
+        },
+        "4row3jIQabLW4zaY2"      // Your Public Key
+      );
+
       setResendStatus("success");
     } catch (err) {
       console.error(err);
@@ -67,8 +88,8 @@ const VerifyGuardian = () => {
            <div>
              <ShieldCheck size={64} color="#48BB78" style={{margin: "0 auto 20px"}} />
              <h2 style={{color: "#2F855A"}}>Verified!</h2>
-             <p>Guardian confirmed successfully.</p>
-             <p style={{fontSize: "0.8rem", color: "#A0AEC0", marginTop: "20px"}}>Redirecting to login...</p>
+             <p>Thank you! You have successfully confirmed your status as a Guardian.</p>
+             <p style={{fontSize: "0.8rem", color: "#A0AEC0", marginTop: "20px"}}>You can close this page now.</p>
            </div>
         )}
 
@@ -79,7 +100,7 @@ const VerifyGuardian = () => {
              <h2 style={{color: "#C53030", marginBottom: "10px"}}>Verification Failed</h2>
              <p style={{color: "#E53E3E", marginBottom: "20px"}}>{errorMessage}</p>
              
-             {/* ⭐ RESEND SECTION ⭐ */}
+             {/* ⭐ RESEND SECTION */}
              <div style={{ borderTop: "1px solid #eee", paddingTop: "20px", textAlign: "left" }}>
                 <p style={{marginBottom: "10px", fontWeight: "bold", color: "#4A5568", fontSize: "0.95rem"}}>Need a new link?</p>
                 
@@ -115,7 +136,7 @@ const VerifyGuardian = () => {
                         
                         {resendStatus === "error" && (
                             <p style={{color: "#E53E3E", fontSize: "0.8rem", marginTop: "8px"}}>
-                                ❌ Failed to resend. Check the email provided.
+                                ❌ Failed to resend. Ensure the email is correct.
                             </p>
                         )}
                     </>
