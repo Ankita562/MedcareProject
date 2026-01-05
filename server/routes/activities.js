@@ -4,8 +4,6 @@ const Medicine = require("../models/Medicine");
 const User = require("../models/User");
 const Analytics = require("../models/Analytics");
 const nodemailer = require("nodemailer");
-const path = require('path'); 
-const { spawn } = require('child_process');
 
 // ==========================================
 // 1. GET Activities (System Suggestions + DB)
@@ -48,97 +46,36 @@ router.get("/:userId", async (req, res) => {
 });
 
 // ==========================================
-// 2. ⭐ ADVANCED ADD (Med-SpaCy Integration)
+// 2. ⭐ SAFE ADD (JavaScript Version - No Python Crash)
 // ==========================================
 router.post("/add", async (req, res) => {
   try {
     const { userId, text } = req.body;
     
-    // ⭐ POINT TO YOUR VIRTUAL ENVIRONMENT PYTHON
-    // This path ensures we use the isolated Python 3.11 environment
-    const venvPythonPath = path.join(__dirname, '../venv/Scripts/python.exe');
-    const scriptPath = path.join(__dirname, '../process_prescription.py');
-
-    console.log(`🔍 Spawning Python Logic...`);
-
-    const pythonProcess = spawn(venvPythonPath, [scriptPath, text]);
-
-    let pythonData = "";
+    // Simple JS Logic to guess category (Replaces Python for now)
+    let category = "General";
+    const lowerText = text.toLowerCase();
     
-    // Collect output from Python
-    pythonProcess.stdout.on('data', (data) => {
-      pythonData += data.toString();
+    if (lowerText.includes("yoga") || lowerText.includes("walk") || lowerText.includes("run") || lowerText.includes("exercise")) {
+        category = "Exercise";
+    } else if (lowerText.includes("meditat") || lowerText.includes("sleep") || lowerText.includes("stress")) {
+        category = "Mental Health";
+    } else if (lowerText.includes("eat") || lowerText.includes("diet") || lowerText.includes("food") || lowerText.includes("drink")) {
+        category = "Diet";
+    }
+
+    // 1. Create the Activity
+    const newAct = new Activity({
+        userId,
+        title: text, // Use the raw text as the title
+        category: category,
+        source: "Doctor" // Scanned from prescription
     });
 
-    // Handle standard errors (and debug logs)
-    pythonProcess.stderr.on('data', (data) => {
-      console.log(`Python Log: ${data}`); // Log it, but don't fail!
-    });
+    await newAct.save();
 
-    pythonProcess.on('close', async (code) => {
-      console.log(`Python finished with code ${code}`);
-
-      try {
-        // ⭐ NOISE FILTER: Find the first '{' to ignore DEBUG logs
-        const jsonStartIndex = pythonData.indexOf('{');
-        
-        if (jsonStartIndex === -1) {
-            throw new Error("No JSON found in Python output");
-        }
-
-        const cleanJson = pythonData.substring(jsonStartIndex);
-        const extracted = JSON.parse(cleanJson);
-        
-        const results = [];
-
-        // A. Save Activities (Yoga, Walk)
-        if (extracted.activities) {
-            for (const act of extracted.activities) {
-              const newAct = new Activity({
-                userId,
-                title: act.title,
-                category: act.category || "General",
-                source: "Doctor"
-              });
-              await newAct.save();
-              results.push(newAct);
-            }
-        }
-
-        // B. Save Medicines
-        if (extracted.medicines) {
-            for (const med of extracted.medicines) {
-              const newMed = new Medicine({
-                userId,
-                name: med.name,
-                dosage: med.dosage || "As prescribed",
-                frequency: med.frequency || ""
-              });
-              await newMed.save();
-            }
-        }
-
-        // C. Save Vitals (BP, Weight)
-        if (extracted.vitals) {
-            for (const vital of extracted.vitals) {
-              const newLog = new Analytics({
-                userId,
-                category: vital.label, 
-                value: vital.value,
-                date: new Date()
-              });
-              await newLog.save();
-            }
-        }
-
-        res.status(200).json(results); 
-
-      } catch (e) {
-        console.error("Parsing Error:", e);
-        console.error("Raw Output was:", pythonData);
-        res.status(500).json("Could not parse clinical data.");
-      }
-    });
+    // 2. Return it in an array (to match frontend expectation)
+    res.status(200).json([newAct]);
 
   } catch (err) {
     console.error("Server Error:", err);
@@ -171,7 +108,9 @@ router.post("/complete", async (req, res) => {
     if (user.guardianEmail && user.isGuardianVerified) {
       
       const transporter = nodemailer.createTransport({
-        service: "gmail",
+        host: 'smtp.gmail.com', // Explicit host
+        port: 465,              // Secure port
+        secure: true,
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
