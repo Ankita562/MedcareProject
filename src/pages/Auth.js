@@ -125,10 +125,15 @@ const Auth = ({ onLogin }) => {
 
     } catch (err) {
       console.error(err);
-      const serverMessage = err.response?.data?.message || err.message || "Something went wrong!";
+      const serverMessage = 
+          err.response?.data?.message || 
+          err.response?.data || 
+          err.message || 
+          "Something went wrong!";
+          
       setError(serverMessage);
     } finally {
-      setLoading(false); // ⭐ STOP LOADING
+      setLoading(false); 
     }
   };
 
