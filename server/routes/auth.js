@@ -1,34 +1,14 @@
 const router = require("express").Router();
 const User = require("../models/User");
-const nodemailer = require("nodemailer");
 const crypto = require("crypto"); 
 const bcrypt = require("bcrypt"); 
 
-// EMAIL CONFIGURATION 
-// EMAIL CONFIGURATION (Updated for Render/Cloud)
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,        // <--- CHANGE THIS (Was 587)
-  secure: true,     // <--- CHANGE THIS (Was false)
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-console.log('EMAIL_USER:', process.env.EMAIL_USER ? '✅ Loaded' : '❌ Missing');
-console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '✅ Loaded' : '❌ Missing');
-
-// Test the connection
-transporter.verify(function(error, success) {
-  if (error) {
-    console.log('SMTP Error:', error);
-  } else {
-    console.log('✅ Server is ready to send emails');
-  }
-});
+// --------------------------------------------------------------------
+// NOTE: All Email Sending has been moved to Frontend (EmailJS).
+// This backend now only generates tokens and saves data.
+// --------------------------------------------------------------------
 
 // 1. REGISTER ROUTE
-// 1. REGISTER ROUTE (Modified for EmailJS)
 router.post("/register", async (req, res) => {
   try {
     const userExists = await User.findOne({ email: req.body.email });
@@ -49,13 +29,10 @@ router.post("/register", async (req, res) => {
 
     await newUser.save();
 
-    // --------------------------------------------------------------------
-    // CHANGE: We removed transporter.sendMail()
-    // INSTEAD: We send the token to the Frontend
-    // --------------------------------------------------------------------
+    // Return token to Frontend so IT can send the email
     res.status(200).json({
       message: "User created successfully!",
-      verificationToken: verificationToken, // <--- Frontend needs this!
+      verificationToken: verificationToken, 
       firstName: newUser.firstName
     });
 
@@ -64,7 +41,8 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ message: err.message || "Server Error" });
   }
 });
-// 2. VERIFY EMAIL ROUTE (Updated for Auto-Login)
+
+// 2. VERIFY EMAIL ROUTE
 router.post("/verify-email/:token", async (req, res) => {
   try {
     const user = await User.findOne({ verificationToken: req.params.token });
@@ -74,7 +52,6 @@ router.post("/verify-email/:token", async (req, res) => {
     user.verificationToken = undefined;
     await user.save();
 
-    // ⭐ CHANGE: Return user data (excluding password) so frontend can log in
     const { password, verificationToken, ...others } = user._doc;
     res.status(200).json(others);
 
@@ -101,13 +78,12 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// 4. FORGOT PASSWORD (Updated for EmailJS)
+// 4. FORGOT PASSWORD (Returns User ID for Frontend)
 router.post("/forgot-password", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(404).json({ message: "Account not found." });
 
-    
     res.status(200).json({
         message: "User found",
         userId: user._id,       
@@ -134,7 +110,7 @@ router.post("/reset-password/:id", async (req, res) => {
   }
 });
 
-// 6. UPDATE PROFILE (Fixed: Removes Backend Emailer)
+// 6. UPDATE PROFILE
 router.put("/update/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -142,8 +118,6 @@ router.put("/update/:id", async (req, res) => {
 
     // Check if Guardian Email changed
     if (guardianEmail && guardianEmail !== user.guardianEmail) {
-        // Generate token and save it, but DO NOT send email here.
-        // We will let the Frontend handle the email via "Resend Link".
         const token = crypto.randomBytes(32).toString("hex");
         user.guardianToken = token;
         user.isGuardianVerified = false;
@@ -153,7 +127,6 @@ router.put("/update/:id", async (req, res) => {
     Object.assign(user, otherUpdates);
     const updatedUser = await user.save();
     
-    // Return the updated user immediately
     res.status(200).json(updatedUser);
     
   } catch (err) {
@@ -162,17 +135,19 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
-// GET SINGLE USER (Add this to auth.js)
+// 7. GET SINGLE USER (Required for Auto-Refresh)
 router.get("/find/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json("User not found");
     const { password, ...others } = user._doc;
     res.status(200).json(others);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-// 7. VERIFY GUARDIAN TOKEN (The link clicked in email)
+
+// 8. VERIFY GUARDIAN TOKEN
 router.post("/verify-guardian", async (req, res) => {
   try {
     const { token } = req.body;
@@ -190,24 +165,20 @@ router.post("/verify-guardian", async (req, res) => {
   }
 });
 
-// ⭐ 8. RESEND GUARDIAN LINK (Updated for EmailJS)
+// 9. RESEND GUARDIAN LINK (Returns Token for Frontend)
 router.post("/resend-guardian-link", async (req, res) => {
     try {
         const { email } = req.body;
-        
-        // Find user by GUARDIAN email
         const user = await User.findOne({ guardianEmail: email });
         if (!user) return res.status(404).json({ message: "No user found with this guardian." });
 
-        // Generate new token
         const token = crypto.randomBytes(32).toString("hex");
         user.guardianToken = token;
         await user.save();
 
-        // STOP sending email. Return token to Frontend.
         res.status(200).json({
             message: "Token generated",
-            guardianToken: token,     // <--- Send this to Frontend
+            guardianToken: token, 
             firstName: user.firstName 
         });
 
@@ -217,7 +188,7 @@ router.post("/resend-guardian-link", async (req, res) => {
     }
 });
 
-// 8.5 RESEND VERIFICATION (Updated for EmailJS)
+// 10. RESEND VERIFICATION (Returns Token for Frontend)
 router.post("/resend-verification", async (req, res) => {
     try {
         const { email } = req.body;
@@ -226,12 +197,10 @@ router.post("/resend-verification", async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found." });
         if (user.isVerified) return res.status(400).json({ message: "Account already verified." });
 
-        // Generate new token
         const verificationToken = crypto.randomBytes(32).toString("hex");
         user.verificationToken = verificationToken;
         await user.save();
 
-        // STOP sending email here. Return the token to React instead.
         res.status(200).json({
             message: "Token generated",
             verificationToken: verificationToken,
@@ -244,7 +213,7 @@ router.post("/resend-verification", async (req, res) => {
     }
 });
 
-// 9. DELETE ACCOUNT
+// 11. DELETE ACCOUNT
 router.delete("/delete-account/:userId", async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.userId);
