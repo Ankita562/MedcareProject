@@ -1,13 +1,17 @@
 const router = require("express").Router();
-const HealthLog = require("../models/HealthLog");
+const Analytics = require("../models/Analytics"); // ⭐ Keeping name consistent
 
-// 1. POST: Add Manual Entry
-router.post("/log", async (req, res) => {
+// 1. POST: Add Entry (Matches Frontend "/add")
+router.post("/add", async (req, res) => {
   try {
-    const newLog = new HealthLog({
-      ...req.body,
-      source: "manual" // Force source to be manual here
+    const newLog = new Analytics({
+      userId: req.body.userId,
+      category: req.body.category,
+      value: req.body.value,
+      date: new Date(),
+      source: "manual" // We tag this so we know the user typed it
     });
+    
     const savedLog = await newLog.save();
     res.status(200).json(savedLog);
   } catch (err) {
@@ -15,25 +19,11 @@ router.post("/log", async (req, res) => {
   }
 });
 
-// 2. POST: Add Entry from Report (This is called when parsing a PDF)
-router.post("/log-from-report", async (req, res) => {
-  try {
-    const newLog = new HealthLog({
-      ...req.body,
-      source: "report" // Tag as report data
-    });
-    const savedLog = await newLog.save();
-    res.status(200).json(savedLog);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-// 3. GET: Fetch Data for Graphs (Merges both sources!)
+// 2. GET: Fetch Data (Matches Frontend "/:userId")
 router.get("/:userId", async (req, res) => {
   try {
-    const logs = await HealthLog.find({ userId: req.params.userId })
-      .sort({ date: 1 }); // Oldest first for graphs
+    // Sort by date (Oldest -> Newest) so the graph draws correctly from left to right
+    const logs = await Analytics.find({ userId: req.params.userId }).sort({ date: 1 });
     res.status(200).json(logs);
   } catch (err) {
     res.status(500).json(err);

@@ -21,6 +21,11 @@ const AnalyticsSchema = new mongoose.Schema({
     default: "" 
     // Examples: "mmHg", "bpm", "kg", "F"
   },
+  source: {
+    type: String,
+    default: "manual" 
+    // ⭐ NEW: Helps distinguish between "manual" entry and "device" or "report"
+  },
   date: {
     type: Date,
     default: Date.now,
