@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Defs, LinearGradient
 } from "recharts";
 import { Activity, Plus, X } from "lucide-react";
 
 // ==========================================
-// 🧠 MEDICAL LOGIC ENGINE (Standard Reference Ranges)
+// 🧠 MEDICAL LOGIC ENGINE
 // ==========================================
 const getHealthStatus = (category, value) => {
   if (!value) return { status: "", color: "#333" };
@@ -14,18 +14,18 @@ const getHealthStatus = (category, value) => {
 
   switch (category) {
     case "Blood Pressure":
-      // Format expected: "120/80"
+      // Format: "120/80"
       const parts = value.toString().split("/");
       if (parts.length !== 2) return { status: "", color: "#333" };
       const sys = parseInt(parts[0]);
       const dia = parseInt(parts[1]);
 
-      if (sys > 180 || dia > 120) return { status: "⚠️ Hypertensive Crisis", color: "#C53030" }; // Dark Red
-      if (sys >= 140 || dia >= 90) return { status: "⚠️ High (Stage 2)", color: "#E53E3E" };     // Red
-      if (sys >= 130 || dia >= 80) return { status: "⚠️ High (Stage 1)", color: "#DD6B20" };     // Orange
-      if (sys >= 120 && dia < 80)  return { status: "⚠️ Elevated", color: "#D69E2E" };           // Gold
-      if (sys < 90 || dia < 60)    return { status: "⚠️ Low BP", color: "#3182CE" };             // Blue
-      return { status: "✅ Normal", color: "#38A169" };                                          // Green
+      if (sys > 180 || dia > 120) return { status: "⚠️ Hypertensive Crisis", color: "#C53030" }; 
+      if (sys >= 140 || dia >= 90) return { status: "⚠️ High (Stage 2)", color: "#E53E3E" };     
+      if (sys >= 130 || dia >= 80) return { status: "⚠️ High (Stage 1)", color: "#DD6B20" };     
+      if (sys >= 120 && dia < 80)  return { status: "⚠️ Elevated", color: "#D69E2E" };           
+      if (sys < 90 || dia < 60)    return { status: "⚠️ Low BP", color: "#3182CE" };             
+      return { status: "✅ Normal", color: "#38A169" };                                          
 
     case "Heart Rate":
       if (num > 100) return { status: "⚠️ High (Tachycardia)", color: "#E53E3E" };
@@ -33,7 +33,6 @@ const getHealthStatus = (category, value) => {
       return { status: "✅ Normal", color: "#38A169" };
 
     case "Blood Sugar":
-       // General guidelines (Fasting/Random mix safety check)
        if (num >= 200) return { status: "⚠️ High (Diabetes)", color: "#E53E3E" };
        if (num >= 140) return { status: "⚠️ High (Prediabetes)", color: "#DD6B20" };
        if (num < 70)   return { status: "⚠️ Low Sugar", color: "#3182CE" };
@@ -45,8 +44,6 @@ const getHealthStatus = (category, value) => {
        return { status: "✅ Normal", color: "#38A169" };
 
     case "Weight":
-       // Simple BMI estimation trigger if value is low/high for typical adults
-       // (Real BMI requires height, so this is just a raw weight alert)
        if (num >= 100)  return { status: "⚠️ Check BMI", color: "#DD6B20" };
        if (num < 45)    return { status: "⚠️ Low Weight", color: "#3182CE" };
        return { status: "Recorded", color: "#38A169" };
@@ -60,8 +57,6 @@ const Analytics = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [logs, setLogs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Form State
   const [newLog, setNewLog] = useState({ category: "Blood Pressure", value: "" });
 
   // Fetch Data
@@ -88,23 +83,22 @@ const Analytics = () => {
         category: newLog.category,
         value: newLog.value
       });
-      setLogs([res.data, ...logs]); // Add to list instantly
-      setIsModalOpen(false);        // Close modal
-      setNewLog({ category: "Blood Pressure", value: "" }); // Reset form
+      setLogs([res.data, ...logs]); 
+      setIsModalOpen(false);        
+      setNewLog({ category: "Blood Pressure", value: "" }); 
     } catch (err) {
       alert("Failed to save log");
     }
   };
 
-  // Filter Data for Chart
   const [activeTab, setActiveTab] = useState("Blood Pressure");
-  
+
+  // Prepare Data for Chart
   const chartData = logs
     .filter(l => l.category === activeTab)
-    .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort purely for chart line
+    .sort((a, b) => new Date(a.date) - new Date(b.date)) 
     .map(l => ({
-        date: new Date(l.date).toLocaleDateString(),
-        // For BP, we graph the Systolic (top number)
+        date: new Date(l.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
         value: activeTab === "Blood Pressure" ? parseInt(l.value.split("/")[0]) : parseFloat(l.value),
         originalValue: l.value,
         statusObj: getHealthStatus(activeTab, l.value)
@@ -150,16 +144,34 @@ const Analytics = () => {
         ))}
       </div>
 
-      {/* GRAPH SECTION */}
-      <div style={{ background: "white", padding: "20px", borderRadius: "15px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)", height: "300px", marginBottom: "30px" }}>
+      {/* ⭐ NEW GRADIENT AREA CHART ⭐ */}
+      <div style={{ background: "white", padding: "20px", borderRadius: "15px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)", height: "350px", marginBottom: "30px" }}>
         <h3 style={{ marginBottom: "20px", color: "#2D3748" }}>{activeTab} Trends</h3>
         
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8B5E3C" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#8B5E3C" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis dataKey="date" stroke="#A0AEC0" fontSize={12} tickLine={false} />
-              <YAxis stroke="#A0AEC0" fontSize={12} tickLine={false} />
+              <XAxis 
+                dataKey="date" 
+                stroke="#A0AEC0" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false}
+              />
+              <YAxis 
+                stroke="#A0AEC0" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false} 
+                domain={['auto', 'auto']} // ⭐ AUTO-SCALES THE GRAPH TO FIT CURVES
+              />
               <Tooltip 
                  content={({ active, payload }) => {
                     if (active && payload && payload.length) {
@@ -177,56 +189,59 @@ const Analytics = () => {
                     return null;
                  }}
               />
-              <Line 
-                type="monotone" 
+              <Area 
+                type="monotone" // ⭐ THIS MAKES IT SMOOTH (PARABOLA LIKE)
                 dataKey="value" 
                 stroke="#8B5E3C" 
                 strokeWidth={3} 
-                dot={{ r: 4, fill: "#8B5E3C" }} 
-                activeDot={{ r: 6 }} 
+                fillOpacity={1} 
+                fill="url(#colorValue)" 
+                activeDot={{ r: 6, strokeWidth: 0 }}
+                dot={{ r: 4, fill: "#8B5E3C", strokeWidth: 2, stroke: "white" }} // ⭐ SHOWS EVERY POINT CLEARLY
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#A0AEC0" }}>
-             No data recorded yet. Log your first reading!
+          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#A0AEC0", flexDirection: "column" }}>
+             <Activity size={40} style={{marginBottom: "10px", opacity: 0.5}}/>
+             <p>No data recorded yet.</p>
+             <button onClick={() => setIsModalOpen(true)} style={{marginTop:"10px", color: "#8B5E3C", background:"none", border:"none", textDecoration:"underline", cursor:"pointer"}}>Log your first reading</button>
           </div>
         )}
       </div>
 
       {/* HISTORY LIST */}
-      <h3 style={{ marginBottom: "15px", color: "#2D3748" }}>Recent History</h3>
+      <h3 style={{ marginBottom: "15px", color: "#2D3748" }}>History</h3>
       <div style={{ display: "grid", gap: "12px" }}>
-        {logs.filter(l => l.category === activeTab).map(log => {
-           const health = getHealthStatus(log.category, log.value);
-           return (
-            <div key={log._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "white", padding: "15px", borderRadius: "10px", borderLeft: `6px solid ${health.color}`, boxShadow: "0 2px 4px rgba(0,0,0,0.03)" }}>
-              <div>
-                <span style={{ fontSize: "0.85rem", color: "#718096" }}>{new Date(log.date).toLocaleDateString()}</span>
-                <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#2D3748", marginTop: "4px" }}>{log.value}</div>
+        {logs.filter(l => l.category === activeTab).length > 0 ? (
+          logs.filter(l => l.category === activeTab).sort((a,b) => new Date(b.date) - new Date(a.date)).map(log => {
+             const health = getHealthStatus(log.category, log.value);
+             return (
+              <div key={log._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "white", padding: "15px", borderRadius: "10px", borderLeft: `6px solid ${health.color}`, boxShadow: "0 2px 4px rgba(0,0,0,0.03)" }}>
+                <div>
+                  <span style={{ fontSize: "0.85rem", color: "#718096" }}>{new Date(log.date).toLocaleDateString()} • {new Date(log.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                  <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#2D3748", marginTop: "4px" }}>{log.value}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                   <span style={{ display: "inline-block", padding: "4px 10px", borderRadius: "12px", background: `${health.color}15`, fontSize: "0.85rem", fontWeight: "bold", color: health.color }}>
+                      {health.status}
+                   </span>
+                </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                 <span style={{ display: "inline-block", padding: "4px 10px", borderRadius: "12px", background: `${health.color}15`, fontSize: "0.85rem", fontWeight: "bold", color: health.color }}>
-                    {health.status}
-                 </span>
-              </div>
-            </div>
-           );
-        })}
-        {logs.filter(l => l.category === activeTab).length === 0 && (
-            <p style={{textAlign: "center", color: "#a0aec0", marginTop: "20px"}}>No history found for this category.</p>
+             );
+          })
+        ) : (
+          <p style={{color: "#718096", fontStyle: "italic"}}>No history available.</p>
         )}
       </div>
 
-      {/* ==========================================
-          ⭐ CENTERED MODAL OVERLAY
-      ========================================== */}
+      {/* CENTERED MODAL */}
       {isModalOpen && (
         <div style={{
            position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
            background: "rgba(0,0,0,0.6)", zIndex: 9999,
            display: "flex", justifyContent: "center", alignItems: "center",
-           backdropFilter: "blur(4px)" // Nice modern touch
+           backdropFilter: "blur(4px)"
         }}>
            <div className="fade-in" style={{
               background: "white", padding: "30px", borderRadius: "16px",
