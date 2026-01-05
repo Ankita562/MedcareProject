@@ -136,7 +136,7 @@ router.post("/reset-password/:id", async (req, res) => {
   }
 });
 
-// 6. UPDATE PROFILE (Triggers Guardian Verification)
+// 6. UPDATE PROFILE (Fixed: Removes Backend Emailer)
 router.put("/update/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -144,31 +144,22 @@ router.put("/update/:id", async (req, res) => {
 
     // Check if Guardian Email changed
     if (guardianEmail && guardianEmail !== user.guardianEmail) {
+        // Generate token and save it, but DO NOT send email here.
+        // We will let the Frontend handle the email via "Resend Link".
         const token = crypto.randomBytes(32).toString("hex");
         user.guardianToken = token;
         user.isGuardianVerified = false;
         user.guardianEmail = guardianEmail;
-
-        const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
-        // Added /#/ to match your frontend routing style
-        const verificationLink = `${clientURL}/#/verify-guardian/${token}`;
-        
-        await transporter.sendMail({
-            from: "MedCare Support <${process.env.EMAIL_USER}>",
-            to: guardianEmail,
-            subject: "MedCare: Verify Guardian Status",
-            html: `
-              <h3>Hello,</h3>
-              <p>${user.firstName} added you as a Guardian.</p>
-              <a href="${verificationLink}">Verify Email</a>
-            `
-        });
     }
 
     Object.assign(user, otherUpdates);
     const updatedUser = await user.save();
+    
+    // Return the updated user immediately
     res.status(200).json(updatedUser);
+    
   } catch (err) {
+    console.error("Update Error:", err);
     res.status(500).json(err);
   }
 });
