@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react"; // ⭐ FIXED: Added useEffect
+import React, { useState, useEffect } from "react"; 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import emailjs from '@emailjs/browser'; // <--- ⭐ NEW IMPORT
 import "./Dashboard.css"; 
 
 const Profile = () => {
@@ -20,38 +21,61 @@ const Profile = () => {
     guardianEmail: storedUser?.guardianEmail || "" 
   });
 
-  // --- LOGIC STARTS HERE ---
   const [needsGuardian, setNeedsGuardian] = useState(false);
 
   // 1. Logic to Hide/Show based on Age Change
   useEffect(() => {
     const currentAge = parseInt(formData.age);
     if (!isNaN(currentAge)) {
-      // If Age is SAFE (18-60)
       if (currentAge >= 18 && currentAge <= 60) {
         setNeedsGuardian(false);
-        // Clear the email so it doesn't persist
         if (formData.guardianEmail) {
             setFormData(prev => ({ ...prev, guardianEmail: "" }));
         }
       } 
-      // If Age is NOT SAFE (<18 or >60)
       else {
         setNeedsGuardian(true);
       }
     }
-  }, [formData.age]); // Runs whenever "Age" field changes
+  }, [formData.age]);
 
-  // 2. Resend Link Function
+  // ⭐ 2. FIXED: Resend Guardian Link (Now uses EmailJS)
   const resendGuardianLink = async () => {
     if (!formData.guardianEmail) return;
+    
+    // Ask for confirmation to prevent spamming
+    if(!window.confirm(`Resend verification email to ${formData.guardianEmail}?`)) return;
+
     try {
-        await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { 
+        // Step A: Get Token from Backend
+        const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/resend-guardian-link", { 
             email: formData.guardianEmail 
         });
-        alert("✅ Verification link resent! Check inbox.");
+        
+        // Step B: Extract Token & Name
+        const { guardianToken, firstName } = res.data;
+
+        // Step C: Create the Link (Using your CORRECT domain)
+        const verifyLink = `https://medcare-project-green.vercel.app/#/verify-guardian/${guardianToken}`;
+
+        // Step D: Send via EmailJS
+        await emailjs.send(
+            "service_lt52jez",       // Your Service ID
+            "template_rgln76n",      // Your Template ID
+            {
+                to_email: formData.guardianEmail,
+                to_name: "Guardian",
+                verify_link: verifyLink,
+                // You can add a custom message if your template supports it
+                message: `${firstName} has added you as their emergency guardian on MedCare.`
+            },
+            "4row3jIQabLW4zaY2"      // Your Public Key
+        );
+
+        alert("✅ Verification link sent! Check the guardian's inbox.");
     } catch (error) {
-        alert("❌ Failed to resend.");
+        console.error(error);
+        alert("❌ Failed to resend. Please try again.");
     }
   };
 
@@ -60,22 +84,17 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
-    // VALIDATION: Check if Guardian Email is same as User Email
     if (formData.guardianEmail && formData.guardianEmail.toLowerCase() === formData.email.toLowerCase()) {
        alert("⛔ Error: Guardian Email cannot be the same as your own Email.");
        return; 
     }
 
     try {
-      // 1. Send update to Backend
       const res = await axios.put(`https://medcare-api-vw0f.onrender.com/api/auth/update/${storedUser._id}`, formData);
-
-      // 2. Update LocalStorage
       localStorage.setItem("user", JSON.stringify(res.data));
 
       setIsEditing(false);
       alert("Profile Updated Successfully! ✅");
-      
       window.location.reload(); 
 
     } catch (err) {
@@ -90,7 +109,6 @@ const Profile = () => {
     navigate("/login");
   };
 
-  // Handle Delete Account
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm(
       "⚠ Are you sure you want to PERMANENTLY delete your account?\n\nThis action cannot be undone."
@@ -179,7 +197,7 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* ⭐ FIXED: Guardian Email Section (Logic + Resend Button) */}
+            {/* Guardian Email Section */}
             {needsGuardian && (
             <div style={{background: "#fdf2f2", padding: "15px", borderRadius: "10px", border: "1px solid #f8d7da"}}>
                 <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px"}}>
@@ -203,7 +221,7 @@ const Profile = () => {
                             </span>
                         )}
 
-                        {/* ⭐ RESEND BUTTON ADDED HERE */}
+                        {/* RESEND BUTTON */}
                         <button 
                             onClick={resendGuardianLink}
                             style={{
@@ -229,9 +247,6 @@ const Profile = () => {
                     placeholder="parent@example.com"
                     style={{width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #f5c6cb"}}
                 />
-                <p style={{fontSize: "0.8rem", color: "#c53030", marginTop: "5px", fontStyle: "italic"}}>
-                   (Required if Age &lt; 18 or &gt; 60)
-                </p>
             </div>
             )}
 
