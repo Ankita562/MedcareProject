@@ -135,7 +135,7 @@ const Dashboard = () => {
     }
   };
   
-  // 3. Reminder Checker (Fixed Timezone)
+  // 3. Reminder Checker (Now with SOUND 🔊)
   useEffect(() => {
     const interval = setInterval(() => {
       if (Notification.permission !== "granted") return;
@@ -143,6 +143,8 @@ const Dashboard = () => {
 
       reminders.forEach(rem => {
         const remDate = new Date(rem.datetime);
+        
+        // Compare UTC hours to Local hours
         const isTimeMatch = 
            remDate.getUTCHours() === now.getHours() && 
            remDate.getUTCMinutes() === now.getMinutes();
@@ -151,15 +153,25 @@ const Dashboard = () => {
         const alreadyNotified = localStorage.getItem(notificationKey);
 
         if (isTimeMatch && !alreadyNotified) {
+             console.log("✅ Triggering Reminder:", rem.title); 
+             
+             // 1. Play Sound 🔊
+             const audio = new Audio("/alarm.mp3"); 
+             audio.play().catch(e => console.log("Audio blocked by browser:", e));
+
+             // 2. Show Visual Alerts
              setActiveAlert(rem);
              new Notification(`⏰ Reminder: ${rem.title}`, {
                body: "It's time to take action!",
                icon: "/favicon.ico"
              });
+             
+             // 3. Mark as done
              localStorage.setItem(notificationKey, "true");
         }
       });
-    }, 2000);
+    }, 2000); 
+
     return () => clearInterval(interval);
   }, [reminders]);
 
