@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom"; // 👈 1. IMPORT THIS
 import axios from "axios";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Defs, LinearGradient
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import { Activity, Plus, X } from "lucide-react";
 
@@ -14,7 +15,6 @@ const getHealthStatus = (category, value) => {
 
   switch (category) {
     case "Blood Pressure":
-      // Format: "120/80"
       const parts = value.toString().split("/");
       if (parts.length !== 2) return { status: "", color: "#333" };
       const sys = parseInt(parts[0]);
@@ -144,7 +144,7 @@ const Analytics = () => {
         ))}
       </div>
 
-      {/* ⭐ NEW GRADIENT AREA CHART ⭐ */}
+      {/* GRADIENT AREA CHART */}
       <div style={{ background: "white", padding: "20px", borderRadius: "15px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)", height: "350px", marginBottom: "30px" }}>
         <h3 style={{ marginBottom: "20px", color: "#2D3748" }}>{activeTab} Trends</h3>
         
@@ -170,7 +170,7 @@ const Analytics = () => {
                 fontSize={12} 
                 tickLine={false} 
                 axisLine={false} 
-                domain={['auto', 'auto']} // ⭐ AUTO-SCALES THE GRAPH TO FIT CURVES
+                domain={['auto', 'auto']}
               />
               <Tooltip 
                  content={({ active, payload }) => {
@@ -190,14 +190,14 @@ const Analytics = () => {
                  }}
               />
               <Area 
-                type="monotone" // ⭐ THIS MAKES IT SMOOTH (PARABOLA LIKE)
+                type="monotone"
                 dataKey="value" 
                 stroke="#8B5E3C" 
                 strokeWidth={3} 
                 fillOpacity={1} 
                 fill="url(#colorValue)" 
                 activeDot={{ r: 6, strokeWidth: 0 }}
-                dot={{ r: 4, fill: "#8B5E3C", strokeWidth: 2, stroke: "white" }} // ⭐ SHOWS EVERY POINT CLEARLY
+                dot={{ r: 4, fill: "#8B5E3C", strokeWidth: 2, stroke: "white" }} 
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -235,18 +235,20 @@ const Analytics = () => {
         )}
       </div>
 
-      {/* CENTERED MODAL */}
-      {isModalOpen && (
+      {/* ==========================================
+          ⭐ PORTAL MODAL (Fixes Centering Issue)
+      ========================================== */}
+      {isModalOpen && ReactDOM.createPortal(
         <div style={{
            position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-           background: "rgba(0,0,0,0.6)", zIndex: 9999,
+           background: "rgba(0,0,0,0.6)", zIndex: 10000,
            display: "flex", justifyContent: "center", alignItems: "center",
            backdropFilter: "blur(4px)"
         }}>
            <div className="fade-in" style={{
               background: "white", padding: "30px", borderRadius: "16px",
               width: "90%", maxWidth: "420px", 
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
               position: "relative"
            }}>
               <button 
@@ -300,7 +302,8 @@ const Analytics = () => {
                  </button>
               </form>
            </div>
-        </div>
+        </div>,
+        document.body // 👈 2. RENDER DIRECTLY TO BODY
       )}
 
     </div>
