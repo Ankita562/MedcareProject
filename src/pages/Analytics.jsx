@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom"; // 👈 1. IMPORT THIS
+import ReactDOM from "react-dom";
 import axios from "axios";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -7,9 +7,9 @@ import {
 import { Activity, Plus, X } from "lucide-react";
 
 // ==========================================
-// 🧠 MEDICAL LOGIC ENGINE
+// 🧠 MEDICAL LOGIC ENGINE (Updated for Gender)
 // ==========================================
-const getHealthStatus = (category, value) => {
+const getHealthStatus = (category, value, gender = "Female") => {
   if (!value) return { status: "", color: "#333" };
   const num = parseFloat(value);
 
@@ -44,9 +44,20 @@ const getHealthStatus = (category, value) => {
        return { status: "✅ Normal", color: "#38A169" };
 
     case "Weight":
-       if (num >= 100)  return { status: "⚠️ Check BMI", color: "#DD6B20" };
-       if (num < 45)    return { status: "⚠️ Low Weight", color: "#3182CE" };
-       return { status: "Recorded", color: "#38A169" };
+       // ⭐ NEW: Gender-Based Logic (Approximation without Height)
+       // These are general thresholds for adults to flag potential issues
+       if (gender === "Male") {
+           if (num >= 100) return { status: "⚠️ High", color: "#E53E3E" };
+           if (num >= 90)  return { status: "⚠️ Elevated", color: "#DD6B20" };
+           if (num < 50)   return { status: "⚠️ Low", color: "#3182CE" };
+           return { status: "✅ Normal", color: "#38A169" };
+       } else {
+           // Default to Female ranges
+           if (num >= 90)  return { status: "⚠️ High", color: "#E53E3E" };
+           if (num >= 80)  return { status: "⚠️ Elevated", color: "#DD6B20" };
+           if (num < 45)   return { status: "⚠️ Low", color: "#3182CE" };
+           return { status: "✅ Normal", color: "#38A169" };
+       }
 
     default:
       return { status: "", color: "#333" };
@@ -58,6 +69,7 @@ const Analytics = () => {
   const [logs, setLogs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newLog, setNewLog] = useState({ category: "Blood Pressure", value: "" });
+  const [activeTab, setActiveTab] = useState("Blood Pressure");
 
   // Fetch Data
   useEffect(() => {
@@ -91,17 +103,18 @@ const Analytics = () => {
     }
   };
 
-  const [activeTab, setActiveTab] = useState("Blood Pressure");
-
   // Prepare Data for Chart
   const chartData = logs
     .filter(l => l.category === activeTab)
     .sort((a, b) => new Date(a.date) - new Date(b.date)) 
     .map(l => ({
-        date: new Date(l.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        // ⭐ FIX 1: Include TIME in the date key so every point is unique!
+        date: new Date(l.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ", " + new Date(l.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        
         value: activeTab === "Blood Pressure" ? parseInt(l.value.split("/")[0]) : parseFloat(l.value),
         originalValue: l.value,
-        statusObj: getHealthStatus(activeTab, l.value)
+        // ⭐ FIX 2: Pass User Gender to Logic
+        statusObj: getHealthStatus(activeTab, l.value, user?.gender)
     }));
 
   return (
@@ -161,9 +174,11 @@ const Analytics = () => {
               <XAxis 
                 dataKey="date" 
                 stroke="#A0AEC0" 
-                fontSize={12} 
+                fontSize={10} 
                 tickLine={false} 
                 axisLine={false}
+                // Hide crowded labels if there are too many points
+                interval={chartData.length > 5 ? "preserveStartEnd" : 0}
               />
               <YAxis 
                 stroke="#A0AEC0" 
@@ -178,7 +193,7 @@ const Analytics = () => {
                       const data = payload[0].payload;
                       return (
                         <div style={{ background: "white", padding: "12px", border: "1px solid #ddd", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-                          <p style={{ fontWeight: "bold", margin: "0 0 5px", color: "#555" }}>{data.date}</p>
+                          <p style={{ fontWeight: "bold", margin: "0 0 5px", color: "#555", fontSize: "0.8rem" }}>{data.date}</p>
                           <p style={{ margin: "0 0 5px", fontSize: "1.2rem", fontWeight: "bold" }}>{data.originalValue}</p>
                           <p style={{ color: data.statusObj.color, fontWeight: "bold", margin: 0, fontSize: "0.9rem" }}>
                              {data.statusObj.status}
@@ -215,7 +230,8 @@ const Analytics = () => {
       <div style={{ display: "grid", gap: "12px" }}>
         {logs.filter(l => l.category === activeTab).length > 0 ? (
           logs.filter(l => l.category === activeTab).sort((a,b) => new Date(b.date) - new Date(a.date)).map(log => {
-             const health = getHealthStatus(log.category, log.value);
+             // ⭐ FIX 3: Calculate status for the list too
+             const health = getHealthStatus(log.category, log.value, user?.gender);
              return (
               <div key={log._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "white", padding: "15px", borderRadius: "10px", borderLeft: `6px solid ${health.color}`, boxShadow: "0 2px 4px rgba(0,0,0,0.03)" }}>
                 <div>
@@ -235,9 +251,7 @@ const Analytics = () => {
         )}
       </div>
 
-      {/* ==========================================
-          ⭐ PORTAL MODAL (Fixes Centering Issue)
-      ========================================== */}
+      {/* PORTAL MODAL */}
       {isModalOpen && ReactDOM.createPortal(
         <div style={{
            position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
@@ -303,7 +317,7 @@ const Analytics = () => {
               </form>
            </div>
         </div>,
-        document.body // 👈 2. RENDER DIRECTLY TO BODY
+        document.body
       )}
 
     </div>
