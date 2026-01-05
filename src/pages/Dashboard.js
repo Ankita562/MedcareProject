@@ -4,7 +4,7 @@ import axios from "axios";
 import "./Dashboard.css";
 import AddReminderModal from "../components/AddReminderModal"; 
 import { toast } from "react-toastify";
-import emailjs from '@emailjs/browser'; // ⭐ NEW: Import EmailJS
+import emailjs from '@emailjs/browser'; 
 import {
   Calendar, Pill, FileText, Bell, User, Activity, Trash2, CheckCircle
 } from "lucide-react";
@@ -24,25 +24,59 @@ const Dashboard = () => {
   // Reminder States
   const [reminders, setReminders] = useState([]);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
-  
-  // Center Alert State
   const [activeAlert, setActiveAlert] = useState(null);
-  const [checkedItems, setCheckedItems] = useState({});
 
-  // ⭐ HELPER: Fixes Timezone Issue (Forces UTC display)
+  // ⭐ FIX 1: Smart Initialization of Checked Items
+  // This reads from storage OR resets if it's a new day
+  const [checkedItems, setCheckedItems] = useState(() => {
+    if (!user?._id) return {};
+
+    const storageKey = `daily_checks_${user._id}`;
+    const savedData = localStorage.getItem(storageKey);
+    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+    if (savedData) {
+        const parsed = JSON.parse(savedData);
+        // If the saved date MATCHES today, keep the checks
+        if (parsed.date === today) {
+            return parsed.items || {};
+        }
+    }
+    // If no data OR date is old, start fresh (reset for next day)
+    return {};
+  });
+
+  // ⭐ FIX 2: Save to Storage whenever an item is checked
+  const markAsChecked = (itemId) => {
+    if (!user?._id) return;
+
+    setCheckedItems(prev => {
+        const newState = { ...prev, [itemId]: true };
+        
+        // Save to LocalStorage with TODAY'S DATE
+        const storageKey = `daily_checks_${user._id}`;
+        const today = new Date().toISOString().split('T')[0];
+        
+        localStorage.setItem(storageKey, JSON.stringify({
+            date: today,
+            items: newState
+        }));
+
+        return newState;
+    });
+  };
+
+  // Helper: Fix Timezone
   const formatTime = (isoString) => {
     if (!isoString) return "";
     return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'UTC' // <--- This prevents the +5:30 shift!
+      hour: '2-digit', minute: '2-digit', timeZone: 'UTC'
     });
   };
 
   // 1. Fetch Data
   const fetchData = useCallback(async () => {
     if (!user?._id) return;
-
     try {
       const [medRes, apptRes, reportRes, remRes, analyticsRes] = await Promise.all([
         axios.get(`https://medcare-api-vw0f.onrender.com/api/medicines/${user._id}`),
@@ -78,9 +112,7 @@ const Dashboard = () => {
     }
   }, [user?._id]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   // 2. Open Reminder Modal
   const handleOpenReminderModal = async () => {
@@ -103,8 +135,7 @@ const Dashboard = () => {
     }
   };
   
-  // 3. Reminder Checker
-  // 3. Reminder Checker (Fixed: Ignores Timezone Offsets)
+  // 3. Reminder Checker (Fixed Timezone)
   useEffect(() => {
     const interval = setInterval(() => {
       if (Notification.permission !== "granted") return;
@@ -112,68 +143,57 @@ const Dashboard = () => {
 
       reminders.forEach(rem => {
         const remDate = new Date(rem.datetime);
-        
-        // ⭐ FIX: Compare UTC (Stored) Hours with Local (Wall Clock) Hours
-        // This ensures that if you set "4:30 PM", it rings at "4:30 PM" on your clock.
         const isTimeMatch = 
            remDate.getUTCHours() === now.getHours() && 
            remDate.getUTCMinutes() === now.getMinutes();
 
-        // Unique key to prevent spamming
         const notificationKey = `notified-${rem._id}-${now.toDateString()}-${now.getHours()}:${now.getMinutes()}`;
         const alreadyNotified = localStorage.getItem(notificationKey);
 
         if (isTimeMatch && !alreadyNotified) {
-             console.log("✅ Triggering Reminder:", rem.title); 
-             
-             // A. Show Center Alert
              setActiveAlert(rem);
-
-             // B. Show Browser Notification
              new Notification(`⏰ Reminder: ${rem.title}`, {
                body: "It's time to take action!",
                icon: "/favicon.ico"
              });
-             
-             // C. Mark as done locally
              localStorage.setItem(notificationKey, "true");
         }
       });
-    }, 2000); // Check every 2 seconds
-
+    }, 2000);
     return () => clearInterval(interval);
   }, [reminders]);
 
-  // ⭐ 4. UPDATED: Guardian Notification (Uses EmailJS)
+  // ⭐ 4. UPDATED: Notify Guardian & Persist Checkmark
   const notifyGuardian = async (type, itemId, itemName) => {
     if (!user?._id) return;
     
-    // Visual Feedback Immediately
-    setCheckedItems(prev => ({ ...prev, [itemId]: true }));
+    // ⭐ Save to persistent storage immediately
+    markAsChecked(itemId);
 
-    // A. Send Email to Guardian (Frontend Logic)
+    // A. Send Email to Guardian
     if (user.guardianEmail && user.isGuardianVerified) {
         try {
             await emailjs.send(
                 "service_lt52jez",     
-                "template_s12702u", 
+                "template_rgln76n", 
                 {
                     to_email: user.guardianEmail,
                     patient_name: user.firstName,
-                    notification_type: type, // e.g. "Medicine Taken"
+                    notification_type: type, 
                     message: `${type} Completed: ${itemName}`,
                     time: new Date().toLocaleString()
                 },
-                "4row3jIQabLW4zaY2"    // Your Public Key
+                "4row3jIQabLW4zaY2"   
             );
             toast.success("Guardian notified via Email! 📧");
         } catch (e) {
             console.error("EmailJS Error:", e);
-            toast.warn("Could not send email (check console).");
         }
+    } else {
+        toast.success(`${itemName} marked as done! 👍`);
     }
 
-    // B. Sync with Backend (Optional, but good for records)
+    // B. Sync with Backend (Optional Log)
     try {
       await axios.post("https://medcare-api-vw0f.onrender.com/api/guardian/notify", {
         userId: user._id, type: type, itemName: itemName 
@@ -306,7 +326,6 @@ const Dashboard = () => {
                     <div key={r._id} style={{display: "flex", justifyContent: "space-between", alignItems: "center", padding:"10px 0", borderBottom:"1px dashed #eee"}}>
                        <div>
                            <span style={{display:"block", fontWeight:"600", fontSize: "0.9rem"}}>{r.title}</span>
-                           {/* ⭐ FIXED TIME DISPLAY HERE */}
                            <span style={{fontSize:"0.75rem", color:"#888"}}>{formatTime(r.datetime)}</span>
                        </div>
                        <button onClick={(e) => { e.stopPropagation(); deleteReminder(r._id); }} style={{border:"none", background:"#FFF5F5", color:"#E53E3E", cursor:"pointer", padding: "5px", borderRadius: "5px"}}>🗑️</button>
