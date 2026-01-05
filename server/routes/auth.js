@@ -191,7 +191,7 @@ router.post("/verify-guardian", async (req, res) => {
   }
 });
 
-// ⭐ 8. RESEND GUARDIAN LINK 
+// ⭐ 8. RESEND GUARDIAN LINK (Updated for EmailJS)
 router.post("/resend-guardian-link", async (req, res) => {
     try {
         const { email } = req.body;
@@ -205,22 +205,13 @@ router.post("/resend-guardian-link", async (req, res) => {
         user.guardianToken = token;
         await user.save();
 
-        // ⭐ HERE IS THE FIX: Added /#/ 
-        const clientURL = process.env.FRONTEND_URL || "http://localhost:3000";
-        const verificationLink = `${clientURL}/#/verify-guardian/${token}`;
-
-        await transporter.sendMail({
-            from: "MedCare Support <${process.env.EMAIL_USER}>",
-            to: email,
-            subject: "Action Required: Verify Guardian Access (Resent)",
-            html: `
-                <h3>Guardian Verification Needed</h3>
-                <p>You have been listed as a Guardian for <strong>${user.firstName}</strong>.</p>
-                <a href="${verificationLink}" style="padding: 10px; background: #C05621; color: white;">Verify Now</a>
-            `,
+        // STOP sending email. Return token to Frontend.
+        res.status(200).json({
+            message: "Token generated",
+            guardianToken: token,     // <--- Send this to Frontend
+            firstName: user.firstName 
         });
 
-        res.status(200).json({ message: "Link resent successfully!" });
     } catch (err) {
         console.error("Resend Error:", err);
         res.status(500).json({ message: "Failed to resend link." });
