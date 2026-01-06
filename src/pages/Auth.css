@@ -164,9 +164,71 @@ body.dark-mode .auth-left {
   text-decoration: underline !important; /* Optional hover effect */
 }
 
-/* Responsive */
+/* ==============================================
+   📱 MOBILE RESPONSIVENESS FOR LOGIN / REGISTER
+   ============================================== */
 @media (max-width: 768px) {
-  .auth-page { flex-direction: column; }
-  .auth-left { height: 30vh; border-radius: 0 0 30px 30px; }
-  .auth-right { height: 70vh; border-radius: 0; padding: 20px; }
+
+  /* 1. Change Layout from Side-by-Side to Stacked */
+  .auth-page {
+    flex-direction: column; /* Stack top to bottom */
+    height: auto;           /* Allow scrolling! Important */
+    min-height: 100vh;      /* At least full screen */
+    overflow-y: auto;       /* Enable vertical scroll */
+  }
+
+  /* 2. Fix the Top Section (Logo area) */
+  .auth-left {
+    width: 100% !important;
+    height: auto !important; /* Shrink to fit content */
+    padding: 20px !important;
+    flex: 0 0 auto;          /* Don't stretch */
+    background: transparent !important; /* Remove background color if it clashes */
+  }
+
+  /* 3. HIDE the big illustration on phones to save space */
+  .auth-illustration {
+    display: none !important; 
+  }
+
+  /* 4. Keep the Title Visible but smaller */
+  .brand-title {
+    font-size: 2rem !important;
+    margin: 0 !important;
+    color: #C05621; /* Ensure visible against background */
+  }
+
+  .auth-tagline {
+    display: none; /* Hide tagline on mobile to save space */
+  }
+
+  /* 5. Fix the Form Section */
+  .auth-right {
+    width: 100% !important;
+    padding: 20px !important;
+    border-radius: 30px 30px 0 0 !important; /* Round the top only */
+    background: #FFF5F0 !important; /* Ensure readable background */
+    flex: 1; /* Take up all remaining space */
+    
+    /* Center the form content */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Start from top */
+  }
+
+  /* 6. Ensure the form itself fits */
+  .auth-form {
+    width: 100% !important;
+    margin-top: 10px;
+  }
+
+  /* 7. Make buttons and inputs easy to tap */
+  .auth-btn {
+    padding: 15px !important;
+    font-size: 1.1rem !important;
+  }
+
+  input {
+    padding: 12px !important; /* Larger touch area */
+  }
 }
