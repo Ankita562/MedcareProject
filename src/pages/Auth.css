@@ -14,7 +14,7 @@
 /* 2. Left Side (Brand) */
 .auth-left {
   flex: 1;
-  background: linear-gradient(135deg, #F0DFCA, #E6D5BF); /* Light mode gradient */
+  background: linear-gradient(135deg, #F0DFCA, #E6D5BF);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -31,6 +31,7 @@ body.dark-mode .auth-left {
 .auth-illustration {
   width: 250px;
   margin-bottom: 20px;
+  border-radius: 50%;
 }
 
 .brand-title {
