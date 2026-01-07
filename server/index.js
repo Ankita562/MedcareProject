@@ -25,7 +25,9 @@ const app = express();
 // MIDDLEWARE
 app.use(express.json());
 app.use(cors({
-    origin: "https://medcare-project-green.vercel.app", 
+    origin: ["https://medcare-project-green.vercel.app", 
+    "http://localhost:5173",                  // Local Vite Frontend
+    "http://localhost:3000"],
     credentials: true
 }));
 
