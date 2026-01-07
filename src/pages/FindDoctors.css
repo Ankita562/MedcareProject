@@ -158,7 +158,7 @@
 .complete-link {
   color: #d9534f;                  /* Red/Orange color for urgency */
   font-weight: bold;
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
 }

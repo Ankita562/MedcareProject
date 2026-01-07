@@ -184,6 +184,6 @@ const DoctorAppointment = () => {
 // --- Styles for Form & Cards ---
 const inputStyle = { width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc", boxSizing: "border-box" };
 const cardStyle = { background: "#FFF8E7", padding: "15px", borderRadius: "10px", marginBottom: "10px", borderLeft: "5px solid #8B5E3C", position: "relative" };
-const deleteBtnStyle = { marginTop: "10px", background: "none", border: "none", color: "#E53E3E", cursor: "pointer", fontSize: "0.85rem", textDecoration: "underline", width: "100%", textAlign: "right" };
+const deleteBtnStyle = { marginTop: "10px", background: "none", border: "none", color: "#E53E3E", cursor: "pointer", fontSize: "0.85rem", textDecoration: "none", width: "100%", textAlign: "right" };
 
 export default DoctorAppointment;

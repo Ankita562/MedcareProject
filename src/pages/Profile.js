@@ -252,7 +252,7 @@ const Profile = () => {
                                 background: "transparent", 
                                 border: "none", 
                                 color: "#C05621", 
-                                textDecoration: "underline", 
+                                textDecoration: "none", 
                                 cursor: "pointer"
                             }}
                         >

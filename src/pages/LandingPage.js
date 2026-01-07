@@ -106,12 +106,13 @@ const LandingPage = () => {
               </div>
             </div>
             
-            <form className="contact-form" onSubmit={handleContactSubmit}>
+            <form className="contact-form" onSubmit={handleContactSubmit} style={{display:"flex" ,"flex-direction":"column",gap:"10px"}}>
               <input 
                 type="text" placeholder="Your Name" required 
                 value={contactData.name}
                 onChange={(e) => setContactData({...contactData, name: e.target.value})}
               />
+              
               <input 
                 type="email" placeholder="Your Email" required 
                 value={contactData.email}

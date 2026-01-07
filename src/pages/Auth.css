@@ -64,8 +64,6 @@ body.dark-mode .auth-left {
   padding: 12px 15px;
   margin-top: 5px;
   margin-bottom: 15px;
-  
-  /* IMPORTANT: This makes the box visible */
   background: #FFFFFF;       /* White box */
   border: 2px solid #E2E8F0; /* Light Grey Border */
   border-radius: 10px;       /* Rounded corners */
@@ -147,10 +145,10 @@ body.dark-mode .auth-left {
   margin-left: 5px;
 }
 
-/* 8. Resend Link (NO UNDERLINE) */
+
 .resend-link,
 .auth-right a {
-  text-decoration: none !important; /* 👈 Forces removal of underline */
+  text-decoration: none !important; 
   color: var(--accent-color);
   font-weight: bold;
   cursor: pointer;
@@ -162,7 +160,7 @@ body.dark-mode .auth-left {
 
 .resend-link:hover,
 .auth-right a:hover {
-  text-decoration: underline !important; /* Optional hover effect */
+  text-decoration: none !important; 
 }
 
 /* ==============================================

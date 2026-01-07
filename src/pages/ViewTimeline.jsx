@@ -163,7 +163,7 @@ const ViewTimeline = () => {
                onClick={() => setFilterType("All")}
                style={{
                  marginTop: "10px", background: "none", border: "none", 
-                 color: "#8B5E3C", textDecoration: "underline", cursor: "pointer"
+                 color: "#8B5E3C", textDecoration: "none", cursor: "pointer"
                }}
              >
                Clear Filters

@@ -12,6 +12,7 @@
   --radius: 16px;           /* Soft rounded corners */
   --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   
+  /* Retain your existing variables for compatibility */
   --accent-color: var(--primary);
   --btn-gradient: linear-gradient(135deg, #C05621, #9C4221);
 }
@@ -32,7 +33,6 @@ body {
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s, color 0.3s;
-  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* --- ANIMATIONS --- */
@@ -41,38 +41,156 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(192, 86, 33, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(192, 86, 33, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(192, 86, 33, 0); }
+}
+
 .fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
 
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+/* --- LANDING PAGE STYLES --- */
+.landing-container {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.landing-hero {
+  margin-bottom: 60px;
+  padding: 40px 20px;
+}
+
+.hero-title {
+  font-size: 3.5rem; /* Large for older eyes */
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: var(--text-light);
+  margin-bottom: 40px;
+}
+
+/* --- LARGE ACCESSIBLE BUTTONS --- */
+.btn-large {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 18px 40px;
+  font-size: 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+
+.btn-large:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+/* --- FEATURE CARDS --- */
+.features-section {
+  padding: 20px;
+}
+
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: var(--text-main);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+  border-top: 5px solid var(--primary);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+}
+
+.icon-circle {
+  background: var(--bg-color);
+  color: var(--primary);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 2px solid var(--primary);
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.feature-card p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
 /* =========================================
-   DESKTOP LAYOUT SYSTEM (Default)
+   DESKTOP LAYOUT SYSTEM (Main Content)
    ========================================= */
 
 .main-content {
   transition: margin-left 0.3s ease, width 0.3s ease;
   width: 100%;
-  padding: 20px; 
-  box-sizing: border-box; 
-  min-height: 100vh;
+  padding: 20px; /* Adds breathing room around your dashboard */
+  box-sizing: border-box; /* Ensures padding doesn't break width */
 }
 
-/* Desktop: Sidebar Open -> Push Content Right */
+/* 1. When Sidebar is FULLY OPEN (Desktop) */
 .main-content.expanded {
-  margin-left: 250px;       
-  width: calc(100% - 250px); 
+  margin-left: 250px;       /* Moves content to the right */
+  width: calc(100% - 250px); /* Shrinks content width to fit */
 }
 
-/* Desktop: Sidebar Closed -> Push Content Slightly */
+/* 2. When Sidebar is COLLAPSED (Desktop) */
 .main-content.collapsed {
-  margin-left: 70px;        
-  width: calc(100% - 70px); 
+  margin-left: 80px;        /* Moves content slightly right */
+  width: calc(100% - 80px); /* Adjusts width */
 }
 
 /* =========================================
    SIDEBAR & NAVIGATION STYLES
    ========================================= */
 
+/* The Sidebar Container */
 .sidebar {
   height: 100vh;
   width: 250px;
@@ -82,7 +200,7 @@ body {
   background-color: var(--card-bg);
   border-right: 1px solid var(--card-border);
   z-index: 1000;
-  transition: width 0.3s ease; /* Desktop transition */
+  transition: width 0.3s ease, transform 0.3s ease; /* Added transform transition for mobile */
   display: flex;
   flex-direction: column;
   overflow: hidden; 
@@ -94,7 +212,7 @@ body {
   width: 70px; 
 }
 
-/* Sidebar Header */
+/* --- 1. HEADER (MedCare Logo) --- */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -108,7 +226,7 @@ body {
 .sidebar-brand {
   font-size: 1.4rem;
   font-weight: bold;
-  color: var(--text-main);
+  color: var(--text-color);
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
@@ -118,13 +236,13 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--text-light);
+  color: var(--muted-text);
   padding: 5px;
   display: flex;
   align-items: center;
 }
 
-/* Sidebar Links */
+/* --- 2. LINKS CONTAINER (The Menu) --- */
 .sidebar-links {
   flex: 1; 
   padding: 0 10px;
@@ -138,7 +256,7 @@ body {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: var(--text-light);
+  color: var(--muted-text);
   padding: 10px 15px; 
   border-radius: 10px;
   transition: all 0.2s ease;
@@ -148,16 +266,17 @@ body {
 
 .sidebar-links a:hover {
   background-color: var(--bg-color);
-  color: var(--primary);
+  color: var(--accent-color);
   transform: translateX(3px);
 }
 
 .sidebar-links a.active {
   background: var(--btn-gradient);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-color);
 }
 
+/* Icons inside links */
 .sidebar-links .icon {
   min-width: 22px; 
   display: flex;
@@ -171,13 +290,12 @@ body {
   transition: opacity 0.2s;
 }
 
-/* Desktop: Hide text when closed */
 .sidebar.closed .nav-text {
   opacity: 0;
   display: none;
 }
 
-/* Sidebar Bottom (Profile) */
+/* --- 3. BOTTOM SECTION (Profile & Logout) --- */
 .sidebar-bottom {
   padding: 15px 10px; 
   border-top: 2px solid #E2E8F0; 
@@ -186,6 +304,13 @@ body {
   flex-direction: column;
   gap: 5px; 
   background-color: var(--card-bg);
+}
+
+.user-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .logout-btn {
@@ -200,8 +325,9 @@ body {
   justify-content: flex-start;
   gap: 12px;
   font-weight: 600;
-  cursor: pointer;
+  font-size: 0.9rem;
   transition: all 0.2s ease;
+  font-family: "Poppins", sans-serif;
 }
 
 .logout-btn:hover {
@@ -210,28 +336,220 @@ body {
 }
 
 /* =========================================
-   COMPONENTS (Inputs, Footer, Landing)
+   VISIBLE INPUTS & REDUCED BRIGHTNESS
    ========================================= */
 
 input, textarea, select {
   width: 100%;
-  padding: 12px 15px; 
-  border: 2px solid #D1D5DB; 
+  padding: 12px 15px; /* Larger click area */
+  border: 2px solid #D1D5DB; /* Darker Grey Border (Visible!) */
   border-radius: 10px;
   font-size: 1rem;
-  color: #1F2937; 
-  background: #F3F4F6; 
+  color: #1F2937; /* Dark Text Color */
+  background: #F3F4F6; /* Light Grey Background (Not White) */
   transition: all 0.3s ease;
-  box-sizing: border-box; 
-  margin-bottom: 15px; /* Added spacing */
+  box-sizing: border-box; /* Prevents width issues */
 }
 
 input:focus, textarea:focus, select:focus {
-  background: #FFFFFF; 
-  border-color: var(--primary); 
+  background: #FFFFFF; /* Turns white when typing */
+  border-color: var(--primary); /* Turns Orange/Brown */
+  box-shadow: 0 0 0 4px rgba(192, 86, 33, 0.1); /* Soft glow */
   outline: none;
 }
 
+.auth-right, .login-card { 
+  background-color: #FFFAF0 !important; /* "Floral White" - warmer & softer than pure white */
+}
+
+::placeholder {
+  color: #9CA3AF; /* Medium Grey instead of invisible light grey */
+  opacity: 1;
+}
+
+/* --- New Landing Page Styles --- */
+.welcome-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 28px 23px;
+  border-radius: 99px;
+  border: 1px solid #feebc8;
+  color: #c05621;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.landing-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+.progress-card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  max-width: 800px;
+  margin: 0 auto 48px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.progress-percentage {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #c05621;
+}
+
+.progress-track {
+  width: 100%;
+  height: 12px;
+  background: #edf2f7;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ed8936, #c05621);
+  transition: width 0.5s ease;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+  margin-bottom: 64px;
+}
+
+.step-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  border: 2px solid #f7fafc;
+  transition: all 0.3s;
+}
+
+.step-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  border-color: #fbd38d;
+}
+
+.step-content {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.step-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c05621; 
+}
+
+.step-text h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-btn {
+  background: linear-gradient(90deg, #ed8936, #c05621);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.final-cta {
+  background: linear-gradient(135deg, #c05621, #f4d9cf);
+  border-radius: 24px;
+  padding: 60px;
+  color: white;
+  text-align: center;
+}
+
+.cta-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.btn-main {
+  background: white;
+  color: #c05621;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+
+.final-cta-expanded {
+  background: linear-gradient(135deg, #C05621, #9C4221);
+  border-radius: 30px;
+  padding: 100px 40px;
+  color: white;
+  text-align: center;
+  margin-top: 40px;
+  box-shadow: 0 20px 40px rgba(156, 66, 33, 0.3);
+}
+
+.cta-title-large {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color:#E2E8F0;
+}
+
+.cta-description-large {
+  font-size: 1.4rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+}
+
+.cta-group-large {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-main-large {
+  background: white;
+  color: #C05621;
+  padding: 18px 45px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+/* Footer Styles */
 .footer-container {
   padding: 20px;
   background-color: var(--card-bg);
@@ -246,77 +564,71 @@ input:focus, textarea:focus, select:focus {
   color: var(--text-light);
 }
 
+.footer-email, .footer-feedback {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-email:hover, .footer-feedback:hover {
+  text-decoration: underline;
+}
+
+.separator {
+  margin: 0 10px;
+  color: #CBD5E0;
+}
+
 /* =========================================
-   📱 MOBILE RESPONSIVENESS (The Fix)
+   📱 MOBILE RESPONSIVENESS
    ========================================= */
 @media (max-width: 768px) {
   
-  /* 1. SIDEBAR: Becomes an Overlay */
+  /* 1. Sidebar becomes an Overlay (Floats on top) */
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 250px !important; /* Fixed width when open */
-    transform: translateX(-100%); /* Start hidden off-screen */
-    transition: transform 0.3s ease-in-out !important; /* Smooth slide */
-    z-index: 9999; /* Float on top of everything */
-    border-right: none;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+    width: 250px !important; /* Always fixed width when visible */
+    transform: translateX(-100%); /* Default: Hidden off-screen */
   }
 
-  /* When Sidebar is Open on Mobile */
+  /* When toggled open */
   .sidebar.open, .sidebar.sidebar-open {
-    transform: translateX(0) !important; /* Slide in */
+    transform: translateX(0); /* Slide in */
+    box-shadow: 5px 0 25px rgba(0,0,0,0.3);
   }
 
-  /* Ensure text is always visible inside mobile sidebar */
-  .sidebar .nav-text {
-    display: inline-block !important; 
-    opacity: 1 !important;
-  }
-
-  /* 2. MAIN CONTENT: Stop shifting right */
+  /* 2. Main Content - Takes Full Width on Mobile */
   .main-content, 
   .main-content.expanded, 
-  .main-content.collapsed {
-    margin-left: 0 !important; /* Force 0 margin */
-    width: 100% !important;    /* Force full width */
-    padding: 15px !important;  /* Reduced padding */
-    padding-top: 20px !important;
+  .main-content.collapsed,
+  .main-content-responsive {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 15px !important;
   }
 
-  /* 3. FOOTER: Make it smaller */
-  .footer-container {
-    padding: 10px !important; /* Much smaller padding */
-    font-size: 0.8rem; /* Smaller text */
+  /* 3. Footer - Compact View */
+  footer, .footer-container {
+    padding: 15px 10px !important;
+    font-size: 0.8rem;
   }
   
   .footer-content {
-    gap: 5px; /* Tighter gap */
+    gap: 5px;
   }
 
-  /* 4. TEXT & ALIGNMENT FIXES */
+  /* 4. Text & Layout Fixes */
   h1, .hero-title, .landing-title {
-    font-size: 1.75rem !important; /* Prevent huge text breaking layout */
+    font-size: 1.8rem !important; 
     word-wrap: break-word;
-    text-align: center;
   }
 
-  /* Fix Form Card Padding */
-  .auth-right, .login-card, .progress-card { 
-    padding: 20px !important; 
-  }
-
-  /* Stack dashboard cards vertically */
-  .dashboard-grid {
+  .dashboard-grid, .feature-grid {
     grid-template-columns: 1fr !important;
-    gap: 15px;
   }
 
-  /* Ensure buttons fit */
-  .btn-large, button {
+  .welcome-pill {
     width: 100%;
+    box-sizing: border-box;
     justify-content: center;
   }
 }

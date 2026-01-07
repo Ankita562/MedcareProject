@@ -60,7 +60,7 @@ const ForgotPassword = () => {
                 {error.includes("Create account") && (
                    <span 
                      onClick={() => navigate("/login")} 
-                     style={{fontWeight: "bold", textDecoration: "underline", cursor: "pointer"}}
+                     style={{fontWeight: "bold", textDecoration: "none", cursor: "pointer"}}
                    >
                      Go to Sign Up
                    </span>

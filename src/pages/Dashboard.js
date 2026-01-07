@@ -283,9 +283,9 @@ const Dashboard = () => {
                )}
             </div>
           ) : (
-            <div style={{marginTop: "15px"}}>
-                <p style={{color: "#888", marginBottom: "15px"}}>No upcoming appointments.</p>
-                <button className="dash-btn" onClick={(e) => { e.stopPropagation(); navigate("/appointments"); }}>+ Book Now</button>
+            <div style={{marginTop: "auto"}}>
+                <p style={{color: "#888", marginBottom: "15px", padding: "6px"}}>No upcoming appointments.</p>
+                <button className="dash-btn" onClick={(e) => { e.stopPropagation(); navigate("/appointments"); }} style={{marginTop: "auto"}}>+ Book Now</button>
             </div>
           )}
         </div>

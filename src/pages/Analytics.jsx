@@ -220,7 +220,7 @@ const Analytics = () => {
           <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#A0AEC0", flexDirection: "column" }}>
              <Activity size={40} style={{marginBottom: "10px", opacity: 0.5}}/>
              <p>No data recorded yet.</p>
-             <button onClick={() => setIsModalOpen(true)} style={{marginTop:"10px", color: "#8B5E3C", background:"none", border:"none", textDecoration:"underline", cursor:"pointer"}}>Log your first reading</button>
+             <button onClick={() => setIsModalOpen(true)} style={{marginTop:"10px", color: "#8B5E3C", background:"none", border:"none", textDecoration:"none", cursor:"pointer"}}>Log your first reading</button>
           </div>
         )}
       </div>

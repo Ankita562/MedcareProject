@@ -202,7 +202,7 @@ const Auth = ({ onLogin }) => {
                   background: "none", border: "none", padding: 0, 
                   color: loading ? "#ccc" : "#4A90E2", 
                   fontWeight: "bold", cursor: loading ? "not-allowed" : "pointer", 
-                  textDecoration: "underline", fontSize: "0.85rem"
+                  textDecoration: "none", fontSize: "0.85rem"
                 }}
               >
                 {loading ? "Sending..." : "Resend Link"}

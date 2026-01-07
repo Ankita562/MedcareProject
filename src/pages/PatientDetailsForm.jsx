@@ -171,7 +171,7 @@ const PatientDetailsForm = ({ onSubmit }) => {
                         type="button" 
                         onClick={resendGuardianLink}
                         style={{
-                            fontSize: "0.8rem", textDecoration: "underline", 
+                            fontSize: "0.8rem", textDecoration: "none", 
                             color: "#C05621", background: "none", border: "none", cursor: "pointer",
                             padding: 0
                         }}
