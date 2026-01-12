@@ -156,7 +156,7 @@ const Dashboard = () => {
              console.log("✅ Triggering Reminder:", rem.title); 
              
              // 1. Play Sound 🔊
-             const audio = new Audio("/alarm.mp3"); 
+             const audio = new Audio("/alarm.mp3.wav"); 
              audio.play().catch(e => console.log("Audio blocked by browser:", e));
 
              // 2. Show Visual Alerts
