@@ -4,17 +4,17 @@ import {
   Calendar, Pill, FileText, User, 
   Clock, Sparkles, ArrowRight, Activity, Bell, Shield, Mail, MapPin
 } from 'lucide-react';
-
+import "./LandingPage.css"; 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [completedSteps] = useState([]); // This would ideally be synced with backend data
   const [contactData, setContactData] = useState({ name: '', email: '', message: '' });
 
   const steps = [
-    { id: 1, title: "Complete Your Profile", description: "Add personal info and history", icon: User, color: "bg-gradient-0", link: "/profile", time: "2 min" },
-    { id: 2, title: "Add Your Medications", description: "Set up reminders", icon: Pill, color: "bg-gradient-1", link: "/medicines/new", time: "3 min" },
-    { id: 3, title: "Book Appointment", description: "Schedule a visit", icon: Calendar, color: "bg-gradient-2", link: "/appointments", time: "5 min" },
-    { id: 4, title: "Upload Records", description: "Securely store documents", icon: FileText, color: "bg-gradient-3", link: "/reports", time: "4 min" }
+    { id: 1, title: "Complete Your Profile", description: "Tell us about yourself and your medical history", icon: User, color: "bg-gradient-0", link: "/profile", time: "2 min" },
+    { id: 2, title: "Add Your Medications", description: "List your medicines and get automatic reminders", icon: Pill, color: "bg-gradient-1", link: "/medicines/new", time: "3 min" },
+    { id: 3, title: "Book Appointment", description: "Schedule your next doctor visit easily", icon: Calendar, color: "bg-gradient-2", link: "/appointments", time: "5 min" },
+    { id: 4, title: "Upload Records", description: "Store prescriptions, reports, and medical documents", icon: FileText, color: "bg-gradient-3", link: "/reports", time: "4 min" }
   ];
 
   const handleContactSubmit = (e) => {
@@ -33,59 +33,95 @@ const LandingPage = () => {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="welcome-pill">
-            <Sparkles size={16} />
+            <Sparkles size={18} />
             <span>Welcome to MedCare+</span>
           </div>
-          <h2 className="landing-title">Let's Get You Started!</h2>
-          <p className="landing-subtitle">Complete your health profile to unlock all features.</p>
+          <h2 className="landing-title">Your Personal Health Companion</h2>
+          <p className="landing-subtitle">
+            Track medications, manage appointments, store medical records, and take control of your health—all in one simple place.
+          </p>
         </div>
 
-        {/* Progress Card */}
-        <div className="progress-card">
-          <div className="progress-header">
-            <h3>Your Setup Progress</h3>
-            <div className="progress-percentage">{Math.round(progress)}%</div>
-          </div>
-          <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+        {/* What You Can Do Section */}
+        <div className="features-overview">
+          <h3 className="features-title">What Can You Do Here?</h3>
+          <div className="features-grid">
+            <div className="feature-item">
+              <div className="feature-icon-wrap bg-gradient-0">
+                <Bell size={20} color="white" />
+              </div>
+              <h4>Never Miss a Dose</h4>
+              <p>Get timely reminders for your medications and supplements</p>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon-wrap bg-gradient-1">
+                <Calendar size={20} color="white" />
+              </div>
+              <h4>Easy Appointments</h4>
+              <p>Book and manage doctor visits without the hassle</p>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon-wrap bg-gradient-2">
+                <Shield size={20} color="white" />
+              </div>
+              <h4>Secure Records</h4>
+              <p>Keep all your health documents safe and accessible anytime</p>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon-wrap bg-gradient-3">
+                <Activity size={20} color="white" />
+              </div>
+              <h4>Track Your Health</h4>
+              <p>Monitor your wellness journey with easy-to-understand insights</p>
+            </div>
           </div>
         </div>
 
         {/* Steps Grid */}
-        <div className="steps-grid">
-          {steps.map((step) => {
-            const Icon = step.icon;
-            return (
-              <div key={step.id} className="step-card">
-                <div className="step-content">
-                  <div className={`step-icon-wrapper ${step.color}`}>
-                    <Icon size={24} color="white" />
+        <div className="getting-started-section">
+          <h3 className="section-heading">Quick Start Guide - Just 4 Simple Steps</h3>
+          <p className="section-subheading">Set up your account in under 15 minutes</p>
+          <div className="steps-grid">
+            {steps.map((step) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.id} className="step-card">
+                  <div className="step-number">Step {step.id}</div>
+                  <div className="step-content">
+                    <div className={`step-icon-wrapper ${step.color}`}>
+                      <Icon size={24} color="white" />
+                    </div>
+                    <div className="step-text">
+                      <h4>{step.title}</h4>
+                      <p>{step.description}</p>
+                    </div>
                   </div>
-                  <div className="step-text">
-                    <h4>{step.title}</h4>
-                    <p>{step.description}</p>
+                  <div className="step-footer">
+                     <span className="step-time"><Clock size={12} /> Takes only {step.time}</span>
+                     <button className="step-btn" onClick={() => navigate(step.link)}>
+                       Start <ArrowRight size={14} />
+                     </button>
                   </div>
                 </div>
-                <div className="step-footer">
-                   <span className="step-time"><Clock size={12} /> {step.time}</span>
-                   <button className="step-btn" onClick={() => navigate(step.link)}>
-                     Start <ArrowRight size={14} />
-                   </button>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Expanded Final CTA */}
         <div className="final-cta-expanded">
-          <h2 className="cta-title-large">Ready to Take Control?</h2>
+          <h2 className="cta-title-large">Ready to Take Control of Your Health?</h2>
           <p className="cta-description-large">
-            Complete your setup today and experience smarter health management. 
-            Join our community prioritizing their daily wellness.
+            Join thousands who are managing their health smarter. Whether you're tracking daily medications, 
+            organizing medical records, or scheduling appointments, MedCare+ makes it simple and stress-free.
           </p>
+          <div className="benefits-quick">
+            <div className="benefit-badge">✓ Simple & Easy to Use</div>
+            <div className="benefit-badge">✓ Safe & Private</div>
+            <div className="benefit-badge">✓ Works on All Devices</div>
+          </div>
           <div className="cta-group-large">
-            <button className="btn-main-large" onClick={() => navigate('/login')}>Get Started Now</button>
+            <button className="btn-main-large" onClick={() => navigate('/login')}  >Get Started Now</button>
             <button className="btn-alt-large" onClick={() => navigate('/dashboard')}>View Dashboard</button>
           </div>
         </div>
@@ -94,7 +130,7 @@ const LandingPage = () => {
         <section className="contact-section" id="feedback">
           <div className="contact-card">
             <div className="contact-info">
-              <h3>Get in Touch</h3>
+              <h3 style={{color:"#6d4c32"}}>Get in Touch</h3>
               <p>Have questions or feedback? We'd love to hear from you.</p>
               <div className="contact-details">
                 <div className="contact-item">
@@ -106,7 +142,7 @@ const LandingPage = () => {
               </div>
             </div>
             
-            <form className="contact-form" onSubmit={handleContactSubmit} style={{display:"flex" ,"flex-direction":"column",gap:"10px"}}>
+            <form className="contact-form" onSubmit={handleContactSubmit} style={{display:"flex" ,"flexDirection":"column",gap:"10px"}}>
               <input 
                 type="text" placeholder="Your Name" required 
                 value={contactData.name}

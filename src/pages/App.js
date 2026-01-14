@@ -53,12 +53,6 @@ function App() {
     localStorage.setItem("isLoggedIn", isLoggedIn);
   }, [isLoggedIn]);
 
-  // Apply dark/light theme instantly
-  useEffect(() => {
-    document.body.classList.toggle("dark", darkMode);
-    document.body.classList.toggle("light", !darkMode);
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
 
   // Logout function
   const handleLogout = () => {

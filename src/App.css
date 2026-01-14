@@ -586,8 +586,8 @@ input:focus, textarea:focus, select:focus {
   
   /* 1. Sidebar becomes an Overlay (Floats on top) */
   .sidebar {
-    width: 250px !important; /* Always fixed width when visible */
-    transform: translateX(-100%); /* Default: Hidden off-screen */
+    width: auto; /* Always fixed width when visible */
+    transform: translateX(0%); /* Default: Hidden off-screen */
   }
 
   /* When toggled open */

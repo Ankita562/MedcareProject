@@ -26,7 +26,7 @@ const Dashboard = () => {
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [activeAlert, setActiveAlert] = useState(null);
 
-  // ⭐ FIX 1: Smart Initialization of Checked Items
+  // ⭐ Smart Initialization of Checked Items
   // This reads from storage OR resets if it's a new day
   const [checkedItems, setCheckedItems] = useState(() => {
     if (!user?._id) return {};
@@ -136,44 +136,44 @@ const Dashboard = () => {
   };
   
   // 3. Reminder Checker (Now with SOUND 🔊)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (Notification.permission !== "granted") return;
-      const now = new Date();
+useEffect(() => {
+  const interval = setInterval(() => {
+    if (Notification.permission !== "granted") return;
+    const now = new Date();
 
-      reminders.forEach(rem => {
-        const remDate = new Date(rem.datetime);
-        
-        // Compare UTC hours to Local hours
-        const isTimeMatch = 
-           remDate.getUTCHours() === now.getHours() && 
-           remDate.getUTCMinutes() === now.getMinutes();
+    reminders.forEach(rem => {
+      const remDate = new Date(rem.datetime);
+      
+      // Compare UTC hours to Local hours
+      const isTimeMatch = 
+         remDate.getUTCHours() === now.getHours() && 
+         remDate.getUTCMinutes() === now.getMinutes();
 
-        const notificationKey = `notified-${rem._id}-${now.toDateString()}-${now.getHours()}:${now.getMinutes()}`;
-        const alreadyNotified = localStorage.getItem(notificationKey);
+      const notificationKey = `notified-${rem._id}-${now.toDateString()}-${now.getHours()}:${now.getMinutes()}`;
+      const alreadyNotified = localStorage.getItem(notificationKey);
 
-        if (isTimeMatch && !alreadyNotified) {
-             console.log("✅ Triggering Reminder:", rem.title); 
-             
-             // 1. Play Sound 🔊
-             const audio = new Audio("/alarm.mp3"); 
-             audio.play().catch(e => console.log("Audio blocked by browser:", e));
+      if (isTimeMatch && !alreadyNotified) {
+           console.log("✅ Triggering Reminder:", rem.title); 
+           
+           // Mark as notified FIRST (before showing alerts)
+           localStorage.setItem(notificationKey, "true");
+           
+           // 1. Play Sound 🔊
+           const audio = new Audio("/alarm.mp3.wav"); 
+           audio.play().catch(e => console.log("Audio blocked by browser:", e));
 
-             // 2. Show Visual Alerts
-             setActiveAlert(rem);
-             new Notification(`⏰ Reminder: ${rem.title}`, {
-               body: "It's time to take action!",
-               icon: "/favicon.ico"
-             });
-             
-             // 3. Mark as done
-             localStorage.setItem(notificationKey, "true");
-        }
-      });
-    }, 2000); 
+           // 2. Show Visual Alerts
+           setActiveAlert(rem);
+           new Notification(`⏰ Reminder: ${rem.title}`, {
+             body: "It's time to take action!",
+             icon: "/favicon.ico"
+           });
+      }
+    });
+  }, 2000); 
 
-    return () => clearInterval(interval);
-  }, [reminders]);
+  return () => clearInterval(interval);
+}, [reminders]);
 
   // ⭐ 4. UPDATED: Notify Guardian & Persist Checkmark
   const notifyGuardian = async (type, itemId, itemName) => {

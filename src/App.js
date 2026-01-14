@@ -65,7 +65,10 @@ const Layout = ({ children, isLoggedIn, sidebarOpen, navbarProps }) => {
         className={`main-content fade-in ${showSidebar ? (sidebarOpen ? "expanded" : "collapsed") : ""}`}
         style={{
           minHeight: "100vh",
-          paddingTop: showSidebar ? "20px" : "0px", 
+          paddingTop: "20px",
+          paddingBottom: "0px",
+          paddingLeft: "0px",
+          paddingRight: "0px"
         }}
       >
         {children}
@@ -92,17 +95,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem("isLoggedIn", isLoggedIn);
   }, [isLoggedIn]);
-
-  useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("dark-mode");
-      document.body.classList.remove("light-mode");
-    } else {
-      document.body.classList.add("light-mode");
-      document.body.classList.remove("dark-mode");
-    }
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
