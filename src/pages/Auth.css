@@ -11,7 +11,6 @@
   overflow: hidden;
 }
 
-/* 2. Left Side (Brand) */
 .auth-left {
   flex: 1;
   background: linear-gradient(135deg, #F0DFCA, #E6D5BF);
@@ -23,7 +22,6 @@
   padding: 2rem;
 }
 
-/* Dark Mode Gradient for Left Side */
 body.dark-mode .auth-left {
   background: linear-gradient(135deg, #2c2c3e, #1a1a24);
 }
@@ -37,17 +35,15 @@ body.dark-mode .auth-left {
 .brand-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #fff; /* Always white on brand panel */
+  color: #fff;
 }
 
-/* 3. Right Side (Login Form) */
 .auth-right {
-  background-color: #FFF8F0; /* "Floral White" - Warm and soft, not blinding */
+  background-color: #FFF8F0; 
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 40px;
-  /* Ensure text is dark so it shows up against the soft background */
   color: #2D3748; 
 }
 
@@ -58,26 +54,23 @@ body.dark-mode .auth-left {
   font-weight: 700;
 }
 
-/* 4. Inputs */
 .auth-form input {
   width: 100%;
   padding: 12px 15px;
   margin-top: 5px;
   margin-bottom: 15px;
-  background: #FFFFFF;       /* White box */
-  border: 2px solid #E2E8F0; /* Light Grey Border */
-  border-radius: 10px;       /* Rounded corners */
-  
-  /* IMPORTANT: This makes the text inside visible */
-  color: #1A202C;            /* Dark Text */
+  background: #FFFFFF;       
+  border: 2px solid #E2E8F0; 
+  border-radius: 10px;       
+  color: #1A202C;          
   font-size: 1rem;
   outline: none;
   transition: all 0.3s ease;
 }
 
 .auth-form input:focus {
-  border-color: #C05621; /* Your Theme Orange/Brown */
-  box-shadow: 0 0 0 3px rgba(192, 86, 33, 0.1); /* Soft orange glow */
+  border-color: #C05621; 
+  box-shadow: 0 0 0 3px rgba(192, 86, 33, 0.1); 
 }
 
 .auth-form label {
@@ -99,14 +92,11 @@ body.dark-mode .auth-left {
   position: absolute;
   right: 15px;
   top: 50%;
-  transform: translateY(-65%); /* Adjusts vertical center */
+  transform: translateY(-65%); 
   cursor: pointer;
-  color: #718096; /* Grey icon color */
+  color: #718096; 
 }
 
-/* ============================
-   6. FIXED BUTTONS
-   ============================ */
 .auth-btn {
   width: 100%;
   margin-top: 20px; 
@@ -119,8 +109,6 @@ body.dark-mode .auth-left {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  
-  /* Ensure it doesn't shrink or move weirdly */
   display: block;
   text-align: center;
 }
@@ -131,7 +119,6 @@ body.dark-mode .auth-left {
   box-shadow: 0 4px 12px rgba(139, 94, 60, 0.3);
 }
 
-/* 7. Toggle Link (Sign Up / Login text) */
 .toggle-auth {
   margin-top: 20px;
   text-align: center;
@@ -167,67 +154,61 @@ body.dark-mode .auth-left {
    📱 MOBILE RESPONSIVENESS FOR LOGIN / REGISTER
    ============================================== */
 @media (max-width: 768px) {
-
-  /* 1. Change Layout from Side-by-Side to Stacked */
   .auth-page {
-    flex-direction: column; /* Stack top to bottom */
-    height: auto;           /* Allow scrolling! Important */
-    min-height: 100vh;      /* At least full screen */
-    overflow-y: auto;       /* Enable vertical scroll */
+    flex-direction: column; 
+    height: auto;          
+    min-height: 100vh;      
+    overflow-y: auto;      
   }
 
-  /* 2. Fix the Top Section (Logo area) */
   .auth-left {
-    width: 100% !important;
-    height: auto !important; /* Shrink to fit content */
+    width: 90% !important;
+    height: auto !important; 
     padding: 20px !important;
-    flex: 0 0 auto;          /* Don't stretch */
-    background: transparent !important; /* Remove background color if it clashes */
+    flex: 0 0 auto;         
+    background: transparent !important; 
   }
 
-  /* 3. HIDE the big illustration on phones to save space */
   .auth-illustration {
-    display: none !important; 
+    display: flex; 
+    padding-top: 30px;
+    width: 150px;
   }
 
-  /* 4. Keep the Title Visible but smaller */
   .brand-title {
     font-size: 2rem !important;
     margin: 0 !important;
-    color: #C05621; /* Ensure visible against background */
+    color: #C05621; 
   }
 
   .auth-tagline {
-    display: none; /* Hide tagline on mobile to save space */
+    display: flex;
+    width: max-content; 
+    color:black;
   }
 
-  /* 5. Fix the Form Section */
   .auth-right {
-    width: 100% !important;
+    width: 90% !important;
     padding: 20px !important;
-    border-radius: 30px 30px 0 0 !important; /* Round the top only */
-    background: #FFF5F0 !important; /* Ensure readable background */
-    flex: 1; /* Take up all remaining space */
-    
-    /* Center the form content */
+    border-radius: 30px 30px 0 0 !important; 
+    background: #FFF5F0 !important; 
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Start from top */
+    justify-content: flex-start; 
   }
 
-  /* 6. Ensure the form itself fits */
   .auth-form {
     width: 100% !important;
     margin-top: 10px;
   }
 
-  /* 7. Make buttons and inputs easy to tap */
   .auth-btn {
     padding: 15px !important;
     font-size: 1.1rem !important;
   }
 
   input {
-    padding: 12px !important; /* Larger touch area */
+    padding: 12px !important; 
   }
 }

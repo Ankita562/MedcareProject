@@ -242,7 +242,7 @@ body.dark-mode {
 
   /* When closed on mobile */
   .sidebar.closed {
-    width: 70px;
+    width: 100px;
   }
 }
 
