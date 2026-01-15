@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import confetti from "canvas-confetti"; // 👈 Import Confetti
-import { toast } from "react-toastify"; // 👈 Import Toast
+import confetti from "canvas-confetti"; 
+import { toast } from "react-toastify"; 
 import { CheckCircle, Activity as ActivityIcon, Sun, Moon, Award } from "lucide-react";
 import "./Dashboard.css"; 
 
 const Activities = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [activities, setActivities] = useState({ db: [], system: [] });
-  // Track completed items locally to hide them immediately
   const [completedIds, setCompletedIds] = useState([]);
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/activities/${user._id}`);
+        const res = await axios.get(`http://medcare-api-vw0f.onrender.com/api/activities/${user._id}`);
         setActivities(res.data);
       } catch (err) {
         console.error(err);
@@ -41,7 +40,7 @@ const Activities = () => {
 
     // 4. Call Backend to Save & Notify Guardian
     try {
-      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/activities/complete", {
+      const res = await axios.put("https://medcare-api-vw0f.onrender.com/api/activities/complete", {
         userId: user._id,
         title: act.title,
         category: act.category,

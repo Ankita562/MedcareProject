@@ -177,8 +177,8 @@ const Auth = ({ onLogin }) => {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </span>
           </div>
-
-          {/* ⭐ IMPROVED BUTTON: Shows Loading State */}
+           
+          {/* Shows Loading State */}
           <motion.button 
             whileTap={{ scale: 0.95 }} 
             type="submit" 
@@ -191,7 +191,21 @@ const Auth = ({ onLogin }) => {
         </form>
 
         <div className="toggle-auth" style={{ marginTop: "20px", fontSize: "0.95rem", color: "#666", textAlign: "center" }}>
-          
+          {isLogin && (
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "10px", marginBottom: "10px" }}>
+              <span 
+                onClick={() => navigate("/forgot-password")} 
+                style={{ 
+                  color: "#8B5E3C", 
+                  fontSize: "0.9rem", 
+                  cursor: "pointer", 
+                  fontWeight: "600" 
+                }}
+              >
+                Forgot Password?
+              </span>
+            </div>
+          )}
           {isLogin && (
             <div style={{ marginBottom: "15px" }}>
               <span style={{ fontSize: "0.85rem", color: "#888" }}>Did not receive verification email? </span>
@@ -208,6 +222,7 @@ const Auth = ({ onLogin }) => {
                 {loading ? "Sending..." : "Resend Link"}
               </button>
             </div>
+            
           )}
 
           {isLogin ? (

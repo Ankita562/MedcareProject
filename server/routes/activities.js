@@ -6,6 +6,70 @@ const Analytics = require("../models/Analytics");
 const nodemailer = require("nodemailer");
 
 // ==========================================
+// 2. ⭐ SMART ADD (Fixes Giant Text Bug)
+// ==========================================
+router.post("/add", async (req, res) => {
+  try {
+    
+    console.log("⭐ SMART ADD TRIGGERED with text length:", req.body.text?.length);
+    const { userId, text } = req.body;
+    
+    // Convert to lowercase for checking
+    const lowerText = text.toLowerCase();
+    const newActivities = [];
+
+    // --- RULE 1: Morning Walk ---
+    if (lowerText.includes("walk") || lowerText.includes("walking")) {
+        newActivities.push({
+            userId,
+            title: "Morning Brisk Walk (30 mins)",
+            category: "Exercise",
+            source: "Smart Scan"
+        });
+    }
+
+    // --- RULE 2: Yoga ---
+    if (lowerText.includes("yoga")) {
+        newActivities.push({
+            userId,
+            title: "Yoga Session",
+            category: "Exercise",
+            source: "Smart Scan"
+        });
+    }
+
+    // --- RULE 3: Therapy ---
+    if (lowerText.includes("therapy") || lowerText.includes("physio")) {
+        newActivities.push({
+            userId,
+            title: "Physical Therapy",
+            category: "Medical",
+            source: "Smart Scan"
+        });
+    }
+
+    // --- FALLBACK (If no keywords found, THEN save the text as General) ---
+    if (newActivities.length === 0) {
+        newActivities.push({
+            userId,
+            title: "Check Medical Report", // Generic Title
+            category: "General",
+            source: "Smart Scan",
+            notes: text // Save the full text in notes, NOT title
+        });
+    }
+
+    // Save all found activities
+    const savedActs = await Activity.insertMany(newActivities);
+
+    res.status(200).json(savedActs);
+
+  } catch (err) {
+    console.error("Server Error:", err);
+    res.status(500).json(err);
+  }
+});
+// ==========================================
 // 1. GET Activities (System Suggestions + DB)
 // ==========================================
 router.get("/:userId", async (req, res) => {
@@ -46,77 +110,36 @@ router.get("/:userId", async (req, res) => {
 });
 
 // ==========================================
-// 2. ⭐ SAFE ADD (JavaScript Version - No Python Crash)
-// ==========================================
-router.post("/add", async (req, res) => {
-  try {
-    const { userId, text } = req.body;
-    
-    // Simple JS Logic to guess category (Replaces Python for now)
-    let category = "General";
-    const lowerText = text.toLowerCase();
-    
-    if (lowerText.includes("yoga") || lowerText.includes("walk") || lowerText.includes("run") || lowerText.includes("exercise")) {
-        category = "Exercise";
-    } else if (lowerText.includes("meditat") || lowerText.includes("sleep") || lowerText.includes("stress")) {
-        category = "Mental Health";
-    } else if (lowerText.includes("eat") || lowerText.includes("diet") || lowerText.includes("food") || lowerText.includes("drink")) {
-        category = "Diet";
-    }
-
-    // 1. Create the Activity
-    const newAct = new Activity({
-        userId,
-        title: text, // Use the raw text as the title
-        category: category,
-        source: "Doctor" // Scanned from prescription
-    });
-
-    await newAct.save();
-
-    // 2. Return it in an array (to match frontend expectation)
-    res.status(200).json([newAct]);
-
-  } catch (err) {
-    console.error("Server Error:", err);
-    res.status(500).json(err);
-  }
-});
-
-// ==========================================
 // 3. COMPLETE ACTIVITY & NOTIFY GUARDIAN
 // ==========================================
-router.post("/complete", async (req, res) => {
+// 3. MARK AS COMPLETED & NOTIFY GUARDIAN (The Unified Fix)
+router.put("/complete", async (req, res) => {
   try {
-    const { userId, title, category, source } = req.body;
+    const { activityId, userId } = req.body;
 
-    // A. Find User
+    // A. Update the Activity in Database (Make it Green ✅)
+    const updatedActivity = await Activity.findByIdAndUpdate(
+      activityId,
+      { isCompleted: true },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedActivity) return res.status(404).json("Activity not found");
+
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json("User not found");
 
-    // B. Save as "Completed"
-    const completedActivity = new Activity({
-      userId,
-      title,
-      category,
-      source,
-      isCompleted: true
-    });
-    await completedActivity.save();
+    if (user && user.guardianEmail) {
 
-    // C. Notify Guardian
-    if (user.guardianEmail && user.isGuardianVerified) {
-      
+      // 1. Setup Transporter
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com', // Explicit host
-        port: 465,              // Secure port
-        secure: true,
+        service: "gmail",
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
         },
       });
 
+      // 2. Email Content
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.guardianEmail,
@@ -124,21 +147,23 @@ router.post("/complete", async (req, res) => {
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
             <h2 style="color: #38A169;">✅ Activity Completed!</h2>
-            <p><strong>${user.firstName}</strong> just completed a health activity:</p>
+            <p><strong>${user.firstName}</strong> just completed:</p>
             <div style="background: #f0fff4; padding: 15px; border-radius: 5px; margin: 15px 0;">
-              <h3 style="margin: 0; color: #2F855A;">${title}</h3>
-              <p style="margin: 5px 0 0; color: #666;">Category: ${category}</p>
+              <h3 style="margin: 0; color: #2F855A;">${updatedActivity.title}</h3>
+              <p style="margin: 5px 0 0; color: #666;">Category: ${updatedActivity.category}</p>
             </div>
             <p>Great job supporting them!</p>
           </div>
         `,
       };
 
-      await transporter.sendMail(mailOptions);
-      res.status(200).json("Activity saved & Guardian notified!");
-    } else {
-      res.status(200).json("Activity saved (No guardian to notify).");
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) console.error("Email Error:", err);
+        else console.log("Email Sent:", info.response);
+      });
     }
+
+    res.status(200).json(updatedActivity);
 
   } catch (err) {
     console.error(err);

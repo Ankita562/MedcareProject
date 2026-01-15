@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios"; // 👈 IMPORT AXIOS
 import "./ScanReport.css";
+import { toast } from "react-toastify"; // Optional: For better alerts
 
 const ScanReport = () => {
   const [darkMode, setDarkMode] = useState(
@@ -8,7 +10,9 @@ const ScanReport = () => {
   const [files, setFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [cameraFile, setCameraFile] = useState(null);
+  
+  // Get User ID from LocalStorage
+  const user = JSON.parse(localStorage.getItem("user"));
 
   // Sync dark/light mode
   useEffect(() => {
@@ -17,7 +21,7 @@ const ScanReport = () => {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  //  Handle file input
+  // Handle file input
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles((prev) => [...prev, ...selectedFiles]);
@@ -27,7 +31,6 @@ const ScanReport = () => {
   const handleCameraCapture = (e) => {
     const capturedFile = e.target.files[0];
     if (capturedFile) {
-      setCameraFile(capturedFile);
       setFiles((prev) => [...prev, capturedFile]);
     }
   };
@@ -47,23 +50,54 @@ const ScanReport = () => {
 
   const handleDragLeave = () => setIsDragging(false);
 
-  // Upload simulation
-  const handleUpload = () => {
-    if (files.length === 0) return alert("Please select or capture a file.");
+  // ⭐ REAL UPLOAD FUNCTION
+  const handleUpload = async () => {
+    if (files.length === 0) return alert("Please select a file first.");
+    
     setUploading(true);
-    setTimeout(() => {
-      alert("✅ Reports uploaded successfully!");
-      setUploading(false);
+
+    try {
+      const file = files[0]; // Take the first file
+      const formData = new FormData();
+      
+      // 1. Append the File
+      formData.append("file", file);
+      
+      // 2. Append Required Metadata (Hardcoded for now to make it work instantly)
+      formData.append("userId", user?._id || user?.userId); 
+      formData.append("title", "Smart Scan Report");
+      formData.append("doctorName", "Auto-Detected"); 
+      formData.append("date", new Date().toISOString().split('T')[0]); // Today's date
+      formData.append("type", "General");
+      formData.append("notes", "Uploaded via Smart Scan");
+
+      // 3. Send to the REPORT Route (Not Activity Route!)
+      // Ensure this URL matches your backend
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/reports/add", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Upload Success:", res.data);
+      alert("✅ Report Uploaded! Processing for activities...");
+      
       setFiles([]);
-      setCameraFile(null);
-    }, 1500);
+      
+    } catch (err) {
+      console.error("Upload Error:", err);
+      alert("❌ Upload Failed. Check console for details.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
     <div className={`scan-report-page ${darkMode ? "dark" : "light"}`}>
       <div className="scan-report-container fade-in">
         <h1>📄 Scan Report Upload</h1>
-        <p>Upload, capture, and manage your scanned medical reports easily.</p>
+        <p>Upload your medical report to auto-extract activities (Walk, Yoga, etc.)</p>
+        
         <div
           className={`drop-zone ${isDragging ? "dragging" : ""}`}
           onDragOver={handleDragOver}
@@ -78,7 +112,6 @@ const ScanReport = () => {
           <input
             type="file"
             accept="image/*,.pdf"
-            multiple
             onChange={handleFileSelect}
           />
         </div>
@@ -123,7 +156,7 @@ const ScanReport = () => {
           onClick={handleUpload}
           disabled={uploading}
         >
-          {uploading ? "⏳ Uploading..." : "🚀 Upload Reports"}
+          {uploading ? "⏳ Analyzing..." : "🚀 Upload & Analyze"}
         </button>
 
         {/* Mode Toggle */}

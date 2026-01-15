@@ -36,7 +36,7 @@ const VerifyGuardian = () => {
     }
   }, [token, navigate]);
 
-  // 2. ⭐ FIXED: Resend Function (Uses EmailJS)
+  // 2. Resend Function (Uses EmailJS)
   const handleResend = async () => {
     if (!resendEmail) return;
     setResendStatus("sending");

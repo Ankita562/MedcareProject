@@ -46,7 +46,7 @@ const Dashboard = () => {
     return {};
   });
 
-  // ⭐ FIX 2: Save to Storage whenever an item is checked
+  // ⭐Save to Storage whenever an item is checked
   const markAsChecked = (itemId) => {
     if (!user?._id) return;
 
@@ -66,7 +66,7 @@ const Dashboard = () => {
     });
   };
 
-  // Helper: Fix Timezone
+  // Timezone
   const formatTime = (isoString) => {
     if (!isoString) return "";
     return new Date(isoString).toLocaleTimeString('en-US', {
@@ -187,7 +187,7 @@ useEffect(() => {
         try {
             await emailjs.send(
                 "service_lt52jez",     
-                "template_rgln76n", 
+                "template_s12702u", 
                 {
                     to_email: user.guardianEmail,
                     patient_name: user.firstName,

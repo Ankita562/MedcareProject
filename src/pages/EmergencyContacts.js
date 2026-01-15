@@ -36,7 +36,7 @@ const EmergencyContacts = () => {
     if (phone.length !== 10) return toast.warning("Phone number must be exactly 10 digits!");
 
     try {
-      // ✅ FIX: URL changed from ".../add" to just ".../contacts"
+      // URL changed from ".../add" to just ".../contacts"
       const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/contacts", {
         userId: user._id,
         name,

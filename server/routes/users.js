@@ -38,8 +38,7 @@ router.put("/:id", async (req, res) => {
         user.guardianToken = token;      // Save the token
 
         // C. Send Verification Email
-        const verificationLink = `http://localhost:3000/verify-guardian/${token}`;
-        
+        const verificationLink = `https://medcare-project-green.vercel.app/verify-guardian/${token}`;
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: guardianEmail,

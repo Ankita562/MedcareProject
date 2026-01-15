@@ -71,7 +71,7 @@ function App() {
         isLoggedIn={isLoggedIn}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
-        setSidebarOpen={setSidebarOpen}     // ⭐ important
+        setSidebarOpen={setSidebarOpen}     
       />
 
       {/* ===== Main Content (auto-shifts) ===== */}
@@ -80,7 +80,7 @@ function App() {
           padding: "22px",
           minHeight: "80vh",
           overflowX: "hidden",
-          marginLeft: sidebarOpen ? "240px" : "70px", // ⭐ fixed
+          marginLeft: sidebarOpen ? "240px" : "70px", 
           transition: "margin-left 0.3s ease",
         }}
       >

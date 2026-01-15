@@ -44,7 +44,8 @@ const ResetPassword = () => {
     position: "relative",
     marginBottom: "15px",
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
+    paddingLeft: "10px"
   };
 
   const iconStyle = {
@@ -81,7 +82,7 @@ const ResetPassword = () => {
             
             {/* 1. New Password */}
             <label style={{fontWeight: "bold", display:"block", marginBottom:"5px"}}>New Password</label>
-            <div style={inputWrapperStyle}>
+            <div style={inputWrapperStyle} >
               <input 
                 type={showPassword ? "text" : "password"} 
                 value={password} 

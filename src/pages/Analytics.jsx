@@ -7,9 +7,17 @@ import {
 import { Activity, Plus, X } from "lucide-react";
 
 // ==========================================
-// 🧠 MEDICAL LOGIC ENGINE (Updated for Gender)
+// 🧠 MEDICAL LOGIC ENGINE (Client Side Display)
 // ==========================================
-const getHealthStatus = (category, value, gender = "Female") => {
+const getHealthStatus = (category, value, savedStatus) => {
+  // If backend already calculated status (like for BMI), use it!
+  if (category === "Weight" && savedStatus) {
+      if (savedStatus.includes("Healthy")) return { status: savedStatus, color: "#38A169" };
+      if (savedStatus.includes("Overweight")) return { status: savedStatus, color: "#DD6B20" };
+      if (savedStatus.includes("Obese")) return { status: savedStatus, color: "#E53E3E" };
+      if (savedStatus.includes("Underweight")) return { status: savedStatus, color: "#3182CE" };
+  }
+
   if (!value) return { status: "", color: "#333" };
   const num = parseFloat(value);
 
@@ -20,12 +28,10 @@ const getHealthStatus = (category, value, gender = "Female") => {
       const sys = parseInt(parts[0]);
       const dia = parseInt(parts[1]);
 
-      if (sys > 180 || dia > 120) return { status: "⚠️ Hypertensive Crisis", color: "#C53030" }; 
-      if (sys >= 140 || dia >= 90) return { status: "⚠️ High (Stage 2)", color: "#E53E3E" };     
-      if (sys >= 130 || dia >= 80) return { status: "⚠️ High (Stage 1)", color: "#DD6B20" };     
+      if (sys >= 140 || dia >= 90) return { status: "⚠️ High BP", color: "#E53E3E" };     
       if (sys >= 120 && dia < 80)  return { status: "⚠️ Elevated", color: "#D69E2E" };           
       if (sys < 90 || dia < 60)    return { status: "⚠️ Low BP", color: "#3182CE" };             
-      return { status: "✅ Normal", color: "#38A169" };                                          
+      return { status: "✅ Normal", color: "#38A169" };                                         
 
     case "Heart Rate":
       if (num > 100) return { status: "⚠️ High (Tachycardia)", color: "#E53E3E" };
@@ -33,8 +39,8 @@ const getHealthStatus = (category, value, gender = "Female") => {
       return { status: "✅ Normal", color: "#38A169" };
 
     case "Blood Sugar":
-       if (num >= 200) return { status: "⚠️ High (Diabetes)", color: "#E53E3E" };
-       if (num >= 140) return { status: "⚠️ High (Prediabetes)", color: "#DD6B20" };
+       if (num >= 126) return { status: "⚠️ High (Diabetes)", color: "#E53E3E" };
+       if (num >= 100) return { status: "⚠️ Pre-Diabetes", color: "#DD6B20" };
        if (num < 70)   return { status: "⚠️ Low Sugar", color: "#3182CE" };
        return { status: "✅ Normal", color: "#38A169" };
 
@@ -43,24 +49,8 @@ const getHealthStatus = (category, value, gender = "Female") => {
        if (num < 95)     return { status: "⚠️ Hypothermia", color: "#3182CE" };
        return { status: "✅ Normal", color: "#38A169" };
 
-    case "Weight":
-       // ⭐ NEW: Gender-Based Logic (Approximation without Height)
-       // These are general thresholds for adults to flag potential issues
-       if (gender === "Male") {
-           if (num >= 100) return { status: "⚠️ High", color: "#E53E3E" };
-           if (num >= 90)  return { status: "⚠️ Elevated", color: "#DD6B20" };
-           if (num < 50)   return { status: "⚠️ Low", color: "#3182CE" };
-           return { status: "✅ Normal", color: "#38A169" };
-       } else {
-           // Default to Female ranges
-           if (num >= 90)  return { status: "⚠️ High", color: "#E53E3E" };
-           if (num >= 80)  return { status: "⚠️ Elevated", color: "#DD6B20" };
-           if (num < 45)   return { status: "⚠️ Low", color: "#3182CE" };
-           return { status: "✅ Normal", color: "#38A169" };
-       }
-
     default:
-      return { status: "", color: "#333" };
+      return { status: savedStatus || "", color: "#333" };
   }
 };
 
@@ -68,14 +58,18 @@ const Analytics = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [logs, setLogs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Form State
   const [newLog, setNewLog] = useState({ category: "Blood Pressure", value: "" });
+  const [height, setHeight] = useState(""); 
+
   const [activeTab, setActiveTab] = useState("Blood Pressure");
 
   // Fetch Data
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/analytics/${user._id}`);
+        const res = await axios.get(`http://medcare-api-vw0f.onrender.com/api/analytics/${user._id}`);
         setLogs(res.data);
       } catch (err) {
         console.error(err);
@@ -90,14 +84,23 @@ const Analytics = () => {
     if (!newLog.value) return;
 
     try {
-      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/analytics/add", {
+      const payload = {
         userId: user._id,
         category: newLog.category,
         value: newLog.value
-      });
+      };
+
+      // If Weight, include height for BMI calculation
+      if (newLog.category === "Weight") {
+          payload.height = height; 
+      }
+
+      const res = await axios.post("http://medcare-api-vw0f.onrender.com/api/analytics/add", payload);
+      
       setLogs([res.data, ...logs]); 
       setIsModalOpen(false);        
       setNewLog({ category: "Blood Pressure", value: "" }); 
+      setHeight(""); // Reset height
     } catch (err) {
       alert("Failed to save log");
     }
@@ -108,13 +111,11 @@ const Analytics = () => {
     .filter(l => l.category === activeTab)
     .sort((a, b) => new Date(a.date) - new Date(b.date)) 
     .map(l => ({
-        // ⭐ FIX 1: Include TIME in the date key so every point is unique!
         date: new Date(l.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ", " + new Date(l.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        
         value: activeTab === "Blood Pressure" ? parseInt(l.value.split("/")[0]) : parseFloat(l.value),
         originalValue: l.value,
-        // ⭐ FIX 2: Pass User Gender to Logic
-        statusObj: getHealthStatus(activeTab, l.value, user?.gender)
+        // Pass the BACKEND status if available (crucial for BMI)
+        statusObj: getHealthStatus(activeTab, l.value, l.status) 
     }));
 
   return (
@@ -171,22 +172,8 @@ const Analytics = () => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis 
-                dataKey="date" 
-                stroke="#A0AEC0" 
-                fontSize={10} 
-                tickLine={false} 
-                axisLine={false}
-                // Hide crowded labels if there are too many points
-                interval={chartData.length > 5 ? "preserveStartEnd" : 0}
-              />
-              <YAxis 
-                stroke="#A0AEC0" 
-                fontSize={12} 
-                tickLine={false} 
-                axisLine={false} 
-                domain={['auto', 'auto']}
-              />
+              <XAxis dataKey="date" stroke="#A0AEC0" fontSize={10} tickLine={false} axisLine={false} interval={chartData.length > 5 ? "preserveStartEnd" : 0} />
+              <YAxis stroke="#A0AEC0" fontSize={12} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
               <Tooltip 
                  content={({ active, payload }) => {
                     if (active && payload && payload.length) {
@@ -204,16 +191,7 @@ const Analytics = () => {
                     return null;
                  }}
               />
-              <Area 
-                type="monotone"
-                dataKey="value" 
-                stroke="#8B5E3C" 
-                strokeWidth={3} 
-                fillOpacity={1} 
-                fill="url(#colorValue)" 
-                activeDot={{ r: 6, strokeWidth: 0 }}
-                dot={{ r: 4, fill: "#8B5E3C", strokeWidth: 2, stroke: "white" }} 
-              />
+              <Area type="monotone" dataKey="value" stroke="#8B5E3C" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" activeDot={{ r: 6, strokeWidth: 0 }} dot={{ r: 4, fill: "#8B5E3C", strokeWidth: 2, stroke: "white" }} />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
@@ -230,13 +208,13 @@ const Analytics = () => {
       <div style={{ display: "grid", gap: "12px" }}>
         {logs.filter(l => l.category === activeTab).length > 0 ? (
           logs.filter(l => l.category === activeTab).sort((a,b) => new Date(b.date) - new Date(a.date)).map(log => {
-             // ⭐ FIX 3: Calculate status for the list too
-             const health = getHealthStatus(log.category, log.value, user?.gender);
+             const health = getHealthStatus(log.category, log.value, log.status);
              return (
               <div key={log._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "white", padding: "15px", borderRadius: "10px", borderLeft: `6px solid ${health.color}`, boxShadow: "0 2px 4px rgba(0,0,0,0.03)" }}>
                 <div>
                   <span style={{ fontSize: "0.85rem", color: "#718096" }}>{new Date(log.date).toLocaleDateString()} • {new Date(log.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                   <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#2D3748", marginTop: "4px" }}>{log.value}</div>
+                  {log.message && <div style={{ fontSize: "0.8rem", color: "#718096", marginTop: "2px" }}>{log.message}</div>}
                 </div>
                 <div style={{ textAlign: "right" }}>
                    <span style={{ display: "inline-block", padding: "4px 10px", borderRadius: "12px", background: `${health.color}15`, fontSize: "0.85rem", fontWeight: "bold", color: health.color }}>
@@ -294,8 +272,23 @@ const Analytics = () => {
                     <option>Temperature</option>
                  </select>
 
+                 {/* ⭐ NEW HEIGHT INPUT (Only shows if Weight is selected) */}
+                 {newLog.category === "Weight" && (
+                    <div style={{marginBottom: "20px"}}>
+                         <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold", color: "#4A5568" }}>Height (cm)</label>
+                         <input 
+                            type="number" 
+                            value={height}
+                            onChange={(e) => setHeight(e.target.value)}
+                            placeholder="e.g. 175"
+                            style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #E2E8F0", fontSize: "1rem", outline: "none" }}
+                         />
+                         <p style={{fontSize: "0.8rem", color: "#718096", marginTop: "5px"}}>Required for BMI calculation.</p>
+                    </div>
+                 )}
+
                  <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold", color: "#4A5568" }}>
-                    Value {newLog.category === "Blood Pressure" ? "(e.g., 120/80)" : ""}
+                   Value {newLog.category === "Blood Pressure" ? "(e.g., 120/80)" : newLog.category === "Weight" ? "(kg)" : ""}
                  </label>
                  <input 
                    type="text" 

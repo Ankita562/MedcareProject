@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios"; 
+import emailjs from '@emailjs/browser'; // 👈 IMPORT THIS
 import "./Auth.css"; 
 
 const ForgotPassword = () => {
@@ -17,11 +18,42 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // Call Backend API
-      await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/forgot-password", { email });
+      // 1. Call Backend to generate the Token
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/forgot-password", { email });
+      
+      // ⭐ DEBUG: Check if backend sent the token
+      console.log("Backend Response:", res.data);
+
+      // 2. Extract Token & Name (Assuming backend sends them)
+      // Note: If  backend DOESN'T return 'resetToken', this part won't work
+      // You might need to check your backend code to ensure it sends: res.json({ resetToken: "..." })
+      const { resetToken, message } = res.data; 
+      
+      const tokenToUse = res.data.resetToken || res.data.token || res.data.userId; 
+
+      if (tokenToUse) {
+          // 3. Send Email via EmailJS (Frontend)
+          const resetLink = `https://medcare-project-green.vercel.app/#/reset-password/${tokenToUse}`;
+          
+          await emailjs.send(
+            "service_lt52jez",      // Your Service ID
+            "template_rgln76n",     // Your Template ID (Reusing the verify one)
+            {
+              to_email: email,
+              to_name: "User",      // Or res.data.firstName if available
+              verify_link: resetLink, // We inject the reset link into the 'verify_link' variable
+              message: "Click the link below to reset your password:"
+            },
+            "4row3jIQabLW4zaY2"     // Your Public Key
+          );
+          console.log("Email sent via EmailJS!");
+      } else {
+          console.warn("No token returned from backend. Relying on backend emailer.");
+      }
+
       setSubmitted(true);
     } catch (err) {
-      // Handle Error (User not found)
+      console.error(err);
       const msg = err.response?.data?.message || "Something went wrong";
       setError(msg);
     } finally {
@@ -49,14 +81,13 @@ const ForgotPassword = () => {
               Enter your registered email address. We'll send you a secure link to reset your password.
             </p>
 
-            {/* 👇 ERROR MESSAGE DISPLAY */}
+            {/* ERROR MESSAGE DISPLAY */}
             {error && (
               <div style={{
                 background: "#f8d7da", color: "#721c24", padding: "10px", 
                 borderRadius: "5px", marginBottom: "15px", fontSize: "0.9rem", textAlign: "center"
               }}>
                 {error} <br/>
-                {/* Link to create account if not found */}
                 {error.includes("Create account") && (
                    <span 
                      onClick={() => navigate("/login")} 

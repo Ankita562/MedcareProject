@@ -113,10 +113,12 @@ const MedicalReports = () => {
       console.log("Final Extracted Text:", extractedText);
 
       // Send to Backend
-      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/activities/add", {
-        userId: user._id,
-        text: extractedText
-      });
+      // ✅ NEW CODE - Sends to Local Server (New Smart Logic)
+// Make sure your local backend is running on port 5000 (or 8800)!
+const res = await axios.post("http://medcare-api-vw0f.onrender.com/api/activities/add", {
+  userId: user._id,
+  text: extractedText
+});
 
       if (res.data.length > 0) {
         toast.success(`Found ${res.data.length} new activities! 🎉`);

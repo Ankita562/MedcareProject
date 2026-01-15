@@ -616,7 +616,7 @@ input:focus, textarea:focus, select:focus {
     gap: 5px;
   }
 
-  /* 4. Text & Layout Fixes */
+  /* 4. Text & Layout */
   h1, .hero-title, .landing-title {
     font-size: 1.8rem !important; 
     word-wrap: break-word;
