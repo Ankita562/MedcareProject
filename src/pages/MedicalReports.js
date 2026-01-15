@@ -115,7 +115,7 @@ const MedicalReports = () => {
       // Send to Backend
       // ✅ NEW CODE - Sends to Local Server (New Smart Logic)
 // Make sure your local backend is running on port 5000 (or 8800)!
-const res = await axios.post("http://medcare-api-vw0f.onrender.com/api/activities/add", {
+const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/activities/add", {
   userId: user._id,
   text: extractedText
 });

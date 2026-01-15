@@ -69,7 +69,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await axios.get(`http://medcare-api-vw0f.onrender.com/api/analytics/${user._id}`);
+        const res = await axios.get(`https://medcare-api-vw0f.onrender.com/api/analytics/${user._id}`);
         setLogs(res.data);
       } catch (err) {
         console.error(err);
@@ -95,7 +95,7 @@ const Analytics = () => {
           payload.height = height; 
       }
 
-      const res = await axios.post("http://medcare-api-vw0f.onrender.com/api/analytics/add", payload);
+      const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/analytics/add", payload);
       
       setLogs([res.data, ...logs]); 
       setIsModalOpen(false);        
