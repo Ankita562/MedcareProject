@@ -60,7 +60,7 @@ const MedicalReports = () => {
     }
   };
 
-  // ⭐ HELPER: Convert PDF Page to Image Data URL
+  // Convert PDF Page to Image Data URL
   const readPdfText = async (url) => {
     const pdf = await pdfjsLib.getDocument(url).promise;
     let fullText = "";
@@ -88,7 +88,7 @@ const MedicalReports = () => {
     return fullText;
   };
 
-  // ⭐ MAIN SCAN FUNCTION
+  // MAIN SCAN FUNCTION
   const handleScan = async (reportUrl) => {
     setScanning(true);
     toast.info("Scanning document... Please wait 🕵️");

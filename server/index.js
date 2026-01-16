@@ -26,7 +26,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin: ["https://medcare-project-green.vercel.app", 
-    "http://localhost:5173",                  // Local Vite Frontend
+    "http://localhost:5173",                  
     "http://localhost:3000"],
     credentials: true
 }));
@@ -43,7 +43,6 @@ app.use("/api/history", historyRoute);
 app.use("/api/timeline", timelineRoute);
 app.use("/api/contacts", contactRoute); 
 app.use("/api/guardian", guardianRoute);
-// Static Files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/activities", activityRoute);
 // Database Connection

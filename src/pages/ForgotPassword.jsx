@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios"; 
-import emailjs from '@emailjs/browser'; // 👈 IMPORT THIS
+import emailjs from '@emailjs/browser'; 
 import "./Auth.css"; 
 
 const ForgotPassword = () => {
@@ -17,44 +17,46 @@ const ForgotPassword = () => {
     setError("");
     setLoading(true);
 
+    // ⭐ 1. GENERATE FAKE OTP FOR DEMO (Visuals only)
+    const randomOTP = Math.floor(100000 + Math.random() * 900000); 
+
     try {
-      // 1. Call Backend to generate the Token
+      // ⭐ 2. CALL BACKEND (To get the real Reset Token)
       const res = await axios.post("https://medcare-api-vw0f.onrender.com/api/auth/forgot-password", { email });
       
-      // ⭐ DEBUG: Check if backend sent the token
       console.log("Backend Response:", res.data);
 
-      // 2. Extract Token & Name (Assuming backend sends them)
-      // Note: If  backend DOESN'T return 'resetToken', this part won't work
-      // You might need to check your backend code to ensure it sends: res.json({ resetToken: "..." })
-      const { resetToken, message } = res.data; 
-      
+      // Extract Token (Backend usually sends 'resetToken' or just 'token')
       const tokenToUse = res.data.resetToken || res.data.token || res.data.userId; 
 
       if (tokenToUse) {
-          // 3. Send Email via EmailJS (Frontend)
+          // ⭐ 3. SEND EMAIL (Frontend)
           const resetLink = `https://medcare-project-green.vercel.app/#/reset-password/${tokenToUse}`;
           
           await emailjs.send(
-            "service_lt52jez",      // Your Service ID
-            "template_rgln76n",     // Your Template ID (Reusing the verify one)
+            "service_6gze0tb",      
+            "template_m8bi2ug",     
             {
               to_email: email,
-              to_name: "User",      // Or res.data.firstName if available
-              verify_link: resetLink, // We inject the reset link into the 'verify_link' variable
-              message: "Click the link below to reset your password:"
+              to_name: email.split('@')[0], // Extracts name (e.g. "ankita")
+              message: randomOTP,           // ✅ Sends the OTP to the {{message}} field
+              link: resetLink               // ✅ Sends the Link to the {{link}} button
             },
-            "4row3jIQabLW4zaY2"     // Your Public Key
+            "soMJ9o190mRxaIHHi"     
           );
           console.log("Email sent via EmailJS!");
       } else {
-          console.warn("No token returned from backend. Relying on backend emailer.");
+          console.warn("No token returned from backend. Check API.");
+          setError("Backend did not return a secure token.");
+          setLoading(false);
+          return;
       }
 
       setSubmitted(true);
     } catch (err) {
       console.error(err);
-      const msg = err.response?.data?.message || "Something went wrong";
+      // If backend fails (e.g. user not found), show error
+      const msg = err.response?.data?.message || "User not found or Server Error";
       setError(msg);
     } finally {
       setLoading(false);
@@ -78,7 +80,7 @@ const ForgotPassword = () => {
             </div>
             
             <p style={{marginBottom: "25px", color: "#666", textAlign: "center", lineHeight: "1.5"}}>
-              Enter your registered email address. We'll send you a secure link to reset your password.
+              Enter your registered email address. We'll send you a secure link and OTP.
             </p>
 
             {/* ERROR MESSAGE DISPLAY */}
@@ -88,12 +90,12 @@ const ForgotPassword = () => {
                 borderRadius: "5px", marginBottom: "15px", fontSize: "0.9rem", textAlign: "center"
               }}>
                 {error} <br/>
-                {error.includes("Create account") && (
+                {error.includes("not found") && (
                    <span 
                      onClick={() => navigate("/login")} 
-                     style={{fontWeight: "bold", textDecoration: "none", cursor: "pointer"}}
+                     style={{fontWeight: "bold", textDecoration: "underline", cursor: "pointer"}}
                    >
-                     Go to Sign Up
+                     Create an account?
                    </span>
                 )}
               </div>
@@ -146,7 +148,7 @@ const ForgotPassword = () => {
             </motion.div>
             <h2 style={{color: "#28a745", marginBottom: "10px"}}>Check your Inbox!</h2>
             <p style={{color: "#555", marginBottom: "25px", lineHeight: "1.6"}}>
-                We have sent a password reset link to:<br/>
+                We have sent a reset OTP and Link to:<br/>
                 <strong style={{color: "#333"}}>{email}</strong>
             </p>
             <button 

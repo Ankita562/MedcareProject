@@ -32,16 +32,18 @@ const Activities = () => {
       colors: ['#38A169', '#6B46C1', '#D69E2E']
     });
 
-    // 2. Optimistic UI update (Hide it immediately)
+    // 2. Optimistic UI update 
     setCompletedIds(prev => [...prev, act._id]);
 
     // 3. Show Cheer Message
     toast.success(`🎉 Awesome! marked "${act.title}" as done.`);
 
-    // 4. Call Backend to Save & Notify Guardian
+    // 4.Save & Notify Guardian
     try {
       const res = await axios.put("https://medcare-api-vw0f.onrender.com/api/activities/complete", {
         userId: user._id,
+        activityId: act._id,   
+       _id: act._id,
         title: act.title,
         category: act.category,
         source: act.source
@@ -81,11 +83,11 @@ const Activities = () => {
                 <div>
                     <span style={{
                         fontSize: "0.7rem", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px",
-                        color: act.source === "Doctor" ? "#6B46C1" : "#2F855A",
-                        background: act.source === "Doctor" ? "#E9D8FD" : "#C6F6D5",
+                        color: (act.source === "Doctor" || act.source === "AI") ? "#6B46C1" : "#2F855A",
+                        background: (act.source === "Doctor" || act.source === "AI") ? "#E9D8FD" : "#C6F6D5",
                         padding: "4px 10px", borderRadius: "12px"
                     }}>
-                        {act.source === "Doctor" ? "👨‍⚕️ Doctor's Order" : "🤖 Smart Suggestion"}
+                        {(act.source === "Doctor" || act.source === "AI") ? "👨‍⚕️ Doctor's Order" : "🤖 Smart Suggestion"}
                     </span>
                     <h3 style={{margin: "15px 0 8px", color: "#2D3748", fontSize: "1.2rem"}}>{act.title}</h3>
                     <p style={{color: "#718096", fontSize: "0.9rem"}}>{act.category}</p>
